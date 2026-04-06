@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { isValidUrl } from "@/lib/utils";
+import { HyperText } from "@/components/ui/hyper-text";
 
 const REMARK_PLUGINS: PluggableList = [remarkGfm];
 const REHYPE_PLUGINS: PluggableList = [rehypeHighlight];
@@ -45,6 +46,14 @@ export default function FeedmePage() {
   const [copied, setCopied] = useState(false);
 
   const markdownText = result?.markdown ?? result?.content ?? null;
+
+  function handleReset() {
+    setUrl("");
+    setResult(null);
+    setError(null);
+    setCopied(false);
+    setLoading(false);
+  }
 
   async function handleFetch() {
     setError(null);
@@ -82,12 +91,25 @@ export default function FeedmePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center py-16 px-4">
+    <div className="min-h-screen flex flex-col items-center pt-16 px-4">
       <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold">feedme</h1>
+        <div className="flex flex-col gap-1">
+          <div
+            data-testid="logo"
+            className="cursor-pointer"
+            onClick={handleReset}
+          >
+            <span className="sr-only">Feed-me</span>
+            <HyperText
+              as="h1"
+              className="text-5xl font-bold"
+              aria-hidden="true"
+            >
+              Feed-me
+            </HyperText>
+          </div>
           <p className="text-muted-foreground">
-            URL을 입력하면 웹페이지나 YouTube 자막을 마크다운으로 추출합니다
+            어떤 URL이든, Markdown으로.
           </p>
         </div>
 
@@ -172,6 +194,37 @@ export default function FeedmePage() {
         )}
       </div>
 
+      <footer className="mt-auto w-full pt-16 pb-7 text-sm text-muted-foreground">
+        <div className="flex flex-col items-center gap-1">
+          <div className="flex items-center gap-3">
+            <span>© 2026 feed-me</span>
+            <span>·</span>
+            <a
+              href="https://github.com/toy-crane/feedme/issues/new"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Feedback
+            </a>
+            <span>·</span>
+            <a
+              href="https://github.com/toy-crane/feedme"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+            </a>
+          </div>
+          <a
+            href="https://toycrane.notion.site/Toy-Crane-e1083f83d3864669bf27290a8f033b00"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs"
+          >
+            by toy-crane
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }
