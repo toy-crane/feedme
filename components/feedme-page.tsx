@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { isValidUrl } from "@/lib/utils";
 import { HyperText } from "@/components/ui/hyper-text";
+import ThemeToggle from "@/components/theme-toggle";
 
 const REMARK_PLUGINS: PluggableList = [remarkGfm];
 const REHYPE_PLUGINS: PluggableList = [rehypeHighlight];
@@ -91,8 +92,11 @@ export default function FeedmePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center pt-16 px-4">
+    <div className="min-h-screen flex flex-col items-center pt-8 px-4">
       <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
+        <div className="flex justify-end -mb-4">
+          <ThemeToggle />
+        </div>
         <div className="flex flex-col gap-1">
           <div
             data-testid="logo"
@@ -186,7 +190,7 @@ export default function FeedmePage() {
                   />
                 </div>
               </div>
-              <div className="prose max-w-none">
+              <div className="prose dark:prose-invert max-w-none">
                 <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS}>{markdownText}</ReactMarkdown>
               </div>
             </div>

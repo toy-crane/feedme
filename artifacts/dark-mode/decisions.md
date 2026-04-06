@@ -27,3 +27,10 @@
 - 판단: Team Lead가 직접 CSS 기반 구현으로 대체. globals.css에 .dark .hljs 선택자로 github-dark 테마 적용
 - 근거: CSS 선택자 분기가 plan.md의 Architecture Decision과 일치. JS 불필요, 유지보수 용이
 - 결과: 성공 — CSS만으로 다크 하이라이팅 동작, 테스트도 CSS 기반 검증으로 수정
+
+## Task 5 팀 편성 (DARK-007 추가)
+
+- 내용: DARK-007 마크다운 본문 다크 모드 가독성 시나리오 추가 구현
+- 판단: Builder 1명, react-reviewer 1명. design-reviewer 제외
+- 근거: CSS 클래스 한 줄 추가 + spec 테스트 1개. UI 컴포넌트 신규 생성 없으므로 design-reviewer 불필요
+- 결과: 성공 — Builder 1회 위임, react-reviewer pass, code-simplifier가 no-op 테스트 제거

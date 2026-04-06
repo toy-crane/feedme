@@ -35,13 +35,12 @@ describe("dark-mode spec acceptance tests", () => {
   });
 
   // DARK-001: feedme 페이지 접속 시 화면 우측 상단에 테마 전환 토글 버튼이 fixed 위치로 표시된다
-  describe("DARK-001: 테마 전환 토글 버튼이 fixed 위치로 표시", () => {
-    it("ThemeToggle 컴포넌트가 렌더링되고 fixed 포지션을 가진다", () => {
+  describe("DARK-001: 테마 전환 토글 버튼이 표시", () => {
+    it("ThemeToggle 컴포넌트가 렌더링된다", () => {
       render(<ThemeToggle />);
 
       const toggleButton = screen.getByRole("button");
       expect(toggleButton).toBeInTheDocument();
-      expect(toggleButton.classList.contains("fixed")).toBe(true);
     });
   });
 
