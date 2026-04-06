@@ -203,25 +203,35 @@ export default function FeedmePage() {
         </div>
       )}
 
-      <footer className="mt-auto pt-16 pb-6 text-sm text-muted-foreground">
+      <footer className="mt-auto w-full pt-16 pb-6 text-sm text-muted-foreground">
         <Separator className="mb-6" />
-        <div className="flex items-center justify-center gap-4">
-          <span>feedme</span>
-          <span>·</span>
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex items-center gap-3">
+            <span>© 2026 feed-me</span>
+            <span>·</span>
+            <a
+              href="https://github.com/toy-crane/feedme/issues/new"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Feedback
+            </a>
+            <span>·</span>
+            <a
+              href="https://github.com/toy-crane/feedme"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+            </a>
+          </div>
           <a
-            href="https://github.com/toy-crane/feedme/issues/new"
+            href="https://toycrane.notion.site/Toy-Crane-e1083f83d3864669bf27290a8f033b00"
             target="_blank"
             rel="noopener noreferrer"
+            className="text-xs"
           >
-            Feedback
-          </a>
-          <span>·</span>
-          <a
-            href="https://github.com/toy-crane/feedme"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            GitHub
+            by toy-crane
           </a>
         </div>
       </footer>

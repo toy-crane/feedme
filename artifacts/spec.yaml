@@ -280,10 +280,23 @@ features:
       - id: FEEDME-031
         given: "feedme 페이지에 접속한 상태"
         when: "페이지 하단을 확인한다"
-        then: "footer 영역에 'GitHub' 링크가 레포지토리 페이지로 연결된다"
+        then: "footer 영역에 GitHub 아이콘 링크가 레포지토리 페이지로 연결된다"
         examples:
           - input: { page: "feedme" }
             expect: { githubLinkVisible: true, githubLinkHref: "https://github.com/toy-crane/feedme" }
+      - id: FEEDME-032
+        given: "feedme 페이지에 접속한 상태"
+        when: "페이지 하단을 확인한다"
+        then: "footer 영역에 '© 2026 feed-me' 텍스트가 표시된다"
+        examples:
+          - input: { page: "feedme" }
+            expect: { copyrightText: "© 2026 feed-me" }
+      - id: FEEDME-033
+        given: "feedme 페이지에 접속한 상태"
+        when: "페이지 하단을 확인한다"
+        then: "footer 영역에 'by toycrane' 링크가 노션 프로필 페이지로 연결된다"
+        examples:
+          - input: { page: "feedme" }
+            expect: { toycraneText: "by toy-crane", toycraneLinkHref: "https://toycrane.notion.site/Toy-Crane-e1083f83d3864669bf27290a8f033b00" }
     excludes:
-      - "소셜 미디어 링크 — MVP 범위 외"
       - "뉴스레터 구독 — MVP 범위 외"

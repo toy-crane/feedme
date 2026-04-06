@@ -30,4 +30,28 @@ describe("feedme-footer spec acceptance tests", () => {
       );
     });
   });
+
+  // FEEDME-032: © 2026 feed-me 텍스트 표시
+  describe("FEEDME-032: 카피라이트 텍스트", () => {
+    it("footer에 '© 2026 feed-me' 텍스트가 표시된다", () => {
+      render(<FeedmePage />);
+
+      const footer = screen.getByRole("contentinfo");
+      expect(footer).toHaveTextContent("© 2026 feed-me");
+    });
+  });
+
+  // FEEDME-033: by toy-crane 링크가 노션 프로필로 연결
+  describe("FEEDME-033: by toy-crane 링크", () => {
+    it("footer에 'by toy-crane' 링크가 노션 프로필 페이지로 연결된다", () => {
+      render(<FeedmePage />);
+
+      const link = screen.getByRole("link", { name: /by toy-crane/i });
+      expect(link).toBeVisible();
+      expect(link).toHaveAttribute(
+        "href",
+        "https://toycrane.notion.site/Toy-Crane-e1083f83d3864669bf27290a8f033b00"
+      );
+    });
+  });
 });
