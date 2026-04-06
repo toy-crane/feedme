@@ -68,9 +68,10 @@ import { InputGroup, InputGroupInput } from "@/components/ui/input-group"
 
 ---
 
-## Buttons inside inputs use InputGroup + InputGroupAddon
+## Buttons inside inputs use InputGroup + InputGroupButton
 
 Never place a `Button` directly inside or adjacent to an `Input` with custom positioning.
+Always use `InputGroupButton` inside `InputGroupAddon` — never a raw `Button`.
 
 **Incorrect:**
 
@@ -83,11 +84,9 @@ Never place a `Button` directly inside or adjacent to an `Input` with custom pos
 </div>
 ```
 
-**Correct:**
+**Also Incorrect — raw Button inside InputGroupAddon:**
 
 ```tsx
-import { InputGroup, InputGroupInput, InputGroupAddon } from "@/components/ui/input-group"
-
 <InputGroup>
   <InputGroupInput placeholder="Search..." />
   <InputGroupAddon>
@@ -97,6 +96,34 @@ import { InputGroup, InputGroupInput, InputGroupAddon } from "@/components/ui/in
   </InputGroupAddon>
 </InputGroup>
 ```
+
+**Correct — icon button:**
+
+```tsx
+import { InputGroup, InputGroupInput, InputGroupAddon, InputGroupButton } from "@/components/ui/input-group"
+
+<InputGroup>
+  <InputGroupInput placeholder="Search..." />
+  <InputGroupAddon>
+    <InputGroupButton size="icon-xs" aria-label="Search">
+      <SearchIcon data-icon="inline-start" />
+    </InputGroupButton>
+  </InputGroupAddon>
+</InputGroup>
+```
+
+**Correct — text button:**
+
+```tsx
+<InputGroup>
+  <InputGroupInput placeholder="Enter URL..." />
+  <InputGroupAddon>
+    <InputGroupButton variant="secondary">Submit</InputGroupButton>
+  </InputGroupAddon>
+</InputGroup>
+```
+
+> Full API reference: [references/input-group.md](../references/input-group.md)
 
 ---
 
