@@ -202,6 +202,29 @@ export default function FeedmePage() {
           복사됨
         </div>
       )}
+
+      <footer className="mt-auto pt-16 pb-6 text-sm text-muted-foreground">
+        <Separator className="mb-6" />
+        <div className="flex items-center justify-center gap-4">
+          <span>feedme</span>
+          <span>·</span>
+          <a
+            href="https://github.com/toy-crane/feedme/issues/new"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Feedback
+          </a>
+          <span>·</span>
+          <a
+            href="https://github.com/toy-crane/feedme"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }
