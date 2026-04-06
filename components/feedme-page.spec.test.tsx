@@ -566,16 +566,12 @@ describe("Pre-prompt", () => {
   // PROMPT-008: 복사 시 프롬프트+마크다운 합쳐서 클립보드에 복사
   describe("PROMPT-008: 복사 시 프롬프트+마크다운 합쳐서 클립보드 복사", () => {
     it("프롬프트 '요약해줘' + 마크다운 '# Hello' 복사 시 클립보드에 '요약해줘\\n\\n# Hello'가 복사된다", async () => {
-      const writeText = vi.fn().mockResolvedValue(undefined);
-      Object.defineProperty(navigator, "clipboard", {
-        value: { writeText },
-        writable: true,
-        configurable: true,
-      });
-
       const { user } = await renderWithContentAndOpenCollapsible("# Hello");
 
       await user.click(screen.getByText("요약해줘"));
+
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      vi.spyOn(navigator.clipboard, "writeText").mockImplementation(writeText);
 
       await user.click(screen.getByRole("button", { name: "복사하기" }));
 
@@ -583,14 +579,10 @@ describe("Pre-prompt", () => {
     });
 
     it("빈 프롬프트 + 마크다운 '# Hello' 복사 시 클립보드에 '# Hello'만 복사된다", async () => {
-      const writeText = vi.fn().mockResolvedValue(undefined);
-      Object.defineProperty(navigator, "clipboard", {
-        value: { writeText },
-        writable: true,
-        configurable: true,
-      });
-
       const { user } = await renderWithContent("# Hello");
+
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      vi.spyOn(navigator.clipboard, "writeText").mockImplementation(writeText);
 
       await user.click(screen.getByRole("button", { name: "복사하기" }));
 
@@ -655,23 +647,10 @@ describe("Pre-prompt", () => {
   // PROMPT-010: 다운로드는 마크다운만 포함 (프롬프트 제외)
   describe("PROMPT-010: 다운로드 시 마크다운만 포함 (프롬프트 제외)", () => {
     it("프롬프트 '요약해줘'가 입력된 상태에서 다운로드 시 마크다운만 다운로드된다", async () => {
-      // URL.createObjectURL과 anchor click을 모킹
       const createObjectURL = vi.fn().mockReturnValue("blob:mock-url");
       const revokeObjectURL = vi.fn();
       global.URL.createObjectURL = createObjectURL;
       global.URL.revokeObjectURL = revokeObjectURL;
-
-      const mockAnchorClick = vi.fn();
-      const mockAnchor = {
-        href: "",
-        download: "",
-        click: mockAnchorClick,
-        style: {},
-      };
-      vi.spyOn(document, "createElement").mockImplementation((tagName: string) => {
-        if (tagName === "a") return mockAnchor as unknown as HTMLElement;
-        return document.createElement.call(document, tagName) as HTMLElement;
-      });
 
       const { user } = await renderWithContentAndOpenCollapsible("# Hello");
 
