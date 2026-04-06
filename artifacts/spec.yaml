@@ -182,7 +182,7 @@ features:
     excludes:
       - "마크다운/원문 토글 기능 — '편집 없이 바로 복사' 원칙 유지"
       - "복사 버튼 위치 변경 — 현재 위치 유지"
-      - "다크 모드별 하이라이팅 테마 — MVP 범위 외"
+      - "다크 모드별 하이라이팅 테마 — dark-mode 피처에서 처리"
     preconditions:
       - "remark-gfm 패키지 설치"
       - "rehype-highlight 패키지 설치"
@@ -361,3 +361,61 @@ features:
       - "모바일 전용 Popover 분기 — DropdownMenu로 통일"
     preconditions:
       - "shadcn DropdownMenu 컴포넌트 설치"
+
+  - id: dark-mode
+    title: "다크 모드 토글"
+    scenarios:
+      - id: DARK-001
+        given: "feedme 페이지에 접속한 상태"
+        when: "화면 우측 상단을 확인한다"
+        then: "테마 전환 토글 버튼이 fixed 위치로 표시된다"
+        examples:
+          - input: { page: "feedme" }
+            expect: { themeToggleVisible: true, themeTogglePosition: "fixed" }
+      - id: DARK-002
+        given: "라이트 모드가 적용된 상태"
+        when: "테마 토글 버튼을 클릭한다"
+        then: "다크 모드로 전환되어 어두운 배경이 적용된다"
+        examples:
+          - input: { currentTheme: "light", action: "clickThemeToggle" }
+            expect: { htmlDarkClass: true, backgroundDark: true }
+      - id: DARK-003
+        given: "다크 모드가 적용된 상태"
+        when: "테마 토글 버튼을 클릭한다"
+        then: "라이트 모드로 전환되어 밝은 배경이 적용된다"
+        examples:
+          - input: { currentTheme: "dark", action: "clickThemeToggle" }
+            expect: { htmlDarkClass: false, backgroundDark: false }
+      - id: DARK-004
+        given: "OS 다크 모드가 설정되어 있고 feedme에 처음 방문한 상태"
+        when: "페이지가 로드된다"
+        then: "다크 모드로 표시된다"
+        examples:
+          - input: { osTheme: "dark", firstVisit: true }
+            expect: { htmlDarkClass: true, backgroundDark: true }
+          - input: { osTheme: "light", firstVisit: true }
+            expect: { htmlDarkClass: false, backgroundDark: false }
+      - id: DARK-005
+        given: "사용자가 토글로 다크 모드를 선택한 후 페이지를 새로고침한 상태"
+        when: "페이지가 로드된다"
+        then: "다크 모드가 유지된다"
+        examples:
+          - input: { savedTheme: "dark", action: "reload" }
+            expect: { htmlDarkClass: true, backgroundDark: true }
+          - input: { savedTheme: "light", action: "reload" }
+            expect: { htmlDarkClass: false, backgroundDark: false }
+      - id: DARK-006
+        given: "다크 모드에서 코드 블록이 포함된 마크다운이 표시된 상태"
+        when: "코드 블록 영역을 확인한다"
+        then: "다크 테마에 맞는 코드 하이라이팅이 적용된다"
+        examples:
+          - input: { currentTheme: "dark", markdown: "```javascript\nconst x = 1;\n```" }
+            expect: { darkHighlightTheme: true }
+    excludes:
+      - "3단 모드(light/dark/system) 선택 UI — 토글로 2단 전환만 지원"
+      - "애니메이션 전환 효과 — MVP 범위 외"
+      - "커스텀 테마 색상 — 기존 CSS 변수 활용"
+    preconditions:
+      - "next-themes 패키지 설치 완료"
+      - "globals.css에 .dark CSS 변수 정의 완료"
+      - "ThemeProvider가 layout.tsx에 설정 완료"
