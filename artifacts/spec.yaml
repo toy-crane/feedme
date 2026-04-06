@@ -228,3 +228,41 @@ features:
       - "런타임 설정 변경 — 코드 상수로 관리"
     preconditions:
       - "POST /api/extract 엔드포인트가 구현되어 있다"
+
+  - id: upgrade-logo
+    title: "로고 개선"
+    scenarios:
+      - id: LOGO-001
+        given: "feedme 페이지에 접속한 상태"
+        when: "로고 영역을 확인한다"
+        then: "HyperText 컴포넌트로 'Feed-me' 텍스트가 스크램블 애니메이션과 함께 표시된다"
+        examples:
+          - input: { page: "feedme" }
+            expect: { logoText: "Feed-me", hasHyperTextComponent: true }
+      - id: LOGO-002
+        given: "feedme 페이지에 접속한 상태"
+        when: "로고 위에 마우스를 올린다"
+        then: "스크램블 애니메이션이 재실행되고 포인터 커서가 표시된다"
+        examples:
+          - input: { action: "hoverLogo" }
+            expect: { cursorStyle: "pointer", animationRetriggered: true }
+      - id: LOGO-003
+        given: "URL 입력란에 'https://example.com'이 입력되고 콘텐츠가 추출되어 미리보기가 표시된 상태"
+        when: "로고 'Feed-me'를 클릭한다"
+        then: "URL 입력값이 비워지고, 추출 결과가 사라지고, 초기 화면으로 돌아간다"
+        examples:
+          - input: { currentUrl: "https://example.com", hasResult: true, action: "clickLogo" }
+            expect: { urlInputValue: "", previewVisible: false, errorVisible: false, copyButtonVisible: false }
+      - id: LOGO-004
+        given: "에러 메시지가 표시된 상태"
+        when: "로고 'Feed-me'를 클릭한다"
+        then: "에러 메시지가 사라지고 초기 화면으로 돌아간다"
+        examples:
+          - input: { hasError: true, action: "clickLogo" }
+            expect: { urlInputValue: "", errorVisible: false, previewVisible: false }
+    excludes:
+      - "로고 폰트 변경 — 기존 font-bold 유지"
+      - "로고 사이즈 변경 — 기존 text-3xl 유지"
+      - "별도 로고 이미지/아이콘 — 텍스트 로고만 사용"
+    preconditions:
+      - "@magicui/hyper-text 컴포넌트 설치 완료"
