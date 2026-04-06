@@ -17,6 +17,7 @@ import {
 import { ArrowRight, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { isValidUrl } from "@/lib/utils";
+import { HyperText } from "@/components/ui/hyper-text";
 
 const REMARK_PLUGINS: PluggableList = [remarkGfm];
 const REHYPE_PLUGINS: PluggableList = [rehypeHighlight];
@@ -38,6 +39,14 @@ export default function FeedmePage() {
   const [copied, setCopied] = useState(false);
 
   const markdownText = result?.markdown ?? result?.content ?? null;
+
+  function handleReset() {
+    setUrl("");
+    setResult(null);
+    setError(null);
+    setCopied(false);
+    setLoading(false);
+  }
 
   async function handleFetch() {
     setError(null);
@@ -78,7 +87,20 @@ export default function FeedmePage() {
     <div className="min-h-screen flex flex-col items-center py-16 px-4">
       <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold">feedme</h1>
+          <div
+            data-testid="logo"
+            className="cursor-pointer"
+            onClick={handleReset}
+          >
+            <span className="sr-only">Feed-me</span>
+            <HyperText
+              as="h1"
+              className="text-3xl font-bold"
+              aria-hidden="true"
+            >
+              Feed-me
+            </HyperText>
+          </div>
           <p className="text-muted-foreground">
             URL을 입력하면 웹페이지나 YouTube 자막을 마크다운으로 추출합니다
           </p>
