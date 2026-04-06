@@ -6,7 +6,7 @@ export interface ExtractResult {
   title: string;
   content: string;
   type: "webpage" | "youtube";
-  channel?: string;
+  source?: string;
   thumbnail?: string;
 }
 
@@ -59,7 +59,7 @@ export async function extractContent(url: string): Promise<ExtractResult> {
       type: "youtube",
       title: result.title ?? "",
       content,
-      channel: result.author ?? undefined,
+      source: result.author ?? undefined,
       thumbnail: result.image ?? undefined,
     };
   }
@@ -68,5 +68,7 @@ export async function extractContent(url: string): Promise<ExtractResult> {
     type: "webpage",
     title: result.title ?? "",
     content: result.contentMarkdown ?? result.content ?? "",
+    thumbnail: result.image ?? undefined,
+    source: result.author || new URL(url).hostname,
   };
 }
