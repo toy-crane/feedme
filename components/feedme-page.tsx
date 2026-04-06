@@ -14,7 +14,7 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { ArrowRight, Loader2, Copy, Check, ChevronDown, Download } from "lucide-react";
+import { ArrowRight, Loader2, Copy, Check, ChevronDown, ChevronRight, Download, Plus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ButtonGroup } from "@/components/ui/button-group";
 import {
@@ -24,12 +24,21 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { isValidUrl } from "@/lib/utils";
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@/components/ui/collapsible";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { cn, isValidUrl, buildCopyText } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
 import { HyperText } from "@/components/ui/hyper-text";
 import ThemeToggle from "@/components/theme-toggle";
 
 const REMARK_PLUGINS: PluggableList = [remarkGfm];
 const REHYPE_PLUGINS: PluggableList = [rehypeHighlight];
+
+const PRESETS = ["요약해줘", "한국어로 번역해줘", "쉽게 설명해줘"] as const;
 
 type ExtractResult = {
   markdown?: string;
@@ -46,6 +55,9 @@ export default function FeedmePage() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ExtractResult | null>(null);
   const [copied, setCopied] = useState(false);
+  const [prompt, setPrompt] = useState("");
+  const [promptOpen, setPromptOpen] = useState(false);
+  const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
 
   const markdownText = result?.markdown ?? result?.content ?? null;
 
@@ -55,6 +67,9 @@ export default function FeedmePage() {
     setError(null);
     setCopied(false);
     setLoading(false);
+    setPrompt("");
+    setPromptOpen(false);
+    setSelectedPreset(null);
   }
 
   async function handleFetch() {
@@ -87,9 +102,26 @@ export default function FeedmePage() {
 
   async function handleCopy() {
     if (!markdownText) return;
-    await navigator.clipboard.writeText(markdownText);
+    await navigator.clipboard.writeText(buildCopyText(prompt, markdownText));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  function handlePresetChange(value: string) {
+    if (!value) {
+      setSelectedPreset(null);
+      setPrompt("");
+    } else {
+      setSelectedPreset(value);
+      setPrompt(value);
+    }
+  }
+
+  function handlePromptChange(value: string) {
+    setPrompt(value);
+    if (selectedPreset !== null && value !== selectedPreset) {
+      setSelectedPreset(null);
+    }
   }
 
   return (
@@ -147,7 +179,7 @@ export default function FeedmePage() {
                   onClick={() => { if (isValidUrl(url) && !loading) handleFetch(); }}
                   aria-disabled={loading || !isValidUrl(url)}
                   aria-label="가져오기"
-                  className={loading || !isValidUrl(url) ? "pointer-events-auto opacity-50 cursor-not-allowed" : ""}
+                  className={cn((loading || !isValidUrl(url)) && "pointer-events-auto opacity-50 cursor-not-allowed")}
                 >
                   {loading ? <Loader2 className="animate-spin" /> : <ArrowRight />}
                 </InputGroupButton>
@@ -164,7 +196,7 @@ export default function FeedmePage() {
         {result && markdownText && !loading && (
           <>
             <Separator />
-            <div className={`flex flex-col ${result.type === "youtube" ? "gap-4" : "gap-3"}`}>
+            <div className={cn("flex flex-col", result.type === "youtube" ? "gap-4" : "gap-3")}>
               {result.type === "youtube" && result.thumbnail && (
                 <img
                   src={result.thumbnail}
@@ -185,11 +217,65 @@ export default function FeedmePage() {
                 <div className="flex justify-end">
                   <SplitCopyButton
                     markdown={markdownText}
+                    prompt={prompt}
                     copied={copied}
                     onCopy={handleCopy}
                     title={result?.title}
                   />
                 </div>
+
+                <Collapsible open={promptOpen} onOpenChange={setPromptOpen}>
+                  <CollapsibleTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground px-0"
+                    >
+                      <Plus data-icon="inline-start" aria-hidden="true" />
+                      프롬프트 추가하기
+                      {promptOpen ? (
+                        <ChevronDown data-icon="inline-end" aria-hidden="true" />
+                      ) : (
+                        <ChevronRight data-icon="inline-end" aria-hidden="true" />
+                      )}
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="flex flex-col gap-2 pt-2">
+                      <Field>
+                        <FieldLabel htmlFor="prompt-input" className="sr-only">
+                          프롬프트
+                        </FieldLabel>
+                        <Textarea
+                          id="prompt-input"
+                          placeholder="ex) 이 글을 요약해줘"
+                          value={prompt}
+                          onChange={(e) => handlePromptChange(e.target.value)}
+                          rows={2}
+                        />
+                      </Field>
+                      <ToggleGroup
+                        type="single"
+                        value={selectedPreset ?? ""}
+                        onValueChange={handlePresetChange}
+                        spacing={2}
+                        className="flex flex-wrap justify-start"
+                      >
+                        {PRESETS.map((preset) => (
+                          <ToggleGroupItem
+                            key={preset}
+                            value={preset}
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full"
+                          >
+                            {preset}
+                          </ToggleGroupItem>
+                        ))}
+                      </ToggleGroup>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               </div>
               <div className="prose dark:prose-invert max-w-none">
                 <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS}>{markdownText}</ReactMarkdown>
@@ -248,11 +334,13 @@ const CLAUDE_ICON = (
 
 function SplitCopyButton({
   markdown,
+  prompt,
   copied,
   onCopy,
   title,
 }: {
   markdown: string;
+  prompt: string;
   copied: boolean;
   onCopy: () => void;
   title?: string;
@@ -268,6 +356,8 @@ function SplitCopyButton({
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
+
+  const copyText = buildCopyText(prompt, markdown);
 
   return (
     <ButtonGroup>
@@ -302,7 +392,7 @@ function SplitCopyButton({
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <a
-                href={`https://chatgpt.com/?q=${encodeURIComponent(markdown)}`}
+                href={`https://chatgpt.com/?q=${encodeURIComponent(copyText)}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -312,7 +402,7 @@ function SplitCopyButton({
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <a
-                href={`https://claude.ai/new?q=${encodeURIComponent(markdown)}`}
+                href={`https://claude.ai/new?q=${encodeURIComponent(copyText)}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

@@ -428,3 +428,104 @@ features:
       - "next-themes 패키지 설치 완료"
       - "globals.css에 .dark CSS 변수 정의 완료"
       - "ThemeProvider가 layout.tsx에 설정 완료"
+
+  - id: pre-prompt
+    title: "프리프롬프트"
+    scenarios:
+      - id: PROMPT-001
+        given: "콘텐츠가 추출되어 미리보기가 표시된 상태"
+        when: "제목과 복사 버튼 사이 영역을 확인한다"
+        then: "접힌 상태의 '프롬프트 추가하기' 토글이 표시된다"
+        examples:
+          - input: { state: "contentExtracted" }
+            expect: { collapsibleTriggerVisible: true, collapsibleOpen: false }
+      - id: PROMPT-002
+        given: "콘텐츠가 추출되지 않은 초기 화면"
+        when: "화면을 확인한다"
+        then: "'프롬프트 추가하기' 토글이 표시되지 않는다"
+        examples:
+          - input: { state: "initial" }
+            expect: { collapsibleTriggerVisible: false }
+      - id: PROMPT-003
+        given: "콘텐츠가 추출되어 '프롬프트 추가하기' 토글이 접힌 상태"
+        when: "'프롬프트 추가하기' 토글을 클릭한다"
+        then: "Textarea 입력창과 프리셋 칩 3개('요약해줘', '한국어로 번역해줘', '쉽게 설명해줘')가 표시된다"
+        examples:
+          - input: { action: "clickCollapsibleTrigger" }
+            expect: { textareaVisible: true, presetChips: ["요약해줘", "한국어로 번역해줘", "쉽게 설명해줘"], presetChipCount: 3 }
+      - id: PROMPT-004
+        given: "프롬프트 영역이 펼쳐진 상태"
+        when: "'프롬프트 추가하기' 토글을 클릭한다"
+        then: "Textarea와 프리셋 칩이 숨겨진다"
+        examples:
+          - input: { action: "clickCollapsibleTrigger", collapsibleOpen: true }
+            expect: { textareaVisible: false, presetChipsVisible: false }
+      - id: PROMPT-005
+        given: "프롬프트 영역이 펼쳐진 상태"
+        when: "'요약해줘' 프리셋 칩을 클릭한다"
+        then: "Textarea에 '요약해줘' 텍스트가 채워진다"
+        examples:
+          - input: { action: "clickPreset", preset: "요약해줘" }
+            expect: { textareaValue: "요약해줘", selectedPreset: "요약해줘" }
+          - input: { action: "clickPreset", preset: "한국어로 번역해줘" }
+            expect: { textareaValue: "한국어로 번역해줘", selectedPreset: "한국어로 번역해줘" }
+          - input: { action: "clickPreset", preset: "쉽게 설명해줘" }
+            expect: { textareaValue: "쉽게 설명해줘", selectedPreset: "쉽게 설명해줘" }
+      - id: PROMPT-006
+        given: "프리셋 '요약해줘'가 선택되어 Textarea에 채워진 상태"
+        when: "이미 선택된 '요약해줘' 칩을 다시 클릭한다"
+        then: "Textarea가 비워지고 칩 선택이 해제된다"
+        examples:
+          - input: { selectedPreset: "요약해줘", action: "clickPreset", preset: "요약해줘" }
+            expect: { textareaValue: "", selectedPreset: null }
+      - id: PROMPT-007
+        given: "프리셋 '요약해줘'가 선택되어 Textarea에 '요약해줘'가 채워진 상태"
+        when: "Textarea의 텍스트를 '요약해줘 한국어로'로 수정한다"
+        then: "ToggleGroup의 선택 상태가 해제된다"
+        examples:
+          - input: { selectedPreset: "요약해줘", action: "editTextarea", newValue: "요약해줘 한국어로" }
+            expect: { textareaValue: "요약해줘 한국어로", selectedPreset: null }
+          - input: { selectedPreset: null, action: "editTextarea", newValue: "직접 입력한 텍스트" }
+            expect: { textareaValue: "직접 입력한 텍스트", selectedPreset: null }
+      - id: PROMPT-008
+        given: "프롬프트에 '요약해줘'가 입력되고 마크다운 '# Hello'가 추출된 상태"
+        when: "'복사하기' 버튼을 클릭한다"
+        then: "'요약해줘\n\n# Hello'가 클립보드에 복사된다"
+        examples:
+          - input: { prompt: "요약해줘", markdown: "# Hello", action: "clickCopyButton" }
+            expect: { clipboardContent: "요약해줘\n\n# Hello" }
+          - input: { prompt: "", markdown: "# Hello", action: "clickCopyButton" }
+            expect: { clipboardContent: "# Hello" }
+      - id: PROMPT-009
+        given: "프롬프트에 '요약해줘'가 입력되고 마크다운이 추출된 상태"
+        when: "'ChatGPT에서 열기'를 클릭한다"
+        then: "'요약해줘\n\n마크다운'이 query에 인코딩된 ChatGPT URL이 새 탭에서 열린다"
+        examples:
+          - input: { prompt: "요약해줘", markdown: "# Hello", action: "clickChatGPT" }
+            expect: { openedUrlContains: "chatgpt.com/?q=", queryIncludesPrompt: true, queryIncludesMarkdown: true, targetBlank: true }
+          - input: { prompt: "요약해줘", markdown: "# Hello", action: "clickClaude" }
+            expect: { openedUrlContains: "claude.ai/new?q=", queryIncludesPrompt: true, queryIncludesMarkdown: true, targetBlank: true }
+          - input: { prompt: "", markdown: "# Hello", action: "clickChatGPT" }
+            expect: { openedUrlContains: "chatgpt.com/?q=", queryIncludesPrompt: false, queryIncludesMarkdown: true, targetBlank: true }
+      - id: PROMPT-010
+        given: "프롬프트에 '요약해줘'가 입력된 상태"
+        when: "'마크다운 다운로드'를 클릭한다"
+        then: "다운로드 파일에 마크다운만 포함되고 프롬프트는 포함되지 않는다"
+        examples:
+          - input: { prompt: "요약해줘", markdown: "# Hello", action: "clickDownload" }
+            expect: { downloadedContent: "# Hello", promptNotIncluded: true }
+      - id: PROMPT-011
+        given: "프롬프트에 '요약해줘'가 입력되고 Collapsible이 펼쳐진 상태"
+        when: "로고 'Feed-me'를 클릭한다"
+        then: "프롬프트가 비워지고, Collapsible이 접히고, ToggleGroup 선택이 해제된다"
+        examples:
+          - input: { prompt: "요약해줘", collapsibleOpen: true, action: "clickLogo" }
+            expect: { textareaValue: "", collapsibleOpen: false, selectedPreset: null }
+    excludes:
+      - "프롬프트 히스토리 저장 — MVP 범위 외"
+      - "사용자 정의 프리셋 추가/삭제 — MVP 범위 외"
+      - "마크다운 다운로드 시 프롬프트 포함 — 다운로드는 원본 보존 목적"
+    preconditions:
+      - "shadcn Collapsible 컴포넌트 설치"
+      - "shadcn ToggleGroup 컴포넌트 설치"
+      - "Textarea 컴포넌트 이미 설치됨"
