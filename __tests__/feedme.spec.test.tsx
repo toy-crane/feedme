@@ -76,8 +76,8 @@ describe("feedme spec tests", () => {
   });
 
   // FEEDME-003
-  describe("FEEDME-003: 로딩 인디케이터", () => {
-    it("가져오기 버튼 클릭 직후 로딩 인디케이터가 표시된다", async () => {
+  describe("FEEDME-003: 로딩 스피너", () => {
+    it("가져오기 버튼 클릭 직후 버튼에 스피너가 표시되고 텍스트는 사라진다", async () => {
       const user = userEvent.setup();
       let resolveResponse: (value: unknown) => void;
       global.fetch = vi.fn().mockReturnValue(
@@ -94,7 +94,16 @@ describe("feedme spec tests", () => {
       const button = screen.getByRole("button", { name: "가져오기" });
       await user.click(button);
 
-      expect(screen.getByRole("status")).toBeInTheDocument();
+      // 버튼에 스피너(animate-spin)가 표시되고 텍스트가 사라짐
+      const buttons = screen.getAllByRole("button");
+      const fetchButton = buttons.find(
+        (b) => b.querySelector(".animate-spin") || b.textContent === "가져오기"
+      )!;
+      expect(fetchButton.querySelector(".animate-spin")).toBeInTheDocument();
+      expect(fetchButton.textContent).not.toContain("가져오기");
+
+      // 별도 로딩 영역이 없음
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
 
       resolveResponse!({
         ok: true,
@@ -151,22 +160,18 @@ describe("feedme spec tests", () => {
   });
 
   // FEEDME-006
-  describe("FEEDME-006: 빈 URL 에러", () => {
-    it("빈 URL로 가져오기 버튼 클릭 시 올바른 URL을 입력해주세요 에러가 표시된다", async () => {
-      const user = userEvent.setup();
-
+  describe("FEEDME-006: 빈 URL 시 버튼 비활성화", () => {
+    it("빈 URL일 때 가져오기 버튼이 disabled 상태이다", () => {
       render(<FeedmePage />);
 
       const button = screen.getByRole("button", { name: "가져오기" });
-      await user.click(button);
-
-      expect(screen.getByText("올바른 URL을 입력해주세요")).toBeInTheDocument();
+      expect(button).toBeDisabled();
     });
   });
 
   // FEEDME-007
-  describe("FEEDME-007: 잘못된 URL 에러", () => {
-    it("not-a-url 입력 후 가져오기 클릭 시 올바른 URL을 입력해주세요 에러가 표시된다", async () => {
+  describe("FEEDME-007: 잘못된 URL 시 버튼 비활성화", () => {
+    it("not-a-url 입력 시 가져오기 버튼이 disabled 상태이다", async () => {
       const user = userEvent.setup();
 
       render(<FeedmePage />);
@@ -175,9 +180,7 @@ describe("feedme spec tests", () => {
       await user.type(input, "not-a-url");
 
       const button = screen.getByRole("button", { name: "가져오기" });
-      await user.click(button);
-
-      expect(screen.getByText("올바른 URL을 입력해주세요")).toBeInTheDocument();
+      expect(button).toBeDisabled();
     });
   });
 
