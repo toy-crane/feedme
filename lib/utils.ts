@@ -14,3 +14,8 @@ export function isValidUrl(url: string): boolean {
     return false;
   }
 }
+
+export function buildCopyText(prompt: string, markdown: string): string {
+  if (!prompt.trim()) return markdown;
+  return `${prompt.trim()}\n\n${markdown}`;
+}
