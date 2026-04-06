@@ -100,7 +100,7 @@ export default function FeedmePage() {
               />
               <InputGroupAddon align="inline-end">
                 <InputGroupButton
-                  variant="default"
+                  variant="secondary"
                   onClick={() => { if (isValidUrl(url) && !loading) handleFetch(); }}
                   aria-disabled={loading || !isValidUrl(url)}
                   className={loading || !isValidUrl(url) ? "pointer-events-auto opacity-50 cursor-not-allowed" : ""}
