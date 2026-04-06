@@ -11,6 +11,7 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
+import { Loader2 } from "lucide-react";
 import { isValidUrl } from "@/lib/utils";
 
 type ExtractResult = {
@@ -94,18 +95,12 @@ export default function FeedmePage() {
               />
               <InputGroupAddon align="inline-end">
                 <InputGroupButton variant="secondary" onClick={handleFetch} disabled={loading || !isValidUrl(url)}>
-                  가져오기
+                  {loading ? <Loader2 className="animate-spin" /> : "가져오기"}
                 </InputGroupButton>
               </InputGroupAddon>
             </InputGroup>
           </Field>
         </FieldGroup>
-
-        {loading && (
-          <div role="status" className="flex justify-center py-4">
-            <span className="text-muted-foreground">불러오는 중...</span>
-          </div>
-        )}
 
         {error && (
           <Alert variant="destructive">
