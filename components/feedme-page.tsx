@@ -146,20 +146,22 @@ export default function FeedmePage() {
                   style={{ aspectRatio: "16 / 9", objectFit: "cover" }}
                 />
               )}
-              {result.title && (
-                <div className="flex flex-col gap-1">
-                  <h2 className="text-2xl font-bold">{result.title}</h2>
-                  {result.type === "youtube" && result.channel && (
-                    <p className="text-sm text-muted-foreground">{result.channel}</p>
-                  )}
+              <div className="flex flex-col gap-1">
+                {result.title && (
+                  <div className="flex flex-col gap-1">
+                    <h2 className="text-2xl font-bold">{result.title}</h2>
+                    {result.type === "youtube" && result.channel && (
+                      <p className="text-sm text-muted-foreground">{result.channel}</p>
+                    )}
+                  </div>
+                )}
+                <div className="flex justify-end">
+                  <SplitCopyButton
+                    markdown={markdownText}
+                    copied={copied}
+                    onCopy={handleCopy}
+                  />
                 </div>
-              )}
-              <div className="flex justify-end">
-                <SplitCopyButton
-                  markdown={markdownText}
-                  copied={copied}
-                  onCopy={handleCopy}
-                />
               </div>
               <div className="prose max-w-none">
                 <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS}>{markdownText}</ReactMarkdown>
