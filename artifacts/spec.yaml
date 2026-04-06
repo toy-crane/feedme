@@ -44,10 +44,10 @@ features:
       - id: FEEDME-005
         given: "콘텐츠가 추출되어 마크다운 미리보기가 표시된 상태"
         when: "'복사' 버튼을 클릭한다"
-        then: "마크다운 원문이 클립보드에 복사되고 '복사됨' 토스트 메시지가 표시된다"
+        then: "마크다운 원문이 클립보드에 복사되고, 버튼 아이콘이 체크로 바뀐다"
         examples:
           - input: { action: "clickCopyButton" }
-            expect: { clipboardHasContent: true, toastMessage: "복사됨" }
+            expect: { clipboardHasContent: true, copyButtonIcon: "check" }
     excludes:
       - "챗봇별 맞춤 형식 — 설계 원칙 '챗봇 비종속'"
 
@@ -200,10 +200,10 @@ features:
       - id: FEEDME-031
         given: "콘텐츠가 추출되어 split button이 표시된 상태"
         when: "메인 '복사' 버튼을 클릭한다"
-        then: "마크다운이 클립보드에 복사되고, 버튼 아이콘이 체크로 바뀌며, '복사됨' 토스트가 표시된다"
+        then: "마크다운이 클립보드에 복사되고, 버튼 아이콘이 체크로 바뀐다 (토스트 없음)"
         examples:
           - input: { action: "clickCopyButton" }
-            expect: { clipboardHasContent: true, toastMessage: "복사됨", copyButtonIcon: "check" }
+            expect: { clipboardHasContent: true, copyButtonIcon: "check", toastVisible: false }
       - id: FEEDME-032
         given: "콘텐츠가 추출되어 split button이 표시된 상태"
         when: "chevron(▼) 버튼을 클릭한다"
