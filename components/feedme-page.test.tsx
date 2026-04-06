@@ -45,19 +45,22 @@ describe("feedme-page unit tests", () => {
   describe("onChange 핸들러가 에러 상태를 초기화한다", () => {
     it("에러가 표시된 상태에서 URL 입력 시 에러가 사라진다", async () => {
       const user = userEvent.setup();
+      global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
       render(<FeedmePage />);
 
-      // 빈 상태에서 가져오기 클릭 → 에러 표시
+      // 유효한 URL로 가져오기 클릭 → 네트워크 에러 표시
+      const input = screen.getByRole("textbox");
+      await user.type(input, "https://example.com");
+
       const button = screen.getByRole("button", { name: "가져오기" });
       await user.click(button);
 
-      expect(screen.getByText("올바른 URL을 입력해주세요")).toBeInTheDocument();
+      await screen.findByText("네트워크 오류가 발생했습니다");
 
       // URL 입력 시 에러가 사라져야 한다
-      const input = screen.getByRole("textbox");
-      await user.type(input, "h");
+      await user.type(input, "a");
 
-      expect(screen.queryByText("올바른 URL을 입력해주세요")).not.toBeInTheDocument();
+      expect(screen.queryByText("네트워크 오류가 발생했습니다")).not.toBeInTheDocument();
     });
   });
 });

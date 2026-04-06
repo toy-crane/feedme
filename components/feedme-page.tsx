@@ -33,12 +33,6 @@ export default function FeedmePage() {
 
   async function handleFetch() {
     setError(null);
-
-    if (!isValidUrl(url)) {
-      setError("올바른 URL을 입력해주세요");
-      return;
-    }
-
     setLoading(true);
     setResult(null);
     setCopied(false);
@@ -93,13 +87,13 @@ export default function FeedmePage() {
                 type="url"
                 placeholder="https://example.com 또는 YouTube URL"
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
+                onChange={(e) => { setUrl(e.target.value); setError(null); }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleFetch();
                 }}
               />
               <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="secondary" onClick={handleFetch} disabled={loading}>
+                <InputGroupButton variant="secondary" onClick={handleFetch} disabled={loading || !isValidUrl(url)}>
                   가져오기
                 </InputGroupButton>
               </InputGroupAddon>
