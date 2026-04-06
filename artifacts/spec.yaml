@@ -435,27 +435,27 @@ features:
       - id: PROMPT-001
         given: "콘텐츠가 추출되어 미리보기가 표시된 상태"
         when: "제목과 복사 버튼 사이 영역을 확인한다"
-        then: "접힌 상태의 '프롬프트 추가' 토글이 표시된다"
+        then: "접힌 상태의 '프롬프트 추가하기' 토글이 표시된다"
         examples:
           - input: { state: "contentExtracted" }
             expect: { collapsibleTriggerVisible: true, collapsibleOpen: false }
       - id: PROMPT-002
         given: "콘텐츠가 추출되지 않은 초기 화면"
         when: "화면을 확인한다"
-        then: "'프롬프트 추가' 토글이 표시되지 않는다"
+        then: "'프롬프트 추가하기' 토글이 표시되지 않는다"
         examples:
           - input: { state: "initial" }
             expect: { collapsibleTriggerVisible: false }
       - id: PROMPT-003
-        given: "콘텐츠가 추출되어 '프롬프트 추가' 토글이 접힌 상태"
-        when: "'프롬프트 추가' 토글을 클릭한다"
+        given: "콘텐츠가 추출되어 '프롬프트 추가하기' 토글이 접힌 상태"
+        when: "'프롬프트 추가하기' 토글을 클릭한다"
         then: "Textarea 입력창과 프리셋 칩 3개('요약해줘', '한국어로 번역해줘', '쉽게 설명해줘')가 표시된다"
         examples:
           - input: { action: "clickCollapsibleTrigger" }
             expect: { textareaVisible: true, presetChips: ["요약해줘", "한국어로 번역해줘", "쉽게 설명해줘"], presetChipCount: 3 }
       - id: PROMPT-004
         given: "프롬프트 영역이 펼쳐진 상태"
-        when: "'프롬프트 추가' 토글을 클릭한다"
+        when: "'프롬프트 추가하기' 토글을 클릭한다"
         then: "Textarea와 프리셋 칩이 숨겨진다"
         examples:
           - input: { action: "clickCollapsibleTrigger", collapsibleOpen: true }
