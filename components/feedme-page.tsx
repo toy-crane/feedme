@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github.css";
+import type { PluggableList } from "unified";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
@@ -11,7 +15,11 @@ import {
   InputGroupButton,
 } from "@/components/ui/input-group";
 import { Loader2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 import { isValidUrl } from "@/lib/utils";
+
+const REMARK_PLUGINS: PluggableList = [remarkGfm];
+const REHYPE_PLUGINS: PluggableList = [rehypeHighlight];
 
 type ExtractResult = {
   markdown?: string;
@@ -68,7 +76,7 @@ export default function FeedmePage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center py-16 px-4">
-      <div className="w-full max-w-lg mx-auto flex flex-col gap-6">
+      <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold">feedme</h1>
           <p className="text-muted-foreground">
@@ -117,6 +125,10 @@ export default function FeedmePage() {
           </Field>
         </FieldGroup>
 
+        {(result && markdownText && !loading) && (
+          <Separator />
+        )}
+
         {result && markdownText && !loading && result.type === "youtube" ? (
           <div className="flex flex-col gap-4">
             {result.thumbnail && (
@@ -127,34 +139,35 @@ export default function FeedmePage() {
                 style={{ aspectRatio: "16 / 9", objectFit: "cover" }}
               />
             )}
-            {result.title && (
-              <h2 className="text-xl font-bold">{result.title}</h2>
-            )}
-            {result.channel && (
-              <p className="text-sm text-muted-foreground">{result.channel}</p>
-            )}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-muted-foreground">자막</span>
-                <Button variant="outline" onClick={handleCopy}>
-                  복사
-                </Button>
-              </div>
-              <div className="prose prose-sm max-w-none rounded-md border p-4 max-h-60 overflow-y-auto">
-                <ReactMarkdown>{markdownText}</ReactMarkdown>
-              </div>
-            </div>
-          </div>
-        ) : markdownText && !loading ? (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-muted-foreground">미리보기</span>
+            <div className="flex items-start justify-between">
+              {result.title && (
+                <div className="flex flex-col gap-1">
+                  <h2 className="text-2xl font-bold">{result.title}</h2>
+                  {result.channel && (
+                    <p className="text-sm text-muted-foreground">{result.channel}</p>
+                  )}
+                </div>
+              )}
               <Button variant="outline" onClick={handleCopy}>
                 복사
               </Button>
             </div>
-            <div className="prose prose-sm max-w-none rounded-md border p-4 max-h-96 overflow-y-auto">
-              <ReactMarkdown>{markdownText}</ReactMarkdown>
+            <div className="prose max-w-none">
+              <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS}>{markdownText}</ReactMarkdown>
+            </div>
+          </div>
+        ) : markdownText && !loading ? (
+          <div className="flex flex-col gap-3">
+            <div className="flex items-start justify-between">
+              {result?.title && (
+                <h2 className="text-2xl font-bold">{result.title}</h2>
+              )}
+              <Button variant="outline" onClick={handleCopy}>
+                복사
+              </Button>
+            </div>
+            <div className="prose max-w-none">
+              <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS}>{markdownText}</ReactMarkdown>
             </div>
           </div>
         ) : null}
