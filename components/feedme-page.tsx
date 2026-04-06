@@ -134,56 +134,39 @@ export default function FeedmePage() {
           </Field>
         </FieldGroup>
 
-        {(result && markdownText && !loading) && (
-          <Separator />
+        {result && markdownText && !loading && (
+          <>
+            <Separator />
+            <div className={`flex flex-col ${result.type === "youtube" ? "gap-4" : "gap-3"}`}>
+              {result.type === "youtube" && result.thumbnail && (
+                <img
+                  src={result.thumbnail}
+                  alt={result.title ?? "YouTube 썸네일"}
+                  className="w-full rounded-lg"
+                  style={{ aspectRatio: "16 / 9", objectFit: "cover" }}
+                />
+              )}
+              <div className="flex items-start justify-between">
+                {result.title && (
+                  <div className="flex flex-col gap-1">
+                    <h2 className="text-2xl font-bold">{result.title}</h2>
+                    {result.type === "youtube" && result.channel && (
+                      <p className="text-sm text-muted-foreground">{result.channel}</p>
+                    )}
+                  </div>
+                )}
+                <SplitCopyButton
+                  markdown={markdownText}
+                  copied={copied}
+                  onCopy={handleCopy}
+                />
+              </div>
+              <div className="prose max-w-none">
+                <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS}>{markdownText}</ReactMarkdown>
+              </div>
+            </div>
+          </>
         )}
-
-        {result && markdownText && !loading && result.type === "youtube" ? (
-          <div className="flex flex-col gap-4">
-            {result.thumbnail && (
-              <img
-                src={result.thumbnail}
-                alt={result.title ?? "YouTube 썸네일"}
-                className="w-full rounded-lg"
-                style={{ aspectRatio: "16 / 9", objectFit: "cover" }}
-              />
-            )}
-            <div className="flex items-start justify-between">
-              {result.title && (
-                <div className="flex flex-col gap-1">
-                  <h2 className="text-2xl font-bold">{result.title}</h2>
-                  {result.channel && (
-                    <p className="text-sm text-muted-foreground">{result.channel}</p>
-                  )}
-                </div>
-              )}
-              <SplitCopyButton
-                markdown={markdownText}
-                copied={copied}
-                onCopy={handleCopy}
-              />
-            </div>
-            <div className="prose max-w-none">
-              <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS}>{markdownText}</ReactMarkdown>
-            </div>
-          </div>
-        ) : markdownText && !loading ? (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-start justify-between">
-              {result?.title && (
-                <h2 className="text-2xl font-bold">{result.title}</h2>
-              )}
-              <SplitCopyButton
-                markdown={markdownText}
-                copied={copied}
-                onCopy={handleCopy}
-              />
-            </div>
-            <div className="prose max-w-none">
-              <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS}>{markdownText}</ReactMarkdown>
-            </div>
-          </div>
-        ) : null}
       </div>
 
     </div>
@@ -195,7 +178,7 @@ function SplitCopyButton({
   copied,
   onCopy,
 }: {
-  markdown: string | null;
+  markdown: string;
   copied: boolean;
   onCopy: () => void;
 }) {
@@ -230,7 +213,7 @@ function SplitCopyButton({
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
               <a
-                href={`https://chatgpt.com/?q=${encodeURIComponent(markdown ?? "")}`}
+                href={`https://chatgpt.com/?q=${encodeURIComponent(markdown)}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -242,7 +225,7 @@ function SplitCopyButton({
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <a
-                href={`https://claude.ai/new?q=${encodeURIComponent(markdown ?? "")}`}
+                href={`https://claude.ai/new?q=${encodeURIComponent(markdown)}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
