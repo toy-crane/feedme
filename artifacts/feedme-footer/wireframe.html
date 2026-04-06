@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireframe: feedme-footer</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --w-bg: #f5f5f5;
+    --w-border: #ccc;
+    --w-text: #555;
+    --w-muted: #aaa;
+    --w-fill: #eee;
+  }
+
+  * {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    color: var(--w-text);
+  }
+
+  body { background: var(--w-bg); }
+
+  /* Screen nav */
+  nav { position: sticky; top: 0; z-index: 40; background: var(--w-bg); border-bottom: 1px solid var(--w-border); }
+  nav button { cursor: pointer; font-size: 13px; }
+  nav button:hover { background: var(--w-fill); border-radius: 4px; }
+  nav button.active { font-weight: bold; border-bottom: 2px solid var(--w-text); }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Viewport toggle */
+  .vp-toggle button {
+    font-size: 12px; padding: 2px 8px;
+    border: 1px solid var(--w-border); cursor: pointer; background: white;
+  }
+  .vp-toggle button:first-child { border-radius: 4px 0 0 4px; }
+  .vp-toggle button:last-child { border-radius: 0 4px 4px 0; border-left: none; }
+  .vp-toggle button.active { background: var(--w-text); color: white; }
+
+  /* Mobile viewport frame */
+  body.viewport-mobile .screen-content {
+    max-width: 375px !important;
+    margin: 24px auto !important;
+    border: 2px solid var(--w-border);
+    border-radius: 24px;
+    min-height: 667px;
+    background: white;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 32px 16px !important;
+  }
+
+  /* Screen Notes */
+  .screen-notes {
+    background: #fffde7;
+    border-left: 3px solid #ffd54f;
+    padding: 12px 16px;
+    margin-top: 24px;
+    font-size: 13px;
+    border-radius: 0 4px 4px 0;
+  }
+  .screen-notes summary {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    color: #b0a050;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .screen-notes p { margin: 6px 0 2px; color: #777; }
+  .screen-notes ul { margin: 4px 0 0 16px; padding: 0; color: #777; }
+  .screen-notes li { margin: 2px 0; }
+
+  /* Footer wireframe styles */
+  .w-footer {
+    border-top: 1px solid var(--w-border);
+    padding: 16px 0;
+    font-size: 13px;
+    color: var(--w-muted);
+    margin-top: 40px;
+  }
+  .w-footer a { color: var(--w-muted); text-decoration: underline; }
+  .w-footer a:hover { color: var(--w-text); }
+
+  .w-page-stub {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding-top: 40px;
+  }
+  .w-page-stub .w-logo { font-size: 32px; font-weight: bold; color: var(--w-text); }
+  .w-page-stub .w-tagline { font-size: 13px; color: var(--w-muted); }
+  .w-page-stub .w-input {
+    width: 100%;
+    max-width: 480px;
+    height: 44px;
+    border: 1px solid var(--w-border);
+    border-radius: 8px;
+    background: white;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    color: var(--w-muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body class="p-0 m-0 viewport-desktop">
+
+<nav class="flex items-center gap-4 px-6 py-2">
+  <span class="text-xs" style="color:var(--w-muted)">wireframe</span>
+  <button id="nav-0" onclick="show(0)" class="px-2 py-1">Option A</button>
+  <button id="nav-1" onclick="show(1)" class="px-2 py-1">Option B</button>
+  <button id="nav-2" onclick="show(2)" class="px-2 py-1">Option C</button>
+  <div class="vp-toggle flex ml-auto">
+    <button id="vp-desktop" onclick="setViewport('desktop')" class="active">Desktop</button>
+    <button id="vp-mobile" onclick="setViewport('mobile')">Mobile</button>
+  </div>
+</nav>
+
+<!-- Option A: Hashimoto 스타일 — 좌: 카피라이트, 우: 아이콘 -->
+<div id="screen-0" class="screen" data-scenario="FEEDME-030, FEEDME-031, FEEDME-032, FEEDME-033">
+  <div class="screen-content @container max-w-2xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-5" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      Option A: 좌 텍스트 / 우 아이콘
+    </h2>
+
+    <div class="w-page-stub">
+      <div class="w-logo">FEED-ME</div>
+      <div class="w-tagline">어떤 URL이든, Markdown으로.</div>
+      <div class="w-input">https://example.com 또는 YouTube URL</div>
+    </div>
+
+    <div class="w-footer flex items-center justify-between">
+      <span>© 2026 feed-me. <a href="#">by toycrane</a></span>
+      <div class="flex items-center gap-3">
+        <a href="#" title="Feedback"><i data-lucide="message-square" style="width:18px;height:18px;"></i></a>
+        <a href="#" title="GitHub"><i data-lucide="github" style="width:18px;height:18px;"></i></a>
+      </div>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>Mitchell Hashimoto 스타일. 좌측에 카피라이트+제작자, 우측에 아이콘 그룹.</p>
+        <ul>
+          <li>장점: 레퍼런스와 가장 유사, 깔끔한 좌우 분리</li>
+          <li>단점: Feedback이 아이콘이라 텍스트보다 눈에 덜 띔</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<!-- Option B: 좌: 카피라이트+제작자, 우: 텍스트 링크+아이콘 -->
+<div id="screen-1" class="screen" data-scenario="FEEDME-030, FEEDME-031, FEEDME-032, FEEDME-033">
+  <div class="screen-content @container max-w-2xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-5" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      Option B: 좌 텍스트 / 우 텍스트+아이콘
+    </h2>
+
+    <div class="w-page-stub">
+      <div class="w-logo">FEED-ME</div>
+      <div class="w-tagline">어떤 URL이든, Markdown으로.</div>
+      <div class="w-input">https://example.com 또는 YouTube URL</div>
+    </div>
+
+    <div class="w-footer flex items-center justify-between">
+      <span>© 2026 feed-me. <a href="#">by toycrane</a></span>
+      <div class="flex items-center gap-3">
+        <a href="#" style="font-size:13px;">Feedback</a>
+        <span style="color:var(--w-border);">·</span>
+        <a href="#" title="GitHub"><i data-lucide="github" style="width:18px;height:18px;"></i></a>
+      </div>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>Feedback은 텍스트로, GitHub만 아이콘으로. 혼합 스타일.</p>
+        <ul>
+          <li>장점: Feedback이 텍스트라 행동 유도가 명확</li>
+          <li>단점: 텍스트와 아이콘 혼합이 살짝 불균형</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<!-- Option C: 한 줄 중앙 정렬 -->
+<div id="screen-2" class="screen" data-scenario="FEEDME-030, FEEDME-031, FEEDME-032, FEEDME-033">
+  <div class="screen-content @container max-w-2xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-5" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      Option C: 중앙 정렬 한 줄
+    </h2>
+
+    <div class="w-page-stub">
+      <div class="w-logo">FEED-ME</div>
+      <div class="w-tagline">어떤 URL이든, Markdown으로.</div>
+      <div class="w-input">https://example.com 또는 YouTube URL</div>
+    </div>
+
+    <div class="w-footer flex flex-col items-center gap-2 text-center">
+      <div class="flex items-center gap-3">
+        <span>© 2026 feed-me</span>
+        <span style="color:var(--w-border);">·</span>
+        <a href="#">Feedback</a>
+        <span style="color:var(--w-border);">·</span>
+        <a href="#">GitHub</a>
+      </div>
+      <a href="#" style="font-size:12px;">by toycrane</a>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>모든 요소를 한 줄 중앙 정렬. 현재 구현과 유사한 구조.</p>
+        <ul>
+          <li>장점: 가장 심플, 모바일에서도 자연스럽게 줄바꿈</li>
+          <li>단점: 요소가 많아지면 복잡해질 수 있음</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var currentScreen = 0;
+var screenIds = [];
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('nav button[id^="nav-"]').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('nav-' + id).classList.add('active');
+  currentScreen = screenIds.indexOf(id);
+}
+
+function setViewport(mode) {
+  document.body.classList.remove('viewport-mobile', 'viewport-desktop');
+  document.body.classList.add('viewport-' + mode);
+  document.querySelectorAll('.vp-toggle button').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('vp-' + mode).classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('nav button[id^="nav-"]').forEach(function(b) {
+    screenIds.push(parseInt(b.id.replace('nav-', '')));
+  });
+  var first = document.querySelector('nav button[id^="nav-"]');
+  if (first) first.click();
+  lucide.createIcons();
+});
+</script>
+</body>
+</html>
