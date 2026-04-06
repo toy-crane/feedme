@@ -264,7 +264,7 @@ export default function FeedmePage() {
                   </CollapsibleContent>
                 </Collapsible>
               </div>
-              <div className="prose dark:prose-invert max-w-none">
+              <div className="prose dark:prose-invert max-w-none [&>:first-child]:mt-0">
                 <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS}>{markdownText}</ReactMarkdown>
               </div>
             </div>
