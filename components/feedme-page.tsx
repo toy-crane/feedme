@@ -3,7 +3,6 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
   InputGroup,
@@ -11,6 +10,7 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
+import { Loader2 } from "lucide-react";
 import { isValidUrl } from "@/lib/utils";
 
 type ExtractResult = {
@@ -33,12 +33,6 @@ export default function FeedmePage() {
 
   async function handleFetch() {
     setError(null);
-
-    if (!isValidUrl(url)) {
-      setError("올바른 URL을 입력해주세요");
-      return;
-    }
-
     setLoading(true);
     setResult(null);
     setCopied(false);
@@ -90,34 +84,38 @@ export default function FeedmePage() {
             <InputGroup>
               <InputGroupInput
                 id="url-input"
+                name="url"
                 type="url"
+                autoComplete="url"
                 placeholder="https://example.com 또는 YouTube URL"
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
+                aria-invalid={!!error}
+                onChange={(e) => {
+                  setUrl(e.target.value);
+                  setError(null);
+                }}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleFetch();
+                  if (e.key === "Enter" && isValidUrl(url) && !loading) handleFetch();
                 }}
               />
               <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="secondary" onClick={handleFetch} disabled={loading}>
-                  가져오기
+                <InputGroupButton
+                  variant="secondary"
+                  onClick={() => { if (isValidUrl(url) && !loading) handleFetch(); }}
+                  aria-disabled={loading || !isValidUrl(url)}
+                  className={loading || !isValidUrl(url) ? "pointer-events-auto opacity-50 cursor-not-allowed" : ""}
+                >
+                  {loading ? <Loader2 className="animate-spin" /> : "가져오기"}
                 </InputGroupButton>
               </InputGroupAddon>
             </InputGroup>
+            <div aria-live="polite">
+              {error && (
+                <p className="text-destructive text-sm">{error}</p>
+              )}
+            </div>
           </Field>
         </FieldGroup>
-
-        {loading && (
-          <div role="status" className="flex justify-center py-4">
-            <span className="text-muted-foreground">불러오는 중...</span>
-          </div>
-        )}
-
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
 
         {result && markdownText && !loading && result.type === "youtube" ? (
           <div className="flex flex-col gap-4">
