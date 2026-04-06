@@ -14,7 +14,7 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { isValidUrl } from "@/lib/utils";
 
@@ -89,7 +89,7 @@ export default function FeedmePage() {
             <FieldLabel htmlFor="url-input" className="sr-only">
               URL
             </FieldLabel>
-            <InputGroup>
+            <InputGroup className="h-12">
               <InputGroupInput
                 id="url-input"
                 name="url"
@@ -108,12 +108,14 @@ export default function FeedmePage() {
               />
               <InputGroupAddon align="inline-end">
                 <InputGroupButton
-                  variant="secondary"
+                  variant="default"
+                  size="icon-sm"
                   onClick={() => { if (isValidUrl(url) && !loading) handleFetch(); }}
                   aria-disabled={loading || !isValidUrl(url)}
+                  aria-label="가져오기"
                   className={loading || !isValidUrl(url) ? "pointer-events-auto opacity-50 cursor-not-allowed" : ""}
                 >
-                  {loading ? <Loader2 className="animate-spin" /> : "가져오기"}
+                  {loading ? <Loader2 className="animate-spin" /> : <ArrowRight />}
                 </InputGroupButton>
               </InputGroupAddon>
             </InputGroup>
