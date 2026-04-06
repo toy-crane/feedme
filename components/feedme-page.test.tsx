@@ -3,6 +3,29 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import FeedmePage from "@/components/feedme-page";
 
+const SAMPLE_MARKDOWN = "# Hello World\n\nThis is sample content.";
+
+async function renderWithExtractedContent(markdown = SAMPLE_MARKDOWN) {
+  global.fetch = vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ markdown, title: "Hello World", type: "webpage" }),
+  });
+
+  const user = userEvent.setup();
+  render(<FeedmePage />);
+
+  const input = screen.getByRole("textbox");
+  await user.type(input, "https://example.com");
+
+  const button = screen.getByRole("button", { name: "가져오기" });
+  await user.click(button);
+
+  // 결과가 표시될 때까지 대기
+  await screen.findByRole("button", { name: /복사/ });
+
+  return user;
+}
+
 describe("feedme-page unit tests", () => {
   beforeEach(() => {
     vi.resetAllMocks();
@@ -39,6 +62,86 @@ describe("feedme-page unit tests", () => {
 
       const button = screen.getByRole("button", { name: "가져오기" });
       expect(button).not.toHaveAttribute("aria-disabled", "true");
+    });
+  });
+
+  // FEEDME-031: 복사 버튼 클릭 시 clipboard API 호출
+  describe("복사 버튼 클릭 시 클립보드에 마크다운 복사 (FEEDME-031)", () => {
+    it("메인 '복사' 버튼 클릭 시 navigator.clipboard.writeText가 마크다운 내용으로 호출된다", async () => {
+      const writeTextSpy = vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue(undefined);
+      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+
+      const copyButton = screen.getByRole("button", { name: /복사/ });
+      await userEvent.setup().click(copyButton);
+
+      expect(writeTextSpy).toHaveBeenCalledWith(SAMPLE_MARKDOWN);
+    });
+
+    it("복사 후 버튼 아이콘이 체크 아이콘으로 바뀐다", async () => {
+      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+
+      const copyButton = screen.getByRole("button", { name: /복사/ });
+      await userEvent.setup().click(copyButton);
+
+      // 체크 아이콘이 표시되는지 확인 (aria-label 또는 data-testid 기반)
+      expect(screen.getByTestId("copy-check-icon")).toBeInTheDocument();
+    });
+
+    it("복사 후 토스트 메시지가 표시되지 않는다", async () => {
+      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+
+      const copyButton = screen.getByRole("button", { name: /복사/ });
+      await userEvent.setup().click(copyButton);
+
+      expect(screen.queryByText("복사됨")).not.toBeInTheDocument();
+    });
+  });
+
+  // FEEDME-033: ChatGPT URL 생성
+  describe("드롭다운 'ChatGPT에서 열기' 링크 URL 검증 (FEEDME-033)", () => {
+    it("'ChatGPT에서 열기' 링크의 href가 encodeURIComponent된 마크다운을 포함한다", async () => {
+      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
+      await userEvent.setup().click(chevronButton);
+
+      const chatgptLink = screen.getByRole("link", { name: /ChatGPT에서 열기/ });
+      const expectedHref = `https://chatgpt.com/?q=${encodeURIComponent(SAMPLE_MARKDOWN)}`;
+      expect(chatgptLink).toHaveAttribute("href", expectedHref);
+    });
+
+    it("'ChatGPT에서 열기' 링크에 target='_blank' 속성이 있다", async () => {
+      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
+      await userEvent.setup().click(chevronButton);
+
+      const chatgptLink = screen.getByRole("link", { name: /ChatGPT에서 열기/ });
+      expect(chatgptLink).toHaveAttribute("target", "_blank");
+    });
+  });
+
+  // FEEDME-034: Claude URL 생성
+  describe("드롭다운 'Claude에서 열기' 링크 URL 검증 (FEEDME-034)", () => {
+    it("'Claude에서 열기' 링크의 href가 encodeURIComponent된 마크다운을 포함한다", async () => {
+      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
+      await userEvent.setup().click(chevronButton);
+
+      const claudeLink = screen.getByRole("link", { name: /Claude에서 열기/ });
+      const expectedHref = `https://claude.ai/new?q=${encodeURIComponent(SAMPLE_MARKDOWN)}`;
+      expect(claudeLink).toHaveAttribute("href", expectedHref);
+    });
+
+    it("'Claude에서 열기' 링크에 target='_blank' 속성이 있다", async () => {
+      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
+      await userEvent.setup().click(chevronButton);
+
+      const claudeLink = screen.getByRole("link", { name: /Claude에서 열기/ });
+      expect(claudeLink).toHaveAttribute("target", "_blank");
     });
   });
 
