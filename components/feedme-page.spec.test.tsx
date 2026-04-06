@@ -18,7 +18,7 @@ describe("feedme-page spec acceptance tests", () => {
       render(<FeedmePage />);
 
       const button = screen.getByRole("button", { name: "가져오기" });
-      expect(button).toBeDisabled();
+      expect(button).toHaveAttribute("aria-disabled", "true");
     });
   });
 
@@ -32,7 +32,7 @@ describe("feedme-page spec acceptance tests", () => {
       await user.type(input, "not-a-url");
 
       const button = screen.getByRole("button", { name: "가져오기" });
-      expect(button).toBeDisabled();
+      expect(button).toHaveAttribute("aria-disabled", "true");
     });
   });
 
@@ -46,12 +46,12 @@ describe("feedme-page spec acceptance tests", () => {
       await user.type(input, "not-a-url");
 
       const button = screen.getByRole("button", { name: "가져오기" });
-      expect(button).toBeDisabled();
+      expect(button).toHaveAttribute("aria-disabled", "true");
 
       await user.clear(input);
       await user.type(input, "https://example.com");
 
-      expect(button).toBeEnabled();
+      expect(button).not.toHaveAttribute("aria-disabled", "true");
     });
   });
 

@@ -16,7 +16,7 @@ describe("feedme-page unit tests", () => {
       const button = screen.getByRole("button", { name: "가져오기" });
 
       // URL input은 비어있는 초기 상태
-      expect(button).toBeDisabled();
+      expect(button).toHaveAttribute("aria-disabled", "true");
     });
 
     it("URL이 유효하지 않은 값(not-a-url)일 때 가져오기 버튼이 비활성화된다", async () => {
@@ -27,7 +27,7 @@ describe("feedme-page unit tests", () => {
       await user.type(input, "not-a-url");
 
       const button = screen.getByRole("button", { name: "가져오기" });
-      expect(button).toBeDisabled();
+      expect(button).toHaveAttribute("aria-disabled", "true");
     });
 
     it("URL이 유효한 값(https://example.com)일 때 가져오기 버튼이 활성화된다", async () => {
@@ -38,7 +38,7 @@ describe("feedme-page unit tests", () => {
       await user.type(input, "https://example.com");
 
       const button = screen.getByRole("button", { name: "가져오기" });
-      expect(button).not.toBeDisabled();
+      expect(button).not.toHaveAttribute("aria-disabled", "true");
     });
   });
 

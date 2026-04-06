@@ -99,7 +99,12 @@ export default function FeedmePage() {
                 }}
               />
               <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="secondary" onClick={handleFetch} disabled={loading || !isValidUrl(url)}>
+                <InputGroupButton
+                  variant="secondary"
+                  onClick={() => { if (isValidUrl(url) && !loading) handleFetch(); }}
+                  aria-disabled={loading || !isValidUrl(url)}
+                  className={loading || !isValidUrl(url) ? "pointer-events-auto opacity-50 cursor-not-allowed" : ""}
+                >
                   {loading ? <Loader2 className="animate-spin" /> : "가져오기"}
                 </InputGroupButton>
               </InputGroupAddon>
