@@ -226,18 +226,19 @@ export default function FeedmePage() {
 
                 <Collapsible open={promptOpen} onOpenChange={setPromptOpen}>
                   <CollapsibleTrigger asChild>
-                    <button
-                      type="button"
-                      className="flex items-center gap-1 text-sm text-muted-foreground bg-transparent border-none cursor-pointer p-0"
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground px-0"
                     >
-                      <Plus className="size-4" aria-hidden="true" />
-                      <span>프롬프트 추가하기</span>
+                      <Plus data-icon="inline-start" aria-hidden="true" />
+                      프롬프트 추가하기
                       {promptOpen ? (
-                        <ChevronDown className="size-3.5" aria-hidden="true" />
+                        <ChevronDown data-icon="inline-end" aria-hidden="true" />
                       ) : (
-                        <ChevronRight className="size-3.5" aria-hidden="true" />
+                        <ChevronRight data-icon="inline-end" aria-hidden="true" />
                       )}
-                    </button>
+                    </Button>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <div className="flex flex-col gap-2 pt-2">
