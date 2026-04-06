@@ -105,7 +105,8 @@ describe("feedme-page unit tests", () => {
       const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
       await userEvent.setup().click(chevronButton);
 
-      const chatgptLink = screen.getByRole("link", { name: /ChatGPT에서 열기/ });
+      // Radix DropdownMenuItem asChild로 렌더된 <a>는 role="menuitem"을 가짐
+      const chatgptLink = screen.getByRole("menuitem", { name: /ChatGPT에서 열기/ });
       const expectedHref = `https://chatgpt.com/?q=${encodeURIComponent(SAMPLE_MARKDOWN)}`;
       expect(chatgptLink).toHaveAttribute("href", expectedHref);
     });
@@ -116,7 +117,8 @@ describe("feedme-page unit tests", () => {
       const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
       await userEvent.setup().click(chevronButton);
 
-      const chatgptLink = screen.getByRole("link", { name: /ChatGPT에서 열기/ });
+      // Radix DropdownMenuItem asChild로 렌더된 <a>는 role="menuitem"을 가짐
+      const chatgptLink = screen.getByRole("menuitem", { name: /ChatGPT에서 열기/ });
       expect(chatgptLink).toHaveAttribute("target", "_blank");
     });
   });
@@ -129,7 +131,8 @@ describe("feedme-page unit tests", () => {
       const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
       await userEvent.setup().click(chevronButton);
 
-      const claudeLink = screen.getByRole("link", { name: /Claude에서 열기/ });
+      // Radix DropdownMenuItem asChild로 렌더된 <a>는 role="menuitem"을 가짐
+      const claudeLink = screen.getByRole("menuitem", { name: /Claude에서 열기/ });
       const expectedHref = `https://claude.ai/new?q=${encodeURIComponent(SAMPLE_MARKDOWN)}`;
       expect(claudeLink).toHaveAttribute("href", expectedHref);
     });
@@ -140,7 +143,8 @@ describe("feedme-page unit tests", () => {
       const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
       await userEvent.setup().click(chevronButton);
 
-      const claudeLink = screen.getByRole("link", { name: /Claude에서 열기/ });
+      // Radix DropdownMenuItem asChild로 렌더된 <a>는 role="menuitem"을 가짐
+      const claudeLink = screen.getByRole("menuitem", { name: /Claude에서 열기/ });
       expect(claudeLink).toHaveAttribute("target", "_blank");
     });
   });

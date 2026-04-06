@@ -249,13 +249,16 @@ describe("feedme-page spec acceptance tests", () => {
   describe("FEEDME-031: 메인 복사 버튼 클릭 시 클립보드 복사 및 체크 아이콘 표시", () => {
     it("클립보드에 마크다운이 복사되고 버튼 아이콘이 체크로 바뀐다", async () => {
       const writeText = vi.fn().mockResolvedValue(undefined);
+
+      const { user } = await renderWithContent("# Hello");
+
+      // renderWithContent 호출 이후 clipboard mock 설정
+      // (userEvent.setup()이 내부적으로 clipboard를 교체할 수 있으므로 이후에 재설정)
       Object.defineProperty(navigator, "clipboard", {
         value: { writeText },
         writable: true,
         configurable: true,
       });
-
-      const { user } = await renderWithContent("# Hello");
 
       const copyButton = screen.getByRole("button", { name: "복사" });
       await user.click(copyButton);
@@ -318,7 +321,8 @@ describe("feedme-page spec acceptance tests", () => {
         expect(screen.getByText("ChatGPT에서 열기")).toBeInTheDocument();
       });
 
-      const chatgptLink = screen.getByRole("link", { name: /ChatGPT에서 열기/ });
+      // Radix DropdownMenuItem asChild로 렌더된 <a>는 role="menuitem"을 가짐
+      const chatgptLink = screen.getByRole("menuitem", { name: /ChatGPT에서 열기/ });
       const expectedHref = `https://chatgpt.com/?q=${encodeURIComponent("# Hello")}`;
       expect(chatgptLink).toHaveAttribute("href", expectedHref);
       expect(chatgptLink).toHaveAttribute("target", "_blank");
@@ -337,7 +341,8 @@ describe("feedme-page spec acceptance tests", () => {
         expect(screen.getByText("Claude에서 열기")).toBeInTheDocument();
       });
 
-      const claudeLink = screen.getByRole("link", { name: /Claude에서 열기/ });
+      // Radix DropdownMenuItem asChild로 렌더된 <a>는 role="menuitem"을 가짐
+      const claudeLink = screen.getByRole("menuitem", { name: /Claude에서 열기/ });
       const expectedHref = `https://claude.ai/new?q=${encodeURIComponent("# Hello")}`;
       expect(claudeLink).toHaveAttribute("href", expectedHref);
       expect(claudeLink).toHaveAttribute("target", "_blank");
