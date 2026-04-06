@@ -149,6 +149,113 @@ describe("feedme-page unit tests", () => {
     });
   });
 
+  // FEEDME-036: 마크다운 다운로드
+  describe("마크다운 다운로드 기능 (FEEDME-036)", () => {
+    it("다운로드 항목 클릭 시 Blob URL이 생성된다", async () => {
+      const createObjectURLSpy = vi.fn().mockReturnValue("blob:http://localhost/test");
+      const revokeObjectURLSpy = vi.fn();
+      global.URL.createObjectURL = createObjectURLSpy;
+      global.URL.revokeObjectURL = revokeObjectURLSpy;
+
+      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
+      await userEvent.setup().click(chevronButton);
+
+      // 다운로드 직전에 spy 설정
+      const clickSpy = vi.fn();
+      const appendChildSpy = vi.spyOn(document.body, "appendChild").mockImplementation((node) => {
+        if (node instanceof HTMLAnchorElement) {
+          node.click = clickSpy;
+        }
+        return node;
+      });
+      const removeChildSpy = vi.spyOn(document.body, "removeChild").mockImplementation((node) => node);
+
+      const downloadItem = screen.getByRole("menuitem", { name: /마크다운 다운로드/ });
+      await userEvent.setup().click(downloadItem);
+
+      expect(createObjectURLSpy).toHaveBeenCalled();
+      expect(clickSpy).toHaveBeenCalled();
+      expect(revokeObjectURLSpy).toHaveBeenCalled();
+
+      appendChildSpy.mockRestore();
+      removeChildSpy.mockRestore();
+    });
+
+    it("다운로드 시 title이 있으면 '{title}.md' 파일명이 설정된다", async () => {
+      const createObjectURLSpy = vi.fn().mockReturnValue("blob:http://localhost/test");
+      global.URL.createObjectURL = createObjectURLSpy;
+      global.URL.revokeObjectURL = vi.fn();
+
+      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
+      await userEvent.setup().click(chevronButton);
+
+      // 다운로드 직전에 spy 설정
+      let anchorElement: HTMLAnchorElement | null = null;
+      const appendChildSpy = vi.spyOn(document.body, "appendChild").mockImplementation((node) => {
+        if (node instanceof HTMLAnchorElement) {
+          anchorElement = node;
+          node.click = vi.fn();
+        }
+        return node;
+      });
+      const removeChildSpy = vi.spyOn(document.body, "removeChild").mockImplementation((node) => node);
+
+      const downloadItem = screen.getByRole("menuitem", { name: /마크다운 다운로드/ });
+      await userEvent.setup().click(downloadItem);
+
+      expect(anchorElement).not.toBeNull();
+      expect((anchorElement as HTMLAnchorElement).download).toBe("Hello World.md");
+
+      appendChildSpy.mockRestore();
+      removeChildSpy.mockRestore();
+    });
+
+    it("다운로드 시 title이 없으면 'feedme.md' fallback 파일명이 설정된다", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ markdown: SAMPLE_MARKDOWN, title: null, type: "webpage" }),
+      });
+
+      const createObjectURLSpy = vi.fn().mockReturnValue("blob:http://localhost/test");
+      global.URL.createObjectURL = createObjectURLSpy;
+      global.URL.revokeObjectURL = vi.fn();
+
+      const user = userEvent.setup();
+      render(<FeedmePage />);
+      const input = screen.getByRole("textbox");
+      await user.type(input, "https://example.com");
+      await user.click(screen.getByRole("button", { name: "가져오기" }));
+      await screen.findByRole("button", { name: /복사/ });
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
+      await userEvent.setup().click(chevronButton);
+
+      // 다운로드 직전에 spy 설정
+      let anchorElement: HTMLAnchorElement | null = null;
+      const appendChildSpy = vi.spyOn(document.body, "appendChild").mockImplementation((node) => {
+        if (node instanceof HTMLAnchorElement) {
+          anchorElement = node;
+          node.click = vi.fn();
+        }
+        return node;
+      });
+      const removeChildSpy = vi.spyOn(document.body, "removeChild").mockImplementation((node) => node);
+
+      const downloadItem = screen.getByRole("menuitem", { name: /마크다운 다운로드/ });
+      await userEvent.setup().click(downloadItem);
+
+      expect(anchorElement).not.toBeNull();
+      expect((anchorElement as HTMLAnchorElement).download).toBe("feedme.md");
+
+      appendChildSpy.mockRestore();
+      removeChildSpy.mockRestore();
+    });
+  });
+
   describe("onChange 핸들러가 에러 상태를 초기화한다", () => {
     it("에러가 표시된 상태에서 URL 입력 시 에러가 사라진다", async () => {
       const user = userEvent.setup();

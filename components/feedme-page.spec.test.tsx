@@ -279,9 +279,9 @@ describe("feedme-page spec acceptance tests", () => {
     });
   });
 
-  // FEEDME-032: chevron 버튼 클릭 → 드롭다운 메뉴에 2개 항목 표시
+  // FEEDME-032: chevron 버튼 클릭 → 드롭다운 메뉴에 3개 항목 표시
   describe("FEEDME-032: chevron 버튼 클릭 시 드롭다운 메뉴 표시", () => {
-    it("ChatGPT에서 열기와 Claude에서 열기 항목이 아이콘과 함께 표시된다", async () => {
+    it("마크다운 다운로드, ChatGPT에서 열기, Claude에서 열기 항목이 아이콘과 함께 표시된다", async () => {
       const { user } = await renderWithContent();
 
       const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
@@ -289,23 +289,64 @@ describe("feedme-page spec acceptance tests", () => {
 
       // 드롭다운 메뉴가 표시되어야 한다
       await waitFor(() => {
+        expect(screen.getByText("마크다운 다운로드")).toBeInTheDocument();
         expect(screen.getByText("ChatGPT에서 열기")).toBeInTheDocument();
         expect(screen.getByText("Claude에서 열기")).toBeInTheDocument();
       });
 
       // 각 메뉴 항목에 아이콘(svg 또는 img)이 있어야 한다
+      const downloadItem = screen.getByText("마크다운 다운로드");
       const chatgptItem = screen.getByText("ChatGPT에서 열기");
       const claudeItem = screen.getByText("Claude에서 열기");
 
+      const downloadMenuItem = downloadItem.closest('[role="menuitem"]') ?? downloadItem.parentElement;
       const chatgptMenuItem = chatgptItem.closest('[role="menuitem"]') ?? chatgptItem.parentElement;
       const claudeMenuItem = claudeItem.closest('[role="menuitem"]') ?? claudeItem.parentElement;
 
+      const downloadIcon =
+        downloadMenuItem!.querySelector("svg") ?? downloadMenuItem!.querySelector("img");
       const chatgptIcon =
         chatgptMenuItem!.querySelector("svg") ?? chatgptMenuItem!.querySelector("img");
       const claudeIcon =
         claudeMenuItem!.querySelector("svg") ?? claudeMenuItem!.querySelector("img");
+      expect(downloadIcon).not.toBeNull();
       expect(chatgptIcon).not.toBeNull();
       expect(claudeIcon).not.toBeNull();
+    });
+  });
+
+  // FEEDME-036: 마크다운 다운로드 항목 클릭 시 .md 파일 다운로드
+  describe("FEEDME-036: 마크다운 다운로드 항목 클릭 시 파일 다운로드", () => {
+    it("드롭다운에 '마크다운 다운로드' 항목이 맨 위에 표시된다", async () => {
+      const { user } = await renderWithContent();
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      await user.click(chevronButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("마크다운 다운로드")).toBeInTheDocument();
+      });
+
+      // '마크다운 다운로드' 항목이 드롭다운 첫 번째 항목이어야 한다
+      const menuItems = screen.getAllByRole("menuitem");
+      expect(menuItems[0]).toHaveTextContent("마크다운 다운로드");
+    });
+
+    it("'마크다운 다운로드' 항목에 아이콘이 있다", async () => {
+      const { user } = await renderWithContent();
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      await user.click(chevronButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("마크다운 다운로드")).toBeInTheDocument();
+      });
+
+      const downloadItem = screen.getByText("마크다운 다운로드");
+      const downloadMenuItem = downloadItem.closest('[role="menuitem"]') ?? downloadItem.parentElement;
+      const icon =
+        downloadMenuItem!.querySelector("svg") ?? downloadMenuItem!.querySelector("img");
+      expect(icon).not.toBeNull();
     });
   });
 

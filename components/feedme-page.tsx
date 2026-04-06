@@ -14,7 +14,7 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { ArrowRight, Loader2, Copy, Check, ChevronDown } from "lucide-react";
+import { ArrowRight, Loader2, Copy, Check, ChevronDown, Download } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
   DropdownMenu,
@@ -160,6 +160,7 @@ export default function FeedmePage() {
                     markdown={markdownText}
                     copied={copied}
                     onCopy={handleCopy}
+                    title={result?.title}
                   />
                 </div>
               </div>
@@ -179,11 +180,25 @@ function SplitCopyButton({
   markdown,
   copied,
   onCopy,
+  title,
 }: {
   markdown: string;
   copied: boolean;
   onCopy: () => void;
+  title?: string;
 }) {
+  function handleDownload() {
+    const blob = new Blob([markdown], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = title ? `${title}.md` : "feedme.md";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="relative flex items-center rounded-lg bg-secondary">
       <Button
@@ -218,6 +233,10 @@ function SplitCopyButton({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuGroup>
+            <DropdownMenuItem onClick={handleDownload}>
+              <Download data-icon="inline-start" aria-hidden="true" />
+              마크다운 다운로드
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <a
                 href={`https://chatgpt.com/?q=${encodeURIComponent(markdown)}`}
