@@ -204,7 +204,6 @@ export default function FeedmePage() {
       )}
 
       <footer className="mt-auto w-full pt-16 pb-6 text-sm text-muted-foreground">
-        <Separator className="mb-6" />
         <div className="flex flex-col items-center gap-2">
           <div className="flex items-center gap-3">
             <span>© 2026 feed-me</span>
