@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -198,12 +199,16 @@ export default function FeedmePage() {
             <Separator />
             <div data-testid="result-container" className="flex flex-col gap-4">
               {result.thumbnail && (
-                <img
-                  src={result.thumbnail}
-                  alt={result.title ?? "썸네일"}
-                  className="w-full rounded-lg"
-                  style={{ aspectRatio: "16 / 9", objectFit: "cover" }}
-                />
+                <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
+                  <Image
+                    src={result.thumbnail}
+                    alt={result.title ?? "썸네일"}
+                    fill
+                    sizes="(max-width: 672px) 100vw, 672px"
+                    className="rounded-lg object-cover"
+                    unoptimized
+                  />
+                </div>
               )}
               <div className="flex flex-col gap-1">
                 {result.title && (

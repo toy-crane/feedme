@@ -879,13 +879,12 @@ describe("align-ui", () => {
       const thumbnail = screen.getByRole("img", { name: /테스트 제목|썸네일/i });
       expect(thumbnail).toBeInTheDocument();
 
-      // 16:9 비율 스타일 확인
-      const style = thumbnail.getAttribute("style") ?? "";
-      const className = thumbnail.getAttribute("class") ?? "";
+      // 16:9 비율 스타일 확인 (next/image wrapper div에 aspect-ratio 적용)
+      const wrapper = thumbnail.closest("div[style]");
+      const style = wrapper?.getAttribute("style") ?? "";
       const hasAspectRatio =
         style.includes("aspect-ratio") ||
-        style.includes("16 / 9") ||
-        className.includes("aspect-video");
+        style.includes("16 / 9");
       expect(hasAspectRatio).toBe(true);
     });
   });
@@ -955,9 +954,10 @@ describe("align-ui", () => {
       expect(container).not.toBeNull();
 
       const children = Array.from(container!.children);
-      // 첫 번째 자식: 썸네일 img
+      // 첫 번째 자식: 썸네일 wrapper div (next/image)
       const firstChild = children[0];
-      expect(firstChild.tagName.toLowerCase()).toBe("img");
+      expect(firstChild.tagName.toLowerCase()).toBe("div");
+      expect(firstChild.querySelector("img")).not.toBeNull();
       // 두 번째 자식: 메타 정보 div (제목/출처)
       const secondChild = children[1];
       expect(secondChild.tagName.toLowerCase()).toBe("div");
