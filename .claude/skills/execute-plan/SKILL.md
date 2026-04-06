@@ -48,7 +48,7 @@ plan.md의 Task 목록을 분석한다.
 
 ## Step 4: Builder에게 Task 위임
 
-실행 계획에 따라 `builder` agent를 spawn한다. 각 Builder에게 Task 내용, spec.yaml 경로, wireframe 경로, 구현 앱 URL을 전달한다.
+실행 계획에 따라 `builder` agent를 spawn한다. 각 Builder에게 Task 내용, spec.yaml 경로, wireframe 경로, 구현 앱 URL을 전달한다. UI 요소를 지시할 때 컴포넌트명을 특정하지 않는다. wireframe 구조를 Builder가 직접 읽고 판단하게 한다.
 
 - 순차 Task: 하나씩 위임하고 결과 확인 후 다음으로 진행
 - 병렬 Task: 독립적인 Task는 동시에 여러 Builder를 spawn하고 완료 후 결과 종합
@@ -66,6 +66,7 @@ plan.md의 Task 목록을 분석한다.
   - 경미한 수정: Team Lead가 직접 수정
   - 구현 수준 수정: Builder를 다시 spawn하여 Reviewer 피드백과 함께 위임
 - 수정 후 Reviewer를 재실행하여 pass를 확인한다
+- UI 변경이 포함된 수정은 스크린샷을 캡처하여 시각적으로 확인한 뒤 승인한다
 
 수정 전략 판단을 decisions.md에 기록한다.
 
