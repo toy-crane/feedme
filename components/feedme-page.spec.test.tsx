@@ -536,10 +536,11 @@ describe("Pre-prompt", () => {
     it("선택된 '요약해줘' 칩을 다시 클릭하면 Textarea가 비워지고 칩 선택이 해제된다", async () => {
       const { user } = await renderWithContentAndOpenCollapsible();
 
-      await user.click(screen.getByText("요약해줘"));
+      const chip = screen.getByRole("radio", { name: "요약해줘" });
+      await user.click(chip);
       expect(screen.getByRole("textbox", { name: /프롬프트/i })).toHaveValue("요약해줘");
 
-      await user.click(screen.getByText("요약해줘"));
+      await user.click(chip);
       expect(screen.getByRole("textbox", { name: /프롬프트/i })).toHaveValue("");
     });
   });

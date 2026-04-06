@@ -30,7 +30,8 @@ import {
   CollapsibleContent,
 } from "@/components/ui/collapsible";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { isValidUrl, buildCopyText } from "@/lib/utils";
+import { cn, isValidUrl, buildCopyText } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
 import { HyperText } from "@/components/ui/hyper-text";
 import ThemeToggle from "@/components/theme-toggle";
 
@@ -180,7 +181,7 @@ export default function FeedmePage() {
                   onClick={() => { if (isValidUrl(url) && !loading) handleFetch(); }}
                   aria-disabled={loading || !isValidUrl(url)}
                   aria-label="가져오기"
-                  className={loading || !isValidUrl(url) ? "pointer-events-auto opacity-50 cursor-not-allowed" : ""}
+                  className={cn((loading || !isValidUrl(url)) && "pointer-events-auto opacity-50 cursor-not-allowed")}
                 >
                   {loading ? <Loader2 className="animate-spin" /> : <ArrowRight />}
                 </InputGroupButton>
@@ -197,7 +198,7 @@ export default function FeedmePage() {
         {result && markdownText && !loading && (
           <>
             <Separator />
-            <div className={`flex flex-col ${result.type === "youtube" ? "gap-4" : "gap-3"}`}>
+            <div className={cn("flex flex-col", result.type === "youtube" ? "gap-4" : "gap-3")}>
               {result.type === "youtube" && result.thumbnail && (
                 <img
                   src={result.thumbnail}
@@ -234,9 +235,9 @@ export default function FeedmePage() {
                       <Plus data-icon="inline-start" />
                       <span>프롬프트 추가하기</span>
                       {promptOpen ? (
-                        <ChevronDown />
+                        <ChevronDown data-icon="inline-end" aria-hidden="true" />
                       ) : (
-                        <ChevronRight />
+                        <ChevronRight data-icon="inline-end" aria-hidden="true" />
                       )}
                     </button>
                   </CollapsibleTrigger>
@@ -246,13 +247,12 @@ export default function FeedmePage() {
                         <FieldLabel htmlFor="prompt-input" className="sr-only">
                           프롬프트
                         </FieldLabel>
-                        <input
+                        <Textarea
                           id="prompt-input"
-                          type="text"
                           placeholder="ex) 이 글을 요약해줘"
                           value={prompt}
                           onChange={(e) => handlePromptChange(e.target.value)}
-                          className="flex w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                          rows={2}
                         />
                       </Field>
                       <ToggleGroup
