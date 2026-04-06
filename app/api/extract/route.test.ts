@@ -5,9 +5,15 @@ vi.mock("@/lib/extract", () => ({
   extractContent: vi.fn(),
 }));
 
+vi.mock("@/lib/ratelimit", () => ({
+  checkRateLimit: vi.fn().mockReturnValue({ allowed: true }),
+}));
+
 import { extractContent } from "@/lib/extract";
+import { checkRateLimit } from "@/lib/ratelimit";
 
 const mockExtractContent = vi.mocked(extractContent);
+const mockCheckRateLimit = vi.mocked(checkRateLimit);
 
 function makeRequest(body: unknown): Request {
   return new Request("http://localhost/api/extract", {
@@ -20,6 +26,7 @@ function makeRequest(body: unknown): Request {
 describe("POST /api/extract", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCheckRateLimit.mockReturnValue({ allowed: true });
   });
 
   it("정상 요청 시 200과 ExtractResult를 반환한다", async () => {
@@ -86,5 +93,16 @@ describe("POST /api/extract", () => {
     expect(response.status).toBe(500);
     const json = await response.json();
     expect(json).toHaveProperty("error", "Unexpected failure");
+  });
+
+  it("checkRateLimit가 allowed:false를 반환하면 429와 에러 메시지를 반환한다", async () => {
+    mockCheckRateLimit.mockReturnValue({ allowed: false, retryAfter: 45 });
+
+    const request = makeRequest({ url: "https://example.com" });
+    const response = await POST(request);
+
+    expect(response.status).toBe(429);
+    const json = await response.json();
+    expect(json).toHaveProperty("error", "요청이 너무 많습니다. 45초 후 다시 시도해주세요");
   });
 });
