@@ -84,12 +84,18 @@ export default function FeedmePage() {
             <InputGroup>
               <InputGroupInput
                 id="url-input"
+                name="url"
                 type="url"
+                autoComplete="url"
                 placeholder="https://example.com 또는 YouTube URL"
                 value={url}
-                onChange={(e) => { setUrl(e.target.value); setError(null); }}
+                aria-invalid={!!error}
+                onChange={(e) => {
+                  setUrl(e.target.value);
+                  setError(null);
+                }}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleFetch();
+                  if (e.key === "Enter" && isValidUrl(url) && !loading) handleFetch();
                 }}
               />
               <InputGroupAddon align="inline-end">
@@ -98,9 +104,11 @@ export default function FeedmePage() {
                 </InputGroupButton>
               </InputGroupAddon>
             </InputGroup>
-            {error && (
-              <p className="text-destructive text-sm">{error}</p>
-            )}
+            <div aria-live="polite">
+              {error && (
+                <p className="text-destructive text-sm">{error}</p>
+              )}
+            </div>
           </Field>
         </FieldGroup>
 
