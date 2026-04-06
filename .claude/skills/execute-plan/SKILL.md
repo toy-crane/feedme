@@ -13,7 +13,7 @@ argument-hint: "feature 이름"
 - **spec 정합성이 목적, 프로세스는 수단** — spec.yaml의 input→output이 일치하는 것이 유일한 목표다. 그 목표를 달성하기 위해서라면 프로세스는 자유롭게 조정할 수 있다
 - **모든 의사결정은 Team Lead를 통한다** — Builder와 Reviewer는 Team Lead에게 보고하고, Team Lead가 다음 행동을 결정한다
 - **유연한 판단의 범위** — Task 순서 변경/합치기, spec 범위 밖 피드백 무시, 접근 방식 전환, 사용자 에스컬레이션 등 상황에 따라 Team Lead가 결정한다
-- **판단을 기록한다** — 자의적으로 내린 판단은 `artifacts/<feature>/decisions.md`에 기록한다 (시점, 내용, 근거)
+- **판단을 기록한다** — 자의적으로 내린 판단은 `artifacts/<feature>/decisions.md`에 `references/decisions-template.md` 형식으로 기록한다
 
 ## Step 1: 전제 조건 확인
 
@@ -23,6 +23,7 @@ $ARGUMENTS에서 feature명을 추출한다.
 - `artifacts/spec.yaml` 읽기
 - `artifacts/<feature>/wireframe.html` — 있으면 참조
 - plan.md의 Required Skills에 나열된 각 SKILL.md를 읽는다
+- `references/decisions-template.md` 읽기 — decisions.md 기록 형식 확인
 
 ## Step 2: 팀 편성
 
@@ -30,6 +31,7 @@ feature 특성을 분석하여 이번 실행에 필요한 팀원을 결정한다
 
 - **Builder**: Task 수와 병렬 가능성을 고려하여 필요한 수를 결정
 - **Reviewer 선별**:
+  - `wireframe-reviewer` — wireframe.html이 존재하고 UI 변경 Task가 있을 때
   - `design-reviewer` — UI 컴포넌트가 있을 때만
   - `react-reviewer` — React/Next.js 코드가 있을 때만
 
@@ -46,14 +48,14 @@ plan.md의 Task 목록을 분석한다.
 
 ## Step 4: Builder에게 Task 위임
 
-실행 계획에 따라 `builder` agent를 spawn한다. 각 Builder에게 Task 내용, spec.yaml 경로, wireframe 경로를 전달한다.
+실행 계획에 따라 `builder` agent를 spawn한다. 각 Builder에게 Task 내용, spec.yaml 경로, wireframe 경로, 구현 앱 URL을 전달한다.
 
 - 순차 Task: 하나씩 위임하고 결과 확인 후 다음으로 진행
 - 병렬 Task: 독립적인 Task는 동시에 여러 Builder를 spawn하고 완료 후 결과 종합
 
 ## Step 5: 평가 루프
 
-전체 Task 완료 후 Step 2에서 선별한 Reviewer를 **병렬로** spawn한다.
+전체 Task 완료 후 Step 2에서 선별한 Reviewer를 **병렬로** spawn한다. wireframe-reviewer에게는 feature명, 구현 앱 URL, wireframe screen ↔ 구현 URL 경로 매핑을 함께 전달한다.
 
 ### 피드백 처리
 
@@ -67,6 +69,8 @@ plan.md의 Task 목록을 분석한다.
 
 수정 전략 판단을 decisions.md에 기록한다.
 
+평가 루프 완료 후, Step 2(팀 편성)와 Step 3(실행 계획)에서 `미정`으로 남긴 결과를 갱신한다.
+
 ## Step 6: Code Simplifier
 
 모든 Reviewer pass 후 `code-simplifier` 에이전트를 호출한다.
@@ -78,4 +82,4 @@ plan.md의 Task 목록을 분석한다.
 - **실행 요약**: 총 Task 수, 병렬/순차 실행 현황, 팀 구성
 - **Reviewer 결과**: 실행한 Reviewer별 pass/fail
 - **Code Simplifier**: 주요 변경사항
-- **판단 기록**: decisions.md 경로 안내
+- **판단 기록**: decisions.md 경로 안내 — 남은 `미정` 결과를 모두 갱신한 뒤 보고

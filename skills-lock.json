@@ -1,11 +1,6 @@
 {
   "version": 1,
   "skills": {
-    "ai-elements": {
-      "source": "vercel/ai-elements",
-      "sourceType": "github",
-      "computedHash": "84f3a2a57fa71ae5061786280987575d673792d6dda9a63941efb2795b83543a"
-    },
     "design-md": {
       "source": "google-labs-code/stitch-skills",
       "sourceType": "github",
@@ -60,11 +55,6 @@
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
       "computedHash": "afeca00ac2f492d88fdd010e73d91719a5b57c564bb4a73325b0bd77e11323ab"
-    },
-    "vercel-react-view-transitions": {
-      "source": "vercel-labs/agent-skills",
-      "sourceType": "github",
-      "computedHash": "4fea9144f604256d0a21faaea904b7e205e7676e316721ba5fdd68c2600c7d42"
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",
