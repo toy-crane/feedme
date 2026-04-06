@@ -1,5 +1,5 @@
-import { ComponentExample } from "@/components/component-example";
+import FeedmePage from "@/components/feedme-page";
 
 export default function Page() {
-return <ComponentExample />;
+  return <FeedmePage />;
 }
