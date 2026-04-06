@@ -3,7 +3,6 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
   InputGroup,
@@ -99,14 +98,11 @@ export default function FeedmePage() {
                 </InputGroupButton>
               </InputGroupAddon>
             </InputGroup>
+            {error && (
+              <p className="text-destructive text-sm">{error}</p>
+            )}
           </Field>
         </FieldGroup>
-
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
 
         {result && markdownText && !loading && result.type === "youtube" ? (
           <div className="flex flex-col gap-4">
