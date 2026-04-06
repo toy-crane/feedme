@@ -58,9 +58,9 @@ export default function FeedmePage() {
   const [copied, setCopied] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [promptOpen, setPromptOpen] = useState(false);
-  const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
 
   const markdownText = result?.markdown ?? result?.content ?? null;
+  const selectedPreset = (PRESETS as readonly string[]).includes(prompt) ? prompt : "";
 
   function handleReset() {
     setUrl("");
@@ -70,7 +70,6 @@ export default function FeedmePage() {
     setLoading(false);
     setPrompt("");
     setPromptOpen(false);
-    setSelectedPreset(null);
   }
 
   async function handleFetch() {
@@ -106,23 +105,6 @@ export default function FeedmePage() {
     await navigator.clipboard.writeText(buildCopyText(prompt, markdownText));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }
-
-  function handlePresetChange(value: string) {
-    if (!value) {
-      setSelectedPreset(null);
-      setPrompt("");
-    } else {
-      setSelectedPreset(value);
-      setPrompt(value);
-    }
-  }
-
-  function handlePromptChange(value: string) {
-    setPrompt(value);
-    if (selectedPreset !== null && value !== selectedPreset) {
-      setSelectedPreset(null);
-    }
   }
 
   return (
@@ -255,14 +237,14 @@ export default function FeedmePage() {
                           id="prompt-input"
                           placeholder="ex) 이 글을 요약해줘"
                           value={prompt}
-                          onChange={(e) => handlePromptChange(e.target.value)}
+                          onChange={(e) => setPrompt(e.target.value)}
                           rows={2}
                         />
                       </Field>
                       <ToggleGroup
                         type="single"
-                        value={selectedPreset ?? ""}
-                        onValueChange={handlePresetChange}
+                        value={selectedPreset}
+                        onValueChange={setPrompt}
                         spacing={2}
                         className="flex flex-wrap justify-start"
                       >
