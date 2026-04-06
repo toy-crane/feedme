@@ -186,7 +186,7 @@ export default function FeedmePage() {
                   />
                 </div>
               </div>
-              <div className="prose max-w-none">
+              <div className="prose dark:prose-invert max-w-none">
                 <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS}>{markdownText}</ReactMarkdown>
               </div>
             </div>
