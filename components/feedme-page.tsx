@@ -109,7 +109,6 @@ export default function FeedmePage() {
 
   function handlePresetChange(value: string) {
     if (!value) {
-      // toggling off
       setSelectedPreset(null);
       setPrompt("");
     } else {
@@ -120,7 +119,6 @@ export default function FeedmePage() {
 
   function handlePromptChange(value: string) {
     setPrompt(value);
-    // auto-deselect preset if text doesn't match
     if (selectedPreset !== null && value !== selectedPreset) {
       setSelectedPreset(null);
     }

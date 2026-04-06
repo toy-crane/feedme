@@ -3,6 +3,26 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import FeedmePage from "@/components/feedme-page";
 
+async function renderWithContent(markdown = "# Hello") {
+  const user = userEvent.setup();
+  global.fetch = vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ markdown }),
+  } as Response);
+
+  render(<FeedmePage />);
+
+  const input = screen.getByRole("textbox");
+  await user.type(input, "https://example.com");
+  await user.click(screen.getByRole("button", { name: "가져오기" }));
+
+  await waitFor(() => {
+    expect(screen.getByRole("button", { name: "복사하기" })).toBeInTheDocument();
+  });
+
+  return { user };
+}
+
 describe("feedme-page spec acceptance tests", () => {
   beforeEach(() => {
     vi.resetAllMocks();
@@ -204,28 +224,6 @@ describe("feedme-page spec acceptance tests", () => {
   // improve-copy-button feature (FEEDME-030 ~ 035)
   // ──────────────────────────────────────────────
 
-  // 콘텐츠 추출 후 split button이 표시된 상태를 만드는 헬퍼
-  async function renderWithContent(markdown = "# Hello") {
-    const user = userEvent.setup();
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ markdown }),
-    } as Response);
-
-    render(<FeedmePage />);
-
-    const input = screen.getByRole("textbox");
-    await user.type(input, "https://example.com");
-    await user.click(screen.getByRole("button", { name: "가져오기" }));
-
-    await waitFor(() => {
-      // split button의 메인 복사 버튼이 나타날 때까지 대기
-      expect(screen.getByRole("button", { name: "복사하기" })).toBeInTheDocument();
-    });
-
-    return { user };
-  }
-
   // FEEDME-030: 콘텐츠 추출 후 split button 표시
   describe("FEEDME-030: 콘텐츠 추출 후 split button 표시", () => {
     it("복사 아이콘+텍스트 메인 버튼과 chevron 버튼이 함께 표시된다", async () => {
@@ -414,27 +412,6 @@ describe("Pre-prompt", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
-
-  // 콘텐츠 추출 후 상태를 만드는 헬퍼
-  async function renderWithContent(markdown = "# Hello") {
-    const user = userEvent.setup();
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ markdown }),
-    } as Response);
-
-    render(<FeedmePage />);
-
-    const input = screen.getByRole("textbox");
-    await user.type(input, "https://example.com");
-    await user.click(screen.getByRole("button", { name: "가져오기" }));
-
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "복사하기" })).toBeInTheDocument();
-    });
-
-    return { user };
-  }
 
   // 콘텐츠 추출 후 Collapsible을 열어놓는 헬퍼
   async function renderWithContentAndOpenCollapsible(markdown = "# Hello") {
