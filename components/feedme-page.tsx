@@ -109,7 +109,7 @@ export default function FeedmePage() {
               <InputGroupAddon align="inline-end">
                 <InputGroupButton
                   variant="default"
-                  size="icon-sm"
+                  size="icon-lg"
                   onClick={() => { if (isValidUrl(url) && !loading) handleFetch(); }}
                   aria-disabled={loading || !isValidUrl(url)}
                   aria-label="가져오기"
