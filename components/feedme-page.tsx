@@ -86,7 +86,7 @@ export default function FeedmePage() {
   return (
     <div className="min-h-screen flex flex-col items-center py-16 px-4">
       <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           <div
             data-testid="logo"
             className="cursor-pointer"
@@ -95,14 +95,14 @@ export default function FeedmePage() {
             <span className="sr-only">Feed-me</span>
             <HyperText
               as="h1"
-              className="text-3xl font-bold"
+              className="text-5xl font-bold"
               aria-hidden="true"
             >
               Feed-me
             </HyperText>
           </div>
           <p className="text-muted-foreground">
-            URL을 입력하면 웹페이지나 YouTube 자막을 마크다운으로 추출합니다
+            어떤 URL이든, Markdown으로.
           </p>
         </div>
 
