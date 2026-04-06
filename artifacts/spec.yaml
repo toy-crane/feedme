@@ -9,10 +9,10 @@ features:
       - id: FEEDME-001
         given: "URL 입력창이 비어 있는 초기 화면"
         when: "URL 입력란에 웹페이지 URL을 입력하고 '추출' 버튼을 클릭한다"
-        then: "제목과 본문이 렌더링된 마크다운 미리보기로 표시된다"
+        then: "제목, 출처, 본문이 렌더링된 마크다운 미리보기로 표시된다"
         examples:
           - input: { url: "https://example.com/article" }
-            expect: { previewVisible: true, previewContainsTitle: true, previewContainsBody: true }
+            expect: { previewVisible: true, previewContainsTitle: true, previewContainsSource: true, previewContainsBody: true }
       - id: FEEDME-002
         given: "URL 입력창이 비어 있는 초기 화면"
         when: "URL 입력란에 YouTube URL을 입력하고 '추출' 버튼을 클릭한다"
@@ -529,3 +529,81 @@ features:
       - "shadcn Collapsible 컴포넌트 설치"
       - "shadcn ToggleGroup 컴포넌트 설치"
       - "Textarea 컴포넌트 이미 설치됨"
+
+  - id: align-ui
+    title: "결과 UI 통일"
+    scenarios:
+      - id: ALIGN-001
+        given: "OG 이미지가 있는 웹페이지 URL을 추출하여 결과가 표시된 상태"
+        when: "결과 영역을 확인한다"
+        then: "제목 위에 OG 이미지가 16:9 비율의 썸네일로 표시된다"
+        examples:
+          - input: { url: "https://example.com/article-with-og", hasOgImage: true }
+            expect: { thumbnailVisible: true, thumbnailAspectRatio: "16/9" }
+      - id: ALIGN-002
+        given: "OG 이미지가 없는 웹페이지 URL을 추출하여 결과가 표시된 상태"
+        when: "결과 영역을 확인한다"
+        then: "썸네일 영역이 표시되지 않는다"
+        examples:
+          - input: { url: "https://example.com/article-no-og", hasOgImage: false }
+            expect: { thumbnailVisible: false }
+      - id: ALIGN-003
+        given: "author 메타가 있는 웹페이지 URL을 추출하여 결과가 표시된 상태"
+        when: "제목 아래 영역을 확인한다"
+        then: "author 텍스트가 출처로 표시된다"
+        examples:
+          - input: { url: "https://example.com/article", author: "홍길동" }
+            expect: { sourceText: "홍길동" }
+      - id: ALIGN-004
+        given: "author 메타가 없는 웹페이지 URL을 추출하여 결과가 표시된 상태"
+        when: "제목 아래 영역을 확인한다"
+        then: "도메인명이 출처로 표시된다"
+        examples:
+          - input: { url: "https://blog.example.com/article", author: null }
+            expect: { sourceText: "blog.example.com" }
+      - id: ALIGN-005
+        given: "YouTube URL과 웹페이지 URL을 각각 추출하여 결과가 표시된 상태"
+        when: "두 결과의 레이아웃 구조를 비교한다"
+        then: "동일한 요소 순서(썸네일 -> 제목 -> 출처 -> 복사 버튼 -> 프롬프트 -> 본문)와 동일한 간격으로 표시된다"
+        examples:
+          - input: { contentType: "youtube" }
+            expect: { elementOrder: ["thumbnail", "title", "source", "copyButton", "prompt", "body"], gap: "gap-4" }
+          - input: { contentType: "webpage", hasOgImage: true }
+            expect: { elementOrder: ["thumbnail", "title", "source", "copyButton", "prompt", "body"], gap: "gap-4" }
+          - input: { contentType: "webpage", hasOgImage: false }
+            expect: { elementOrder: ["title", "source", "copyButton", "prompt", "body"], gap: "gap-4" }
+      - id: ALIGN-006
+        given: "OG 이미지와 author 메타가 있는 웹페이지 URL로 추출 API를 호출한 상태"
+        when: "API 응답을 확인한다"
+        then: "응답에 thumbnail 필드와 source 필드가 포함된다"
+        examples:
+          - input: { url: "https://example.com/article-with-meta", hasOgImage: true, hasAuthor: true }
+            expect: { thumbnailInResponse: true, sourceInResponse: true }
+      - id: ALIGN-007
+        given: "author 메타가 없는 웹페이지 URL로 추출 API를 호출한 상태"
+        when: "API 응답을 확인한다"
+        then: "응답에 source 필드로 도메인명이 포함된다"
+        examples:
+          - input: { url: "https://blog.example.com/article", hasAuthor: false }
+            expect: { sourceInResponse: "blog.example.com" }
+      - id: ALIGN-008
+        given: "YouTube URL을 추출하여 결과가 표시된 상태"
+        when: "마크다운 본문을 확인한다"
+        then: "Defuddle이 삽입한 '## Transcript' 헤딩이 제거되어 표시되지 않는다"
+        examples:
+          - input: { url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", rawContent: "![](url)\n\n## Transcript\n\n### 소개\n\n내용" }
+            expect: { contentContainsTranscriptHeading: false, contentContainsBody: true }
+      - id: ALIGN-009
+        given: "콘텐츠가 추출되어 결과가 표시된 상태"
+        when: "프롬프트 영역과 마크다운 본문 사이를 확인한다"
+        then: "프롬프트 영역과 본문 사이에 구분선(Separator)이 표시된다"
+        examples:
+          - input: { contentType: "youtube" }
+            expect: { separatorBetweenPromptAndBody: true }
+          - input: { contentType: "webpage" }
+            expect: { separatorBetweenPromptAndBody: true }
+    excludes:
+      - "썸네일 크기/비율 변경 — 기존 16:9 유지"
+      - "웹페이지 favicon 표시 — MVP 범위 외"
+    preconditions:
+      - "Defuddle 라이브러리가 웹페이지에서 image, author를 파싱할 수 있다"

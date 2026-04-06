@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -45,8 +46,8 @@ type ExtractResult = {
   content?: string;
   title?: string;
   type?: string;
-  channel?: string;
   thumbnail?: string;
+  source?: string;
 };
 
 export default function FeedmePage() {
@@ -57,9 +58,9 @@ export default function FeedmePage() {
   const [copied, setCopied] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [promptOpen, setPromptOpen] = useState(false);
-  const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
 
   const markdownText = result?.markdown ?? result?.content ?? null;
+  const selectedPreset = (PRESETS as readonly string[]).includes(prompt) ? prompt : "";
 
   function handleReset() {
     setUrl("");
@@ -69,7 +70,6 @@ export default function FeedmePage() {
     setLoading(false);
     setPrompt("");
     setPromptOpen(false);
-    setSelectedPreset(null);
   }
 
   async function handleFetch() {
@@ -105,23 +105,6 @@ export default function FeedmePage() {
     await navigator.clipboard.writeText(buildCopyText(prompt, markdownText));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }
-
-  function handlePresetChange(value: string) {
-    if (!value) {
-      setSelectedPreset(null);
-      setPrompt("");
-    } else {
-      setSelectedPreset(value);
-      setPrompt(value);
-    }
-  }
-
-  function handlePromptChange(value: string) {
-    setPrompt(value);
-    if (selectedPreset !== null && value !== selectedPreset) {
-      setSelectedPreset(null);
-    }
   }
 
   return (
@@ -196,21 +179,25 @@ export default function FeedmePage() {
         {result && markdownText && !loading && (
           <>
             <Separator />
-            <div className={cn("flex flex-col", result.type === "youtube" ? "gap-4" : "gap-3")}>
-              {result.type === "youtube" && result.thumbnail && (
-                <img
-                  src={result.thumbnail}
-                  alt={result.title ?? "YouTube 썸네일"}
-                  className="w-full rounded-lg"
-                  style={{ aspectRatio: "16 / 9", objectFit: "cover" }}
-                />
+            <div data-testid="result-container" className="flex flex-col gap-4">
+              {result.thumbnail && (
+                <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
+                  <Image
+                    src={result.thumbnail}
+                    alt={result.title ?? "썸네일"}
+                    fill
+                    sizes="(max-width: 672px) 100vw, 672px"
+                    className="rounded-lg object-cover"
+                    unoptimized
+                  />
+                </div>
               )}
               <div className="flex flex-col gap-1">
                 {result.title && (
                   <div className="flex flex-col gap-1">
                     <h2 className="text-2xl font-bold">{result.title}</h2>
-                    {result.type === "youtube" && result.channel && (
-                      <p className="text-sm text-muted-foreground">{result.channel}</p>
+                    {result.source && (
+                      <p className="text-sm text-muted-foreground">{result.source}</p>
                     )}
                   </div>
                 )}
@@ -250,14 +237,14 @@ export default function FeedmePage() {
                           id="prompt-input"
                           placeholder="ex) 이 글을 요약해줘"
                           value={prompt}
-                          onChange={(e) => handlePromptChange(e.target.value)}
+                          onChange={(e) => setPrompt(e.target.value)}
                           rows={2}
                         />
                       </Field>
                       <ToggleGroup
                         type="single"
-                        value={selectedPreset ?? ""}
-                        onValueChange={handlePresetChange}
+                        value={selectedPreset}
+                        onValueChange={setPrompt}
                         spacing={2}
                         className="flex flex-wrap justify-start"
                       >
@@ -277,6 +264,7 @@ export default function FeedmePage() {
                   </CollapsibleContent>
                 </Collapsible>
               </div>
+              <Separator />
               <div className="prose dark:prose-invert max-w-none">
                 <ReactMarkdown remarkPlugins={REMARK_PLUGINS} rehypePlugins={REHYPE_PLUGINS}>{markdownText}</ReactMarkdown>
               </div>
