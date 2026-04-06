@@ -411,6 +411,15 @@ features:
         examples:
           - input: { currentTheme: "dark", markdown: "```javascript\nconst x = 1;\n```" }
             expect: { darkHighlightTheme: true }
+      - id: DARK-007
+        given: "다크 모드에서 마크다운 콘텐츠가 추출되어 미리보기가 표시된 상태"
+        when: "마크다운 본문 영역을 확인한다"
+        then: "본문 텍스트가 밝은 색으로 표시되어 어두운 배경에서 읽을 수 있다"
+        examples:
+          - input: { currentTheme: "dark", markdown: "# 제목\n\n본문 텍스트입니다" }
+            expect: { proseInvertApplied: true, textReadableOnDarkBg: true }
+          - input: { currentTheme: "light", markdown: "# 제목\n\n본문 텍스트입니다" }
+            expect: { proseInvertApplied: false, textReadableOnLightBg: true }
     excludes:
       - "3단 모드(light/dark/system) 선택 UI — 토글로 2단 전환만 지원"
       - "애니메이션 전환 효과 — MVP 범위 외"

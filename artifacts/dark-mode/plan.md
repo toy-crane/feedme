@@ -28,8 +28,9 @@
 |-----------|----------|-----------|
 | `components/theme-toggle.tsx` | 신규 | Task 2 |
 | `app/layout.tsx` | 수정 | Task 3 |
-| `components/feedme-page.tsx` | 수정 | Task 4 |
+| `components/feedme-page.tsx` | 수정 | Task 4, Task 5 |
 | `app/globals.css` | 수정 | Task 4 |
+| `components/__tests__/dark-mode-prose.spec.test.tsx` | 신규 | Task 5 |
 
 ## Tasks
 
@@ -111,6 +112,23 @@
   - [ ] 다크 모드에서 코드 블록이 어두운 배경 + 밝은 텍스트로 표시된다
   - [ ] 라이트 모드에서 기존 github.css 스타일이 유지된다
   - [ ] `bun run test` — DARK-006 포함 전체 통과
+
+---
+
+### Task 5: 마크다운 본문 다크 모드 가독성
+
+- **시나리오**: DARK-007
+- **의존성**: 없음 (Task 1~4는 이미 구현 완료)
+- **구현 대상**:
+  - `components/__tests__/dark-mode-prose.spec.test.tsx`
+    - 다크 모드에서 prose 컨테이너에 `dark:prose-invert` 클래스 존재 검증
+    - 라이트 모드에서 `prose-invert` 미적용 검증
+  - `components/feedme-page.tsx`
+    - 마크다운 렌더링 div의 className에 `dark:prose-invert` 추가
+- **수용 기준**:
+  - [ ] 다크 모드 + 마크다운 미리보기 표시 -> prose 컨테이너에 `dark:prose-invert` 클래스 존재
+  - [ ] 라이트 모드 + 마크다운 미리보기 표시 -> `prose-invert` 미적용
+  - [ ] `bun run test` 전체 통과
 
 ---
 
