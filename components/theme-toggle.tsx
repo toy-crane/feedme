@@ -27,7 +27,7 @@ export default function ThemeToggle() {
       aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
-      {isDark ? <Moon data-icon /> : <Sun data-icon />}
+      {isDark ? <Moon /> : <Sun />}
     </Button>
   );
 }

@@ -1,16 +1,10 @@
-/**
- * Dark Mode Spec Tests (수용 기준 테스트)
- *
- * spec.yaml의 dark-mode 시나리오를 검증한다.
- */
-
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import React from "react";
 import ThemeToggle from "@/components/theme-toggle";
+import { useTheme } from "next-themes";
 
-// next-themes 모킹
 vi.mock("next-themes", () => ({
   useTheme: vi.fn(() => ({
     theme: "light",
@@ -23,13 +17,17 @@ vi.mock("next-themes", () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-describe("dark-mode spec acceptance tests", () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-    document.documentElement.classList.remove("dark");
-    localStorage.clear();
+function makeSetTheme() {
+  return vi.fn((newTheme: string) => {
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   });
+}
 
+describe("dark-mode spec acceptance tests", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     document.documentElement.classList.remove("dark");
@@ -50,14 +48,7 @@ describe("dark-mode spec acceptance tests", () => {
   // DARK-002: 라이트 모드에서 테마 토글 클릭 시 다크 모드로 전환
   describe("DARK-002: 라이트 모드 → 다크 모드 전환", () => {
     it("라이트 모드에서 토글 클릭 시 setTheme('dark')가 호출된다", async () => {
-      const { useTheme } = await import("next-themes");
-      const mockSetTheme = vi.fn((newTheme: string) => {
-        if (newTheme === "dark") {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-      });
+      const mockSetTheme = makeSetTheme();
       vi.mocked(useTheme).mockReturnValue({
         theme: "light",
         setTheme: mockSetTheme,
@@ -70,8 +61,7 @@ describe("dark-mode spec acceptance tests", () => {
       const user = userEvent.setup();
       render(<ThemeToggle />);
 
-      const toggleButton = screen.getByRole("button");
-      await user.click(toggleButton);
+      await user.click(screen.getByRole("button"));
 
       expect(mockSetTheme).toHaveBeenCalledWith("dark");
       expect(document.documentElement.classList.contains("dark")).toBe(true);
@@ -81,14 +71,7 @@ describe("dark-mode spec acceptance tests", () => {
   // DARK-003: 다크 모드에서 테마 토글 클릭 시 라이트 모드로 전환
   describe("DARK-003: 다크 모드 → 라이트 모드 전환", () => {
     it("다크 모드에서 토글 클릭 시 setTheme('light')가 호출된다", async () => {
-      const { useTheme } = await import("next-themes");
-      const mockSetTheme = vi.fn((newTheme: string) => {
-        if (newTheme === "dark") {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-      });
+      const mockSetTheme = makeSetTheme();
       vi.mocked(useTheme).mockReturnValue({
         theme: "dark",
         setTheme: mockSetTheme,
@@ -103,8 +86,7 @@ describe("dark-mode spec acceptance tests", () => {
       const user = userEvent.setup();
       render(<ThemeToggle />);
 
-      const toggleButton = screen.getByRole("button");
-      await user.click(toggleButton);
+      await user.click(screen.getByRole("button"));
 
       expect(mockSetTheme).toHaveBeenCalledWith("light");
       expect(document.documentElement.classList.contains("dark")).toBe(false);
@@ -113,7 +95,7 @@ describe("dark-mode spec acceptance tests", () => {
 
   // DARK-004: OS 다크 모드 설정 + 첫 방문 시 다크 모드로 표시
   describe("DARK-004: OS 설정에 따른 초기 테마", () => {
-    it("OS 다크 모드 설정 + 첫 방문 시 resolvedTheme이 dark이다", async () => {
+    it("OS 다크 모드 설정 + 첫 방문 시 resolvedTheme이 dark이다", () => {
       Object.defineProperty(window, "matchMedia", {
         writable: true,
         value: vi.fn().mockImplementation((query: string) => ({
@@ -128,8 +110,6 @@ describe("dark-mode spec acceptance tests", () => {
         })),
       });
 
-      const { useTheme } = await import("next-themes");
-      // ThemeProvider가 OS 설정을 감지하여 resolvedTheme을 dark로 설정하는 것을 시뮬레이션
       vi.mocked(useTheme).mockReturnValue({
         theme: "system",
         setTheme: vi.fn(),
@@ -139,7 +119,6 @@ describe("dark-mode spec acceptance tests", () => {
         forcedTheme: undefined,
       });
 
-      // ThemeProvider는 실제로 html에 dark 클래스를 적용함 (테스트에서 시뮬레이션)
       document.documentElement.classList.add("dark");
 
       render(<ThemeToggle />);
@@ -147,7 +126,7 @@ describe("dark-mode spec acceptance tests", () => {
       expect(document.documentElement.classList.contains("dark")).toBe(true);
     });
 
-    it("OS 라이트 모드 설정 + 첫 방문 시 resolvedTheme이 light이다", async () => {
+    it("OS 라이트 모드 설정 + 첫 방문 시 resolvedTheme이 light이다", () => {
       Object.defineProperty(window, "matchMedia", {
         writable: true,
         value: vi.fn().mockImplementation((query: string) => ({
@@ -162,7 +141,6 @@ describe("dark-mode spec acceptance tests", () => {
         })),
       });
 
-      const { useTheme } = await import("next-themes");
       vi.mocked(useTheme).mockReturnValue({
         theme: "system",
         setTheme: vi.fn(),
@@ -180,10 +158,9 @@ describe("dark-mode spec acceptance tests", () => {
 
   // DARK-005: 사용자가 토글로 다크/라이트 모드 선택 후 새로고침 시 선택 유지
   describe("DARK-005: 테마 선택 유지 (localStorage)", () => {
-    it("다크 모드 선택 후 새로고침 시 dark 클래스가 유지된다", async () => {
+    it("다크 모드 선택 후 새로고침 시 dark 클래스가 유지된다", () => {
       localStorage.setItem("theme", "dark");
 
-      const { useTheme } = await import("next-themes");
       vi.mocked(useTheme).mockReturnValue({
         theme: "dark",
         setTheme: vi.fn(),
@@ -193,7 +170,6 @@ describe("dark-mode spec acceptance tests", () => {
         forcedTheme: undefined,
       });
 
-      // ThemeProvider가 localStorage에서 테마를 읽어 dark 클래스 적용 (시뮬레이션)
       document.documentElement.classList.add("dark");
 
       render(<ThemeToggle />);
@@ -202,10 +178,9 @@ describe("dark-mode spec acceptance tests", () => {
       expect(localStorage.getItem("theme")).toBe("dark");
     });
 
-    it("라이트 모드 선택 후 새로고침 시 dark 클래스가 없다", async () => {
+    it("라이트 모드 선택 후 새로고침 시 dark 클래스가 없다", () => {
       localStorage.setItem("theme", "light");
 
-      const { useTheme } = await import("next-themes");
       vi.mocked(useTheme).mockReturnValue({
         theme: "light",
         setTheme: vi.fn(),
@@ -226,7 +201,6 @@ describe("dark-mode spec acceptance tests", () => {
     it("다크 모드에서 .dark .hljs CSS 규칙으로 코드 블록에 다크 테마가 적용된다", () => {
       document.documentElement.classList.add("dark");
 
-      // 코드 블록을 DOM에 추가
       const codeBlock = document.createElement("pre");
       const code = document.createElement("code");
       code.className = "hljs language-javascript";
@@ -234,18 +208,8 @@ describe("dark-mode spec acceptance tests", () => {
       codeBlock.appendChild(code);
       document.body.appendChild(codeBlock);
 
-      // 다크 모드 상태 확인
       expect(document.documentElement.classList.contains("dark")).toBe(true);
-
-      // hljs 클래스가 있는 코드 블록이 존재해야 한다
-      const hljsElement = document.querySelector(".hljs");
-      expect(hljsElement).not.toBeNull();
-
-      // .dark 클래스가 html에 있고 .hljs 요소가 존재하면
-      // globals.css의 .dark .hljs 규칙이 적용되어 다크 하이라이팅이 동작한다
-      const isDarkMode = document.documentElement.classList.contains("dark");
-      const hasHljsElement = hljsElement !== null;
-      expect(isDarkMode && hasHljsElement).toBe(true);
+      expect(document.querySelector(".hljs")).not.toBeNull();
 
       document.body.removeChild(codeBlock);
     });
