@@ -186,3 +186,45 @@ features:
     preconditions:
       - "remark-gfm 패키지 설치"
       - "rehype-highlight 패키지 설치"
+
+  - id: rate-limit
+    title: "Rate Limit"
+    scenarios:
+      - id: RATE-001
+        given: "1분 이내에 추출 요청을 보내지 않은 상태"
+        when: "URL 입력란에 URL을 입력하고 '가져오기' 버튼을 클릭한다"
+        then: "콘텐츠가 정상적으로 추출되어 표시된다"
+        examples:
+          - input: { url: "https://example.com/article", requestCountInWindow: 0 }
+            expect: { httpStatus: 200, previewVisible: true }
+          - input: { url: "https://example.com/article", requestCountInWindow: 9 }
+            expect: { httpStatus: 200, previewVisible: true }
+      - id: RATE-002
+        given: "1분 이내에 동일 IP에서 10회 요청을 보낸 상태"
+        when: "URL 입력란에 URL을 입력하고 '가져오기' 버튼을 클릭한다"
+        then: "입력 필드 하단에 '요청이 너무 많습니다. N초 후 다시 시도해주세요' 인라인 에러 텍스트가 빨간색으로 표시된다"
+        examples:
+          - input: { url: "https://example.com/article", requestCountInWindow: 10 }
+            expect: { httpStatus: 429, inlineErrorText: "요청이 너무 많습니다. 60초 후 다시 시도해주세요" }
+          - input: { url: "https://example.com/article", requestCountInWindow: 10, elapsedSeconds: 30 }
+            expect: { httpStatus: 429, inlineErrorText: "요청이 너무 많습니다. 30초 후 다시 시도해주세요" }
+      - id: RATE-003
+        given: "1분 이내에 동일 IP에서 10회 요청을 보내고 60초가 경과한 상태"
+        when: "URL 입력란에 URL을 입력하고 '가져오기' 버튼을 클릭한다"
+        then: "콘텐츠가 정상적으로 추출되어 표시된다"
+        examples:
+          - input: { url: "https://example.com/article", requestCountInWindow: 10, elapsedSeconds: 60 }
+            expect: { httpStatus: 200, previewVisible: true }
+      - id: RATE-004
+        given: "IP-A가 1분 이내에 10회 요청을 모두 소진한 상태"
+        when: "IP-B에서 URL 입력란에 URL을 입력하고 '가져오기' 버튼을 클릭한다"
+        then: "IP-B의 콘텐츠가 정상적으로 추출되어 표시된다"
+        examples:
+          - input: { url: "https://example.com/article", ipA_requestCount: 10, ipB_requestCount: 0 }
+            expect: { httpStatus: 200, previewVisible: true }
+    excludes:
+      - "Redis 등 외부 저장소 — 현재 규모에서 불필요"
+      - "글로벌 rate limit — IP 기반만 적용"
+      - "런타임 설정 변경 — 코드 상수로 관리"
+    preconditions:
+      - "POST /api/extract 엔드포인트가 구현되어 있다"
