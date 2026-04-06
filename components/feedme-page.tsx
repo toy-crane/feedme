@@ -45,8 +45,8 @@ type ExtractResult = {
   content?: string;
   title?: string;
   type?: string;
-  channel?: string;
   thumbnail?: string;
+  source?: string;
 };
 
 export default function FeedmePage() {
@@ -196,11 +196,11 @@ export default function FeedmePage() {
         {result && markdownText && !loading && (
           <>
             <Separator />
-            <div className={cn("flex flex-col", result.type === "youtube" ? "gap-4" : "gap-3")}>
-              {result.type === "youtube" && result.thumbnail && (
+            <div data-testid="result-container" className="flex flex-col gap-4">
+              {result.thumbnail && (
                 <img
                   src={result.thumbnail}
-                  alt={result.title ?? "YouTube 썸네일"}
+                  alt={result.title ?? "썸네일"}
                   className="w-full rounded-lg"
                   style={{ aspectRatio: "16 / 9", objectFit: "cover" }}
                 />
@@ -209,8 +209,8 @@ export default function FeedmePage() {
                 {result.title && (
                   <div className="flex flex-col gap-1">
                     <h2 className="text-2xl font-bold">{result.title}</h2>
-                    {result.type === "youtube" && result.channel && (
-                      <p className="text-sm text-muted-foreground">{result.channel}</p>
+                    {result.source && (
+                      <p className="text-sm text-muted-foreground">{result.source}</p>
                     )}
                   </div>
                 )}
