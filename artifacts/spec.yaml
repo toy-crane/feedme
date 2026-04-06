@@ -207,10 +207,19 @@ features:
       - id: FEEDME-032
         given: "콘텐츠가 추출되어 split button이 표시된 상태"
         when: "chevron(▼) 버튼을 클릭한다"
-        then: "드롭다운 메뉴에 'ChatGPT에서 열기'와 'Claude에서 열기' 2개 항목이 각각 서비스 아이콘과 함께 표시된다"
+        then: "드롭다운 메뉴에 '마크다운 다운로드', 'ChatGPT에서 열기', 'Claude에서 열기' 3개 항목이 각각 아이콘과 함께 표시된다"
         examples:
           - input: { action: "clickChevron" }
-            expect: { dropdownVisible: true, menuItems: ["ChatGPT에서 열기", "Claude에서 열기"], menuItemCount: 2, menuItemsHaveIcons: true }
+            expect: { dropdownVisible: true, menuItems: ["마크다운 다운로드", "ChatGPT에서 열기", "Claude에서 열기"], menuItemCount: 3, menuItemsHaveIcons: true }
+      - id: FEEDME-036
+        given: "드롭다운 메뉴가 열린 상태"
+        when: "'마크다운 다운로드' 항목을 클릭한다"
+        then: "추출된 마크다운 내용이 페이지 제목 기반 파일명의 .md 파일로 다운로드된다"
+        examples:
+          - input: { action: "clickDownload", title: "Example Domain", markdown: "# Example Domain" }
+            expect: { downloadedFileName: "Example Domain.md", downloadedContent: "# Example Domain" }
+          - input: { action: "clickDownload", title: null, markdown: "# Hello" }
+            expect: { downloadedFileName: "feedme.md" }
       - id: FEEDME-033
         given: "드롭다운 메뉴가 열린 상태"
         when: "'ChatGPT에서 열기' 항목을 클릭한다"
