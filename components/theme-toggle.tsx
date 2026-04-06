@@ -13,36 +13,21 @@ export default function ThemeToggle() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (resolvedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      document.querySelectorAll(".hljs").forEach((el) => {
-        el.setAttribute("data-dark-highlight", "true");
-      });
-    } else if (resolvedTheme === "light") {
-      document.documentElement.classList.remove("dark");
-      document.querySelectorAll(".hljs").forEach((el) => {
-        el.removeAttribute("data-dark-highlight");
-      });
-    }
-  }, [resolvedTheme]);
-
   if (!mounted) {
-    return <div className="fixed top-4 right-4 z-50 size-8" />;
+    return <Button variant="ghost" size="icon" className="fixed top-4 right-4" aria-hidden />;
   }
 
   const isDark = resolvedTheme === "dark";
 
   return (
-    <div className="fixed top-4 right-4 z-50">
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label={isDark ? "다크 모드 활성화됨. 라이트 모드로 전환" : "라이트 모드 활성화됨. 다크 모드로 전환"}
-        onClick={() => setTheme(isDark ? "light" : "dark")}
-      >
-        {isDark ? <Moon /> : <Sun />}
-      </Button>
-    </div>
+    <Button
+      variant="ghost"
+      size="icon"
+      className="fixed top-4 right-4"
+      aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+    >
+      {isDark ? <Moon data-icon /> : <Sun data-icon />}
+    </Button>
   );
 }
