@@ -2,7 +2,6 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import FeedmePage from "@/components/feedme-page";
-import { HyperText } from "@/components/ui/hyper-text";
 
 describe("feedme-page spec acceptance tests", () => {
   beforeEach(() => {
@@ -216,15 +215,8 @@ describe("upgrade-logo", () => {
     it("페이지에 'Feed-me' 텍스트가 표시되고 HyperText 컴포넌트가 사용된다", () => {
       render(<FeedmePage />);
 
-      // "Feed-me" 텍스트가 화면에 표시되어야 한다
       expect(screen.getByText("Feed-me")).toBeInTheDocument();
-
-      // HyperText 컴포넌트가 렌더링한 요소가 존재해야 한다
-      // HyperText는 children을 span으로 분리해서 렌더링한다
-      const logoElement = screen.getByText("Feed-me");
-      // HyperText가 적용되면 글자가 span으로 분리되어 렌더링된다
-      // 로고 컨테이너의 data-testid 또는 role로 확인
-      expect(logoElement.closest("[data-testid='logo']") ?? logoElement).toBeInTheDocument();
+      expect(screen.getByTestId("logo")).toBeInTheDocument();
     });
   });
 
@@ -233,16 +225,8 @@ describe("upgrade-logo", () => {
     it("로고 요소에 cursor-pointer 스타일이 적용되어 있다", () => {
       render(<FeedmePage />);
 
-      // 로고 컨테이너를 찾는다
       const logoContainer = screen.getByTestId("logo");
-      const computedStyle = window.getComputedStyle(logoContainer);
-
-      // cursor: pointer 또는 className에 cursor-pointer가 있어야 한다
-      const hasCursorPointer =
-        logoContainer.classList.contains("cursor-pointer") ||
-        computedStyle.cursor === "pointer";
-
-      expect(hasCursorPointer).toBe(true);
+      expect(logoContainer.classList.contains("cursor-pointer")).toBe(true);
     });
   });
 
