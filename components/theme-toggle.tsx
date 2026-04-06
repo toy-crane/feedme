@@ -13,6 +13,14 @@ export default function ThemeToggle() {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (resolvedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else if (resolvedTheme === "light") {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [resolvedTheme]);
+
   if (!mounted) {
     return <div className="fixed top-4 right-4 z-50 size-8" />;
   }
