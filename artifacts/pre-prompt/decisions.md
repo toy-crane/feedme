@@ -19,6 +19,13 @@
 - 근거: Builder 분석 결과 구현 버그가 아닌 테스트 mock 순서 문제. 경미한 수정이므로 Builder 재위임 불필요
 - 결과: 성공 — 3건 모두 수정 후 118 tests pass
 
+## Collapsible 트리거 raw button → shadcn Button
+
+- 내용: CollapsibleTrigger에 raw `<button>`을 사용하여 아이콘 사이즈가 텍스트와 불균형
+- 판단: shadcn `Button variant="ghost" size="sm"`으로 교체하여 `data-icon`으로 아이콘 사이즈 자동 관리
+- 근거: raw button에서는 data-icon이 동작하지 않아 수동 size 클래스가 필요했음. shadcn Button을 쓰면 디자인 시스템 규칙을 준수하고 아이콘 사이즈 일관성이 보장됨
+- 결과: 성공 — 아이콘 사이즈 균형 확보, 118 tests pass
+
 ## Design review 피드백 반영
 
 - 내용: design-reviewer가 4건 이슈 보고 (raw input, cn() 미사용 2건, data-icon 누락)
