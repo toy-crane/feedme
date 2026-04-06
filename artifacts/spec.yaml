@@ -103,3 +103,86 @@ features:
         examples:
           - input: { currentError: "페이지에 접근할 수 없습니다", userTypesInInput: true }
             expect: { inlineErrorText: null }
+
+  - id: improve-ui
+    title: "마크다운 UI 개선"
+    scenarios:
+      - id: FEEDME-020
+        given: "긴 콘텐츠가 포함된 웹페이지 URL을 추출하여 미리보기가 표시된 상태"
+        when: "미리보기 영역을 확인한다"
+        then: "높이 제한 없이 전체 콘텐츠가 페이지에 펼쳐져 표시된다"
+        examples:
+          - input: { contentLength: "long" }
+            expect: { hasMaxHeight: false, allContentVisible: true }
+      - id: FEEDME-021
+        given: "YouTube URL을 추출하여 자막 미리보기가 표시된 상태"
+        when: "자막 영역을 확인한다"
+        then: "높이 제한 없이 전체 자막이 페이지에 펼쳐져 표시된다"
+        examples:
+          - input: { contentType: "youtube" }
+            expect: { hasMaxHeight: false, allContentVisible: true }
+      - id: FEEDME-022
+        given: "콘텐츠가 추출되어 미리보기가 표시된 상태"
+        when: "미리보기 영역의 스타일을 확인한다"
+        then: "미리보기 영역에 테두리(border)가 없다"
+        examples:
+          - input: { contentType: "webpage" }
+            expect: { hasBorder: false }
+          - input: { contentType: "youtube" }
+            expect: { hasBorder: false }
+      - id: FEEDME-023
+        given: "feedme 페이지에 접속한 상태"
+        when: "콘텐츠 영역의 너비를 확인한다"
+        then: "콘텐츠 영역의 최대 너비가 672px(max-w-2xl) 이상이다"
+        examples:
+          - input: { page: "feedme" }
+            expect: { maxWidth: "max-w-2xl" }
+      - id: FEEDME-024
+        given: "취소선(~~text~~)이 포함된 마크다운이 추출된 상태"
+        when: "미리보기 영역을 확인한다"
+        then: "취소선이 적용된 텍스트(<del>)로 렌더링된다"
+        examples:
+          - input: { markdown: "~~취소선 텍스트~~" }
+            expect: { renderedElement: "del", textContent: "취소선 텍스트" }
+      - id: FEEDME-025
+        given: "마크다운 테이블이 포함된 콘텐츠가 추출된 상태"
+        when: "미리보기 영역을 확인한다"
+        then: "HTML <table>로 렌더링된다"
+        examples:
+          - input: { markdown: "| 헤더1 | 헤더2 |\n|---|---|\n| 값1 | 값2 |" }
+            expect: { renderedElement: "table", cellText: "값1" }
+      - id: FEEDME-026
+        given: "태스크리스트(- [x] 완료)가 포함된 마크다운이 추출된 상태"
+        when: "미리보기 영역을 확인한다"
+        then: "체크박스가 포함된 리스트로 렌더링된다"
+        examples:
+          - input: { markdown: "- [x] 완료\n- [ ] 미완료" }
+            expect: { checkedCheckbox: true, uncheckedCheckbox: true }
+      - id: FEEDME-027
+        given: "언어가 지정된 코드 블록(```javascript)이 포함된 마크다운이 추출된 상태"
+        when: "미리보기 영역을 확인한다"
+        then: "코드 블록 내 키워드가 색상으로 구분되어 표시된다"
+        examples:
+          - input: { markdown: "```javascript\nconst x = 1;\n```" }
+            expect: { hasHighlightedCode: true, languageClass: "language-javascript" }
+      - id: FEEDME-028
+        given: "자동 링크(https://example.com 형태의 URL)가 포함된 마크다운이 추출된 상태"
+        when: "미리보기 영역을 확인한다"
+        then: "URL 텍스트가 클릭 가능한 <a> 링크로 렌더링된다"
+        examples:
+          - input: { markdown: "방문하세요 https://example.com 여기에" }
+            expect: { renderedElement: "a", href: "https://example.com" }
+      - id: FEEDME-029
+        given: "언어가 지정되지 않은 코드 블록이 포함된 마크다운이 추출된 상태"
+        when: "미리보기 영역을 확인한다"
+        then: "하이라이팅 없이 기본 코드 블록 스타일로 표시된다"
+        examples:
+          - input: { markdown: "```\nplain text code\n```" }
+            expect: { hasHighlightedCode: false, renderedElement: "code" }
+    excludes:
+      - "마크다운/원문 토글 기능 — '편집 없이 바로 복사' 원칙 유지"
+      - "복사 버튼 위치 변경 — 현재 위치 유지"
+      - "다크 모드별 하이라이팅 테마 — MVP 범위 외"
+    preconditions:
+      - "remark-gfm 패키지 설치"
+      - "rehype-highlight 패키지 설치"
