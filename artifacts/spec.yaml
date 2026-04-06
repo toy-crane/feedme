@@ -44,10 +44,10 @@ features:
       - id: FEEDME-005
         given: "콘텐츠가 추출되어 마크다운 미리보기가 표시된 상태"
         when: "'복사' 버튼을 클릭한다"
-        then: "마크다운 원문이 클립보드에 복사되고 '복사됨' 토스트 메시지가 표시된다"
+        then: "마크다운 원문이 클립보드에 복사되고, 버튼 아이콘이 체크로 바뀐다"
         examples:
           - input: { action: "clickCopyButton" }
-            expect: { clipboardHasContent: true, toastMessage: "복사됨" }
+            expect: { clipboardHasContent: true, copyButtonIcon: "check" }
     excludes:
       - "챗봇별 맞춤 형식 — 설계 원칙 '챗봇 비종속'"
 
@@ -300,3 +300,64 @@ features:
             expect: { toycraneText: "by toy-crane", toycraneLinkHref: "https://toycrane.notion.site/Toy-Crane-e1083f83d3864669bf27290a8f033b00" }
     excludes:
       - "뉴스레터 구독 — MVP 범위 외"
+
+  - id: improve-copy-button
+    title: "복사 버튼 개선 (split button + dropdown)"
+    scenarios:
+      - id: FEEDME-040
+        given: "콘텐츠가 추출되어 미리보기가 표시된 상태"
+        when: "복사 버튼 영역을 확인한다"
+        then: "복사 아이콘과 '복사' 텍스트가 있는 메인 버튼과, 오른쪽에 chevron(▼) 아이콘 버튼이 함께 표시된다"
+        examples:
+          - input: { state: "contentExtracted" }
+            expect: { copyButtonVisible: true, copyButtonHasIcon: true, copyButtonText: "복사", chevronButtonVisible: true }
+      - id: FEEDME-041
+        given: "콘텐츠가 추출되어 split button이 표시된 상태"
+        when: "메인 '복사' 버튼을 클릭한다"
+        then: "마크다운이 클립보드에 복사되고, 버튼 아이콘이 체크로 바뀐다 (토스트 없음)"
+        examples:
+          - input: { action: "clickCopyButton" }
+            expect: { clipboardHasContent: true, copyButtonIcon: "check", toastVisible: false }
+      - id: FEEDME-042
+        given: "콘텐츠가 추출되어 split button이 표시된 상태"
+        when: "chevron(▼) 버튼을 클릭한다"
+        then: "드롭다운 메뉴에 '마크다운 다운로드', 'ChatGPT에서 열기', 'Claude에서 열기' 3개 항목이 각각 아이콘과 함께 표시된다"
+        examples:
+          - input: { action: "clickChevron" }
+            expect: { dropdownVisible: true, menuItems: ["마크다운 다운로드", "ChatGPT에서 열기", "Claude에서 열기"], menuItemCount: 3, menuItemsHaveIcons: true }
+      - id: FEEDME-046
+        given: "드롭다운 메뉴가 열린 상태"
+        when: "'마크다운 다운로드' 항목을 클릭한다"
+        then: "추출된 마크다운 내용이 페이지 제목 기반 파일명의 .md 파일로 다운로드된다"
+        examples:
+          - input: { action: "clickDownload", title: "Example Domain", markdown: "# Example Domain" }
+            expect: { downloadedFileName: "Example Domain.md", downloadedContent: "# Example Domain" }
+          - input: { action: "clickDownload", title: null, markdown: "# Hello" }
+            expect: { downloadedFileName: "feedme.md" }
+      - id: FEEDME-043
+        given: "드롭다운 메뉴가 열린 상태"
+        when: "'ChatGPT에서 열기' 항목을 클릭한다"
+        then: "마크다운 내용이 query에 포함된 ChatGPT URL이 새 탭에서 열린다"
+        examples:
+          - input: { action: "clickChatGPT", markdown: "# Hello" }
+            expect: { openedUrl: "https://chatgpt.com/?q=%23%20Hello", targetBlank: true }
+      - id: FEEDME-044
+        given: "드롭다운 메뉴가 열린 상태"
+        when: "'Claude에서 열기' 항목을 클릭한다"
+        then: "마크다운 내용이 query에 포함된 Claude URL이 새 탭에서 열린다"
+        examples:
+          - input: { action: "clickClaude", markdown: "# Hello" }
+            expect: { openedUrl: "https://claude.ai/new?q=%23%20Hello", targetBlank: true }
+      - id: FEEDME-045
+        given: "콘텐츠가 추출되지 않은 초기 화면"
+        when: "화면을 확인한다"
+        then: "split button이 표시되지 않는다"
+        examples:
+          - input: { state: "initial" }
+            expect: { splitButtonVisible: false }
+    excludes:
+      - "View as Markdown 옵션 — feedme가 이미 마크다운을 보여주므로 불필요"
+      - "v0, Scira 등 다른 서비스 — ChatGPT, Claude만 지원"
+      - "모바일 전용 Popover 분기 — DropdownMenu로 통일"
+    preconditions:
+      - "shadcn DropdownMenu 컴포넌트 설치"

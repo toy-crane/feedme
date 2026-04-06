@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import FeedmePage from "@/components/feedme-page";
@@ -197,6 +197,211 @@ describe("feedme-page spec acceptance tests", () => {
       await user.type(input, "a");
 
       expect(screen.queryByText("네트워크 오류가 발생했습니다")).not.toBeInTheDocument();
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // improve-copy-button feature (FEEDME-030 ~ 035)
+  // ──────────────────────────────────────────────
+
+  // 콘텐츠 추출 후 split button이 표시된 상태를 만드는 헬퍼
+  async function renderWithContent(markdown = "# Hello") {
+    const user = userEvent.setup();
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ markdown }),
+    } as Response);
+
+    render(<FeedmePage />);
+
+    const input = screen.getByRole("textbox");
+    await user.type(input, "https://example.com");
+    await user.click(screen.getByRole("button", { name: "가져오기" }));
+
+    await waitFor(() => {
+      // split button의 메인 복사 버튼이 나타날 때까지 대기
+      expect(screen.getByRole("button", { name: "복사" })).toBeInTheDocument();
+    });
+
+    return { user };
+  }
+
+  // FEEDME-030: 콘텐츠 추출 후 split button 표시
+  describe("FEEDME-030: 콘텐츠 추출 후 split button 표시", () => {
+    it("복사 아이콘+텍스트 메인 버튼과 chevron 버튼이 함께 표시된다", async () => {
+      await renderWithContent();
+
+      // 메인 복사 버튼
+      const copyButton = screen.getByRole("button", { name: "복사" });
+      expect(copyButton).toBeInTheDocument();
+
+      // 복사 버튼 안에 아이콘(svg)이 있어야 한다
+      const iconInCopyButton = copyButton.querySelector("svg");
+      expect(iconInCopyButton).not.toBeNull();
+
+      // chevron 버튼 (열기 옵션 드롭다운 트리거)
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      expect(chevronButton).toBeInTheDocument();
+    });
+  });
+
+  // FEEDME-031: 메인 복사 버튼 클릭 → 클립보드 복사 + 체크 아이콘 (토스트 없음)
+  describe("FEEDME-031: 메인 복사 버튼 클릭 시 클립보드 복사 및 체크 아이콘 표시", () => {
+    it("클립보드에 마크다운이 복사되고 버튼 아이콘이 체크로 바뀐다", async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+
+      const { user } = await renderWithContent("# Hello");
+
+      // renderWithContent 호출 이후 clipboard mock 설정
+      // (userEvent.setup()이 내부적으로 clipboard를 교체할 수 있으므로 이후에 재설정)
+      Object.defineProperty(navigator, "clipboard", {
+        value: { writeText },
+        writable: true,
+        configurable: true,
+      });
+
+      const copyButton = screen.getByRole("button", { name: "복사" });
+      await user.click(copyButton);
+
+      // 클립보드에 내용이 복사되어야 한다
+      expect(writeText).toHaveBeenCalledWith("# Hello");
+
+      // 버튼에 체크 아이콘이 표시되어야 한다 (lucide Check 아이콘은 특정 path를 가짐)
+      await waitFor(() => {
+        const updatedButton = screen.getByRole("button", { name: "복사" });
+        // 체크 상태 표시 확인: aria-label 변경 또는 data 속성, 혹은 아이콘 변경
+        // 구현에서 data-copied="true" 속성 또는 아이콘이 바뀌어야 함
+        expect(updatedButton).toHaveAttribute("data-copied", "true");
+      });
+
+      // 토스트 메시지('복사됨' fixed div)가 표시되지 않아야 한다
+      expect(screen.queryByText("복사됨")).not.toBeInTheDocument();
+    });
+  });
+
+  // FEEDME-032: chevron 버튼 클릭 → 드롭다운 메뉴에 3개 항목 표시
+  describe("FEEDME-032: chevron 버튼 클릭 시 드롭다운 메뉴 표시", () => {
+    it("마크다운 다운로드, ChatGPT에서 열기, Claude에서 열기 항목이 아이콘과 함께 표시된다", async () => {
+      const { user } = await renderWithContent();
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      await user.click(chevronButton);
+
+      // 드롭다운 메뉴가 표시되어야 한다
+      await waitFor(() => {
+        expect(screen.getByText("마크다운 다운로드")).toBeInTheDocument();
+        expect(screen.getByText("ChatGPT에서 열기")).toBeInTheDocument();
+        expect(screen.getByText("Claude에서 열기")).toBeInTheDocument();
+      });
+
+      // 각 메뉴 항목에 아이콘(svg 또는 img)이 있어야 한다
+      const downloadItem = screen.getByText("마크다운 다운로드");
+      const chatgptItem = screen.getByText("ChatGPT에서 열기");
+      const claudeItem = screen.getByText("Claude에서 열기");
+
+      const downloadMenuItem = downloadItem.closest('[role="menuitem"]') ?? downloadItem.parentElement;
+      const chatgptMenuItem = chatgptItem.closest('[role="menuitem"]') ?? chatgptItem.parentElement;
+      const claudeMenuItem = claudeItem.closest('[role="menuitem"]') ?? claudeItem.parentElement;
+
+      const downloadIcon =
+        downloadMenuItem!.querySelector("svg") ?? downloadMenuItem!.querySelector("img");
+      const chatgptIcon =
+        chatgptMenuItem!.querySelector("svg") ?? chatgptMenuItem!.querySelector("img");
+      const claudeIcon =
+        claudeMenuItem!.querySelector("svg") ?? claudeMenuItem!.querySelector("img");
+      expect(downloadIcon).not.toBeNull();
+      expect(chatgptIcon).not.toBeNull();
+      expect(claudeIcon).not.toBeNull();
+    });
+  });
+
+  // FEEDME-036: 마크다운 다운로드 항목 클릭 시 .md 파일 다운로드
+  describe("FEEDME-036: 마크다운 다운로드 항목 클릭 시 파일 다운로드", () => {
+    it("드롭다운에 '마크다운 다운로드' 항목이 맨 위에 표시된다", async () => {
+      const { user } = await renderWithContent();
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      await user.click(chevronButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("마크다운 다운로드")).toBeInTheDocument();
+      });
+
+      // '마크다운 다운로드' 항목이 드롭다운 첫 번째 항목이어야 한다
+      const menuItems = screen.getAllByRole("menuitem");
+      expect(menuItems[0]).toHaveTextContent("마크다운 다운로드");
+    });
+
+    it("'마크다운 다운로드' 항목에 아이콘이 있다", async () => {
+      const { user } = await renderWithContent();
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      await user.click(chevronButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("마크다운 다운로드")).toBeInTheDocument();
+      });
+
+      const downloadItem = screen.getByText("마크다운 다운로드");
+      const downloadMenuItem = downloadItem.closest('[role="menuitem"]') ?? downloadItem.parentElement;
+      const icon =
+        downloadMenuItem!.querySelector("svg") ?? downloadMenuItem!.querySelector("img");
+      expect(icon).not.toBeNull();
+    });
+  });
+
+  // FEEDME-033: ChatGPT에서 열기 → 마크다운 포함된 URL, 새 탭
+  describe("FEEDME-033: ChatGPT에서 열기 링크 URL 검증", () => {
+    it("마크다운 내용이 query에 포함된 ChatGPT URL이 새 탭 링크로 표시된다", async () => {
+      const { user } = await renderWithContent("# Hello");
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      await user.click(chevronButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("ChatGPT에서 열기")).toBeInTheDocument();
+      });
+
+      // Radix DropdownMenuItem asChild로 렌더된 <a>는 role="menuitem"을 가짐
+      const chatgptLink = screen.getByRole("menuitem", { name: /ChatGPT에서 열기/ });
+      const expectedHref = `https://chatgpt.com/?q=${encodeURIComponent("# Hello")}`;
+      expect(chatgptLink).toHaveAttribute("href", expectedHref);
+      expect(chatgptLink).toHaveAttribute("target", "_blank");
+    });
+  });
+
+  // FEEDME-034: Claude에서 열기 → 마크다운 포함된 URL, 새 탭
+  describe("FEEDME-034: Claude에서 열기 링크 URL 검증", () => {
+    it("마크다운 내용이 query에 포함된 Claude URL이 새 탭 링크로 표시된다", async () => {
+      const { user } = await renderWithContent("# Hello");
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      await user.click(chevronButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("Claude에서 열기")).toBeInTheDocument();
+      });
+
+      // Radix DropdownMenuItem asChild로 렌더된 <a>는 role="menuitem"을 가짐
+      const claudeLink = screen.getByRole("menuitem", { name: /Claude에서 열기/ });
+      const expectedHref = `https://claude.ai/new?q=${encodeURIComponent("# Hello")}`;
+      expect(claudeLink).toHaveAttribute("href", expectedHref);
+      expect(claudeLink).toHaveAttribute("target", "_blank");
+    });
+  });
+
+  // FEEDME-035: 초기 화면에서 split button 미표시
+  describe("FEEDME-035: 초기 화면에서 split button 미표시", () => {
+    it("콘텐츠가 추출되지 않은 초기 화면에서 split button이 표시되지 않는다", () => {
+      render(<FeedmePage />);
+
+      // 메인 복사 버튼이 없어야 한다
+      expect(screen.queryByRole("button", { name: "복사" })).not.toBeInTheDocument();
+
+      // chevron 버튼도 없어야 한다
+      expect(
+        screen.queryByRole("button", { name: /열기 옵션/i })
+      ).not.toBeInTheDocument();
     });
   });
 });

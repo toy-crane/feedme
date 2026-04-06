@@ -122,8 +122,8 @@ describe("feedme spec tests", () => {
   });
 
   // FEEDME-005
-  describe("FEEDME-005: 클립보드 복사 및 토스트", () => {
-    it("추출 완료 후 복사 버튼 클릭 시 클립보드에 복사되고 복사됨 토스트가 표시된다", async () => {
+  describe("FEEDME-005: 클립보드 복사 및 체크 아이콘", () => {
+    it("추출 완료 후 복사 버튼 클릭 시 클립보드에 복사되고 버튼에 체크 아이콘이 표시된다", async () => {
       const user = userEvent.setup({ writeToClipboard: false });
       const markdownContent = "# 제목\n\n본문 내용";
       global.fetch = vi.fn().mockResolvedValue({
@@ -154,7 +154,8 @@ describe("feedme spec tests", () => {
       expect(writeTextMock).toHaveBeenCalledWith(markdownContent);
 
       await waitFor(() => {
-        expect(screen.getByText("복사됨")).toBeInTheDocument();
+        const copyButton = screen.getByRole("button", { name: /복사/ });
+        expect(copyButton).toHaveAttribute("data-copied", "true");
       });
     });
   });
