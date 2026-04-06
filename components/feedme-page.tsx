@@ -276,14 +276,13 @@ function SplitCopyButton({
         size="sm"
         onClick={onCopy}
         data-copied={copied ? "true" : undefined}
-        aria-label="복사"
       >
         {copied ? (
           <Check data-testid="copy-check-icon" data-icon="inline-start" />
         ) : (
           <Copy data-icon="inline-start" />
         )}
-        복사
+        복사하기
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
