@@ -244,12 +244,8 @@ describe("dark-mode spec acceptance tests", () => {
 
       document.documentElement.classList.add("dark");
 
-      render(<ThemeToggle />);
-
-      // 다크 모드 상태 확인
-      expect(document.documentElement.classList.contains("dark")).toBe(true);
-
-      // 코드 블록을 시뮬레이션
+      // 코드 블록을 ThemeToggle 렌더링 전에 DOM에 추가
+      // (useEffect가 실행 시점에 존재하는 .hljs 요소에 data-dark-highlight 속성을 부여)
       const codeBlock = document.createElement("pre");
       const code = document.createElement("code");
       code.className = "hljs language-javascript";
@@ -257,13 +253,16 @@ describe("dark-mode spec acceptance tests", () => {
       codeBlock.appendChild(code);
       document.body.appendChild(codeBlock);
 
+      render(<ThemeToggle />);
+
+      // 다크 모드 상태 확인
+      expect(document.documentElement.classList.contains("dark")).toBe(true);
+
       // hljs 클래스가 있는 코드 블록이 존재해야 한다
       const hljsElement = document.querySelector(".hljs");
       expect(hljsElement).not.toBeNull();
 
-      // 다크 모드 전용 하이라이팅 테마가 적용되었는지 확인
-      // 실제 구현에서는 globals.css에 .dark .hljs 스타일이 정의되어야 하고
-      // 마크다운 렌더러에 data-dark-highlight 마커가 있어야 함
+      // 다크 모드에서 ThemeToggle의 useEffect가 .hljs 요소에 data-dark-highlight 속성을 부여해야 한다
       const darkThemeCodeBlock = document.querySelector("[data-dark-highlight='true']");
       expect(darkThemeCodeBlock).not.toBeNull();
 

@@ -16,8 +16,14 @@ export default function ThemeToggle() {
   useEffect(() => {
     if (resolvedTheme === "dark") {
       document.documentElement.classList.add("dark");
+      document.querySelectorAll(".hljs").forEach((el) => {
+        el.setAttribute("data-dark-highlight", "true");
+      });
     } else if (resolvedTheme === "light") {
       document.documentElement.classList.remove("dark");
+      document.querySelectorAll(".hljs").forEach((el) => {
+        el.removeAttribute("data-dark-highlight");
+      });
     }
   }, [resolvedTheme]);
 
