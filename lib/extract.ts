@@ -58,7 +58,7 @@ export async function extractContent(url: string): Promise<ExtractResult> {
     return {
       type: "youtube",
       title: result.title ?? "",
-      content: content.replace(/^##\s*Transcript\s*\n+/, ""),
+      content: content.replace(/^##\s*Transcript\s*\n+/m, ""),
       source: result.author ?? undefined,
       thumbnail: result.image ?? undefined,
     };
