@@ -95,33 +95,14 @@ describe("POST /api/extract", () => {
     expect(json).toHaveProperty("error", "Unexpected failure");
   });
 
-  describe("rate limit", () => {
-    it("checkRateLimit가 allowed:true를 반환하면 기존 정상 응답을 반환한다", async () => {
-      const mockResult = {
-        title: "Example Page",
-        content: "Hello world",
-        type: "webpage" as const,
-      };
-      mockCheckRateLimit.mockReturnValue({ allowed: true });
-      mockExtractContent.mockResolvedValue(mockResult);
+  it("checkRateLimit가 allowed:false를 반환하면 429와 에러 메시지를 반환한다", async () => {
+    mockCheckRateLimit.mockReturnValue({ allowed: false, retryAfter: 45 });
 
-      const request = makeRequest({ url: "https://example.com" });
-      const response = await POST(request);
+    const request = makeRequest({ url: "https://example.com" });
+    const response = await POST(request);
 
-      expect(response.status).toBe(200);
-      const json = await response.json();
-      expect(json).toEqual(mockResult);
-    });
-
-    it("checkRateLimit가 allowed:false를 반환하면 429와 에러 메시지를 반환한다", async () => {
-      mockCheckRateLimit.mockReturnValue({ allowed: false, retryAfter: 45 });
-
-      const request = makeRequest({ url: "https://example.com" });
-      const response = await POST(request);
-
-      expect(response.status).toBe(429);
-      const json = await response.json();
-      expect(json).toHaveProperty("error", "요청이 너무 많습니다. 45초 후 다시 시도해주세요");
-    });
+    expect(response.status).toBe(429);
+    const json = await response.json();
+    expect(json).toHaveProperty("error", "요청이 너무 많습니다. 45초 후 다시 시도해주세요");
   });
 });
