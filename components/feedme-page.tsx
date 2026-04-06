@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/input-group";
 import { ArrowRight, Loader2, Copy, Check, ChevronDown, Download } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { ButtonGroup } from "@/components/ui/button-group";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -269,11 +270,10 @@ function SplitCopyButton({
   }
 
   return (
-    <div className="relative flex items-center rounded-lg bg-secondary">
+    <ButtonGroup>
       <Button
-        variant="secondary"
+        variant="outline"
         size="sm"
-        className="shadow-none"
         onClick={onCopy}
         data-copied={copied ? "true" : undefined}
         aria-label="복사"
@@ -285,16 +285,11 @@ function SplitCopyButton({
         )}
         복사
       </Button>
-      <Separator
-        orientation="vertical"
-        className="absolute right-8 top-1 z-0 h-5! bg-foreground/10!"
-      />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="secondary"
+            variant="outline"
             size="sm"
-            className="-ml-0.5 shadow-none"
             aria-label="열기 옵션"
           >
             <ChevronDown />
@@ -329,6 +324,6 @@ function SplitCopyButton({
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
+    </ButtonGroup>
   );
 }
