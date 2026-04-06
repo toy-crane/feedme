@@ -586,6 +586,22 @@ features:
         examples:
           - input: { url: "https://blog.example.com/article", hasAuthor: false }
             expect: { sourceInResponse: "blog.example.com" }
+      - id: ALIGN-008
+        given: "YouTube URL을 추출하여 결과가 표시된 상태"
+        when: "마크다운 본문을 확인한다"
+        then: "Defuddle이 삽입한 '## Transcript' 헤딩이 제거되어 표시되지 않는다"
+        examples:
+          - input: { url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", rawContent: "![](url)\n\n## Transcript\n\n### 소개\n\n내용" }
+            expect: { contentContainsTranscriptHeading: false, contentContainsBody: true }
+      - id: ALIGN-009
+        given: "콘텐츠가 추출되어 결과가 표시된 상태"
+        when: "프롬프트 영역과 마크다운 본문 사이를 확인한다"
+        then: "프롬프트 영역과 본문 사이에 구분선(Separator)이 표시된다"
+        examples:
+          - input: { contentType: "youtube" }
+            expect: { separatorBetweenPromptAndBody: true }
+          - input: { contentType: "webpage" }
+            expect: { separatorBetweenPromptAndBody: true }
     excludes:
       - "썸네일 크기/비율 변경 — 기존 16:9 유지"
       - "웹페이지 favicon 표시 — MVP 범위 외"

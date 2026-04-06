@@ -963,4 +963,27 @@ describe("align-ui", () => {
       expect(secondChild.tagName.toLowerCase()).toBe("div");
     });
   });
+
+  // ALIGN-009: 프롬프트 영역과 본문 사이에 구분선
+  describe("ALIGN-009: 프롬프트 영역과 본문 사이 구분선", () => {
+    it("YouTube 결과에서 프롬프트 영역과 본문 사이에 Separator가 표시된다", async () => {
+      await renderWithYoutubeResult();
+
+      const container = document.querySelector("[data-testid='result-container']");
+      expect(container).not.toBeNull();
+
+      const separators = container!.querySelectorAll('[role="separator"], [data-slot="separator"]');
+      expect(separators.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("웹페이지 결과에서 프롬프트 영역과 본문 사이에 Separator가 표시된다", async () => {
+      await renderWithWebpageResult({});
+
+      const container = document.querySelector("[data-testid='result-container']");
+      expect(container).not.toBeNull();
+
+      const separators = container!.querySelectorAll('[role="separator"], [data-slot="separator"]');
+      expect(separators.length).toBeGreaterThanOrEqual(1);
+    });
+  });
 });
