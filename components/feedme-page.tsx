@@ -84,7 +84,7 @@ export default function FeedmePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center py-16 px-4">
+    <div className="min-h-screen flex flex-col items-center pt-16 px-4">
       <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
         <div className="flex flex-col gap-1">
           <div
@@ -203,8 +203,8 @@ export default function FeedmePage() {
         </div>
       )}
 
-      <footer className="mt-auto w-full pt-16 pb-6 text-sm text-muted-foreground">
-        <div className="flex flex-col items-center gap-2">
+      <footer className="mt-auto w-full pt-16 pb-7 text-sm text-muted-foreground">
+        <div className="flex flex-col items-center gap-1">
           <div className="flex items-center gap-3">
             <span>© 2026 feed-me</span>
             <span>·</span>
