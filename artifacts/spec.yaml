@@ -307,13 +307,13 @@ features:
       - id: FEEDME-040
         given: "콘텐츠가 추출되어 미리보기가 표시된 상태"
         when: "복사 버튼 영역을 확인한다"
-        then: "복사 아이콘과 '복사' 텍스트가 있는 메인 버튼과, 오른쪽에 chevron(▼) 아이콘 버튼이 함께 표시된다"
+        then: "복사 아이콘과 '복사하기' 텍스트가 있는 메인 버튼과, 오른쪽에 chevron(▼) 아이콘 버튼이 함께 표시된다"
         examples:
           - input: { state: "contentExtracted" }
-            expect: { copyButtonVisible: true, copyButtonHasIcon: true, copyButtonText: "복사", chevronButtonVisible: true }
+            expect: { copyButtonVisible: true, copyButtonHasIcon: true, copyButtonText: "복사하기", chevronButtonVisible: true }
       - id: FEEDME-041
         given: "콘텐츠가 추출되어 split button이 표시된 상태"
-        when: "메인 '복사' 버튼을 클릭한다"
+        when: "메인 '복사하기' 버튼을 클릭한다"
         then: "마크다운이 클립보드에 복사되고, 버튼 아이콘이 체크로 바뀐다 (토스트 없음)"
         examples:
           - input: { action: "clickCopyButton" }

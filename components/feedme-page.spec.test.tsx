@@ -220,7 +220,7 @@ describe("feedme-page spec acceptance tests", () => {
 
     await waitFor(() => {
       // split button의 메인 복사 버튼이 나타날 때까지 대기
-      expect(screen.getByRole("button", { name: "복사" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "복사하기" })).toBeInTheDocument();
     });
 
     return { user };
@@ -232,7 +232,7 @@ describe("feedme-page spec acceptance tests", () => {
       await renderWithContent();
 
       // 메인 복사 버튼
-      const copyButton = screen.getByRole("button", { name: "복사" });
+      const copyButton = screen.getByRole("button", { name: "복사하기" });
       expect(copyButton).toBeInTheDocument();
 
       // 복사 버튼 안에 아이콘(svg)이 있어야 한다
@@ -260,7 +260,7 @@ describe("feedme-page spec acceptance tests", () => {
         configurable: true,
       });
 
-      const copyButton = screen.getByRole("button", { name: "복사" });
+      const copyButton = screen.getByRole("button", { name: "복사하기" });
       await user.click(copyButton);
 
       // 클립보드에 내용이 복사되어야 한다
@@ -268,7 +268,7 @@ describe("feedme-page spec acceptance tests", () => {
 
       // 버튼에 체크 아이콘이 표시되어야 한다 (lucide Check 아이콘은 특정 path를 가짐)
       await waitFor(() => {
-        const updatedButton = screen.getByRole("button", { name: "복사" });
+        const updatedButton = screen.getByRole("button", { name: "복사하기" });
         // 체크 상태 표시 확인: aria-label 변경 또는 data 속성, 혹은 아이콘 변경
         // 구현에서 data-copied="true" 속성 또는 아이콘이 바뀌어야 함
         expect(updatedButton).toHaveAttribute("data-copied", "true");
@@ -396,7 +396,7 @@ describe("feedme-page spec acceptance tests", () => {
       render(<FeedmePage />);
 
       // 메인 복사 버튼이 없어야 한다
-      expect(screen.queryByRole("button", { name: "복사" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "복사하기" })).not.toBeInTheDocument();
 
       // chevron 버튼도 없어야 한다
       expect(
@@ -458,7 +458,7 @@ describe("upgrade-logo", () => {
 
       // 결과가 표시될 때까지 대기
       await waitFor(() => {
-        expect(screen.getByText("복사")).toBeInTheDocument();
+        expect(screen.getByText("복사하기")).toBeInTheDocument();
       });
 
       // 로고 클릭
@@ -472,7 +472,7 @@ describe("upgrade-logo", () => {
       expect(screen.queryByText("# 추출된 콘텐츠")).not.toBeInTheDocument();
 
       // 복사 버튼이 사라져야 한다
-      expect(screen.queryByText("복사")).not.toBeInTheDocument();
+      expect(screen.queryByText("복사하기")).not.toBeInTheDocument();
 
       // 에러도 없어야 한다
       expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -509,7 +509,7 @@ describe("upgrade-logo", () => {
       expect(input).toHaveValue("");
 
       // 미리보기도 없어야 한다
-      expect(screen.queryByText("복사")).not.toBeInTheDocument();
+      expect(screen.queryByText("복사하기")).not.toBeInTheDocument();
     });
   });
 });
