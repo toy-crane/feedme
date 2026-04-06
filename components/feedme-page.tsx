@@ -93,8 +93,8 @@ export default function FeedmePage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center pt-16 px-4">
-      <div className="relative w-full max-w-2xl mx-auto flex flex-col gap-6">
-        <div className="absolute top-0 right-0">
+      <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
+        <div className="flex justify-end">
           <ThemeToggle />
         </div>
         <div className="flex flex-col gap-1">
