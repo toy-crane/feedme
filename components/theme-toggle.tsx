@@ -14,7 +14,7 @@ export default function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return <Button variant="ghost" size="icon" className="fixed top-4 right-4" aria-hidden />;
+    return <Button variant="ghost" size="icon" className="" aria-hidden />;
   }
 
   const isDark = resolvedTheme === "dark";
@@ -23,8 +23,7 @@ export default function ThemeToggle() {
     <Button
       variant="ghost"
       size="icon"
-      className="fixed top-4 right-4"
-      aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
+           aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
       {isDark ? <Moon /> : <Sun />}

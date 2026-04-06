@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { isValidUrl } from "@/lib/utils";
 import { HyperText } from "@/components/ui/hyper-text";
+import ThemeToggle from "@/components/theme-toggle";
 
 const REMARK_PLUGINS: PluggableList = [remarkGfm];
 const REHYPE_PLUGINS: PluggableList = [rehypeHighlight];
@@ -92,7 +93,10 @@ export default function FeedmePage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center pt-16 px-4">
-      <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
+      <div className="relative w-full max-w-2xl mx-auto flex flex-col gap-6">
+        <div className="absolute top-0 right-0">
+          <ThemeToggle />
+        </div>
         <div className="flex flex-col gap-1">
           <div
             data-testid="logo"
