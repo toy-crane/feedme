@@ -43,7 +43,7 @@ These rules are **always enforced**. Each links to a file with Incorrect/Correct
 
 - **Forms use `FieldGroup` + `Field`.** Never use raw `div` with `space-y-*` or `grid gap-*` for form layout.
 - **`InputGroup` uses `InputGroupInput`/`InputGroupTextarea`.** Never raw `Input`/`Textarea` inside `InputGroup`.
-- **Buttons inside inputs use `InputGroup` + `InputGroupAddon`.**
+- **Buttons inside inputs use `InputGroup` + `InputGroupAddon` + `InputGroupButton`.** Never use raw `Button` inside `InputGroupAddon`. → [references/input-group.md](./references/input-group.md)
 - **Option sets (2–7 choices) use `ToggleGroup`.** Don't loop `Button` with manual active state.
 - **`FieldSet` + `FieldLegend` for grouping related checkboxes/radios.** Don't use a `div` with a heading.
 - **Field validation uses `data-invalid` + `aria-invalid`.** `data-invalid` on `Field`, `aria-invalid` on the control. For disabled: `data-disabled` on `Field`, `disabled` on the control.
@@ -233,6 +233,7 @@ npx shadcn@latest view @shadcn/button
 ## Detailed References
 
 - [rules/forms.md](./rules/forms.md) — FieldGroup, Field, InputGroup, ToggleGroup, FieldSet, validation states
+- [references/input-group.md](./references/input-group.md) — InputGroup full API: InputGroupButton, InputGroupAddon align, InputGroupText, custom inputs
 - [rules/composition.md](./rules/composition.md) — Groups, overlays, Card, Tabs, Avatar, Alert, Empty, Toast, Separator, Skeleton, Badge, Button loading
 - [rules/icons.md](./rules/icons.md) — data-icon, icon sizing, passing icons as objects
 - [rules/styling.md](./rules/styling.md) — Semantic colors, variants, className, spacing, size, truncate, dark mode, cn(), z-index
