@@ -230,12 +230,12 @@ export default function FeedmePage() {
                       type="button"
                       className="flex items-center gap-1 text-sm text-muted-foreground bg-transparent border-none cursor-pointer p-0"
                     >
-                      <Plus data-icon="inline-start" />
+                      <Plus className="size-4" aria-hidden="true" />
                       <span>프롬프트 추가하기</span>
                       {promptOpen ? (
-                        <ChevronDown data-icon="inline-end" aria-hidden="true" />
+                        <ChevronDown className="size-3.5" aria-hidden="true" />
                       ) : (
-                        <ChevronRight data-icon="inline-end" aria-hidden="true" />
+                        <ChevronRight className="size-3.5" aria-hidden="true" />
                       )}
                     </button>
                   </CollapsibleTrigger>
