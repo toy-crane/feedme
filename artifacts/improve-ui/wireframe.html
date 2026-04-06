@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireframe: 마크다운 UI 개선</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --w-bg: #f5f5f5;
+    --w-border: #ccc;
+    --w-text: #555;
+    --w-muted: #aaa;
+    --w-fill: #eee;
+  }
+
+  * {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    color: var(--w-text);
+  }
+
+  body { background: var(--w-bg); }
+
+  /* Screen nav */
+  nav { position: sticky; top: 0; z-index: 40; background: var(--w-bg); border-bottom: 1px solid var(--w-border); }
+  nav button { cursor: pointer; font-size: 13px; }
+  nav button:hover { background: var(--w-fill); border-radius: 4px; }
+  nav button.active { font-weight: bold; border-bottom: 2px solid var(--w-text); }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Viewport toggle */
+  .vp-toggle button {
+    font-size: 12px; padding: 2px 8px;
+    border: 1px solid var(--w-border); cursor: pointer; background: white;
+  }
+  .vp-toggle button:first-child { border-radius: 4px 0 0 4px; }
+  .vp-toggle button:last-child { border-radius: 0 4px 4px 0; border-left: none; }
+  .vp-toggle button.active { background: var(--w-text); color: white; }
+
+  /* Mobile viewport frame */
+  body.viewport-mobile .screen-content {
+    max-width: 375px !important;
+    margin: 24px auto !important;
+    border: 2px solid var(--w-border);
+    border-radius: 24px;
+    min-height: 667px;
+    background: white;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 32px 16px !important;
+  }
+
+  /* Screen Notes */
+  .screen-notes {
+    background: #fffde7;
+    border-left: 3px solid #ffd54f;
+    padding: 12px 16px;
+    margin-top: 24px;
+    font-size: 13px;
+    border-radius: 0 4px 4px 0;
+  }
+  .screen-notes summary {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    color: #b0a050;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .screen-notes p { margin: 6px 0 2px; color: #777; }
+  .screen-notes ul { margin: 4px 0 0 16px; padding: 0; color: #777; }
+  .screen-notes li { margin: 2px 0; }
+
+  /* Wireframe prose mock */
+  .w-prose { line-height: 1.7; }
+  .w-prose h1 { font-size: 20px; font-weight: bold; margin: 16px 0 8px; }
+  .w-prose h2 { font-size: 17px; font-weight: bold; margin: 14px 0 6px; }
+  .w-prose h3 { font-size: 15px; font-weight: bold; margin: 12px 0 4px; }
+  .w-prose p { margin: 8px 0; font-size: 14px; }
+  .w-prose ul, .w-prose ol { margin: 8px 0 8px 20px; font-size: 14px; }
+  .w-prose li { margin: 4px 0; }
+  .w-prose blockquote { border-left: 3px solid var(--w-border); padding-left: 12px; color: var(--w-muted); margin: 8px 0; font-size: 14px; }
+
+  .w-code-block {
+    background: #2d2d2d;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 8px 0;
+    font-size: 13px;
+    overflow-x: auto;
+  }
+  .w-code-block .w-keyword { color: #c792ea; }
+  .w-code-block .w-string { color: #c3e88d; }
+  .w-code-block .w-comment { color: #676e95; }
+  .w-code-block .w-normal { color: #d6deeb; }
+  .w-code-block .w-function { color: #82aaff; }
+  .w-code-block .w-number { color: #f78c6c; }
+
+  .w-code-plain {
+    background: var(--w-fill);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+
+  .w-inline-code {
+    background: var(--w-fill);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+
+  .w-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+  .w-table th, .w-table td {
+    border: 1px solid var(--w-border);
+    padding: 6px 10px;
+    text-align: left;
+  }
+  .w-table th { background: var(--w-fill); font-weight: bold; }
+
+  .w-strikethrough { text-decoration: line-through; color: var(--w-muted); }
+
+  .w-task-item { display: flex; align-items: center; gap: 6px; margin: 4px 0; font-size: 14px; }
+  .w-checkbox {
+    width: 14px; height: 14px;
+    border: 1px solid var(--w-border);
+    border-radius: 2px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .w-checkbox.checked { background: var(--w-text); }
+
+  .w-autolink { text-decoration: underline; cursor: pointer; }
+</style>
+</head>
+<body class="p-0 m-0 viewport-mobile">
+
+<nav class="flex items-center gap-4 px-6 py-2">
+  <span class="text-xs" style="color:var(--w-muted)">wireframe</span>
+  <button id="nav-0" onclick="show(0)" class="px-2 py-1">웹페이지 추출</button>
+  <button id="nav-1" onclick="show(1)" class="px-2 py-1">YouTube 추출</button>
+  <button id="nav-2" onclick="show(2)" class="px-2 py-1">GFM 요소</button>
+  <div class="vp-toggle flex ml-auto">
+    <button id="vp-desktop" onclick="setViewport('desktop')">Desktop</button>
+    <button id="vp-mobile" onclick="setViewport('mobile')" class="active">Mobile</button>
+  </div>
+</nav>
+
+<!-- Screen 0: 웹페이지 추출 결과 -->
+<div id="screen-0" class="screen" data-scenario="FEEDME-010, FEEDME-012, FEEDME-013, FEEDME-017, FEEDME-019">
+  <div class="screen-content @container max-w-2xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-5" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      웹페이지 추출 결과
+    </h2>
+
+    <!-- Header -->
+    <div class="mb-4">
+      <div class="text-2xl font-bold mb-1">feedme</div>
+      <div class="text-sm" style="color:var(--w-muted)">URL을 입력하면 웹페이지나 YouTube 자막을 마크다운으로 추출합니다</div>
+    </div>
+
+    <!-- URL Input -->
+    <div class="flex border rounded-lg overflow-hidden" style="border-color:var(--w-border)">
+      <div class="flex-1 px-3 py-2 text-sm" style="background:white; color:var(--w-muted)">https://code.claude.com/docs/en/best-practices</div>
+      <div class="px-3 py-2 text-sm font-bold" style="background:var(--w-fill); border-left:1px solid var(--w-border)">가져오기</div>
+    </div>
+
+    <!-- 구분선: Form → Content -->
+    <hr class="my-6" style="border:none; border-top:1px solid var(--w-border)">
+
+    <!-- 제목 + 복사 버튼 -->
+    <div class="flex items-start justify-between gap-4 mb-1">
+      <h1 class="text-xl font-bold" style="margin:0">Best Practices for Claude Code</h1>
+      <div class="flex items-center gap-1 px-3 py-1 rounded text-xs shrink-0" style="border:1px solid var(--w-border)">
+        <i data-lucide="copy" style="width:12px;height:12px"></i>
+        복사
+      </div>
+    </div>
+    <p class="text-sm mb-4" style="color:var(--w-muted)">Claude Code는 자율적인 코딩 에이전트입니다. 효과적으로 사용하기 위한 모범 사례를 소개합니다.</p>
+
+    <!-- 여백: 제목 → 본문 -->
+    <div class="mb-6"></div>
+
+    <!-- 마크다운 본문 (테두리 없음, 높이 제한 없음) -->
+    <div class="w-prose">
+
+      <h2>프로젝트 설정</h2>
+      <p><span class="w-inline-code">CLAUDE.md</span> 파일을 프로젝트 루트에 만들어 Claude에게 컨텍스트를 제공하세요.</p>
+
+      <!-- 코드 블록 (구문 하이라이팅) -->
+      <div class="w-code-block">
+        <div><span class="w-comment">// CLAUDE.md 예시</span></div>
+        <div><span class="w-keyword">const</span> <span class="w-normal">config = {</span></div>
+        <div><span class="w-normal">  name: </span><span class="w-string">"my-project"</span><span class="w-normal">,</span></div>
+        <div><span class="w-normal">  version: </span><span class="w-string">"1.0.0"</span><span class="w-normal">,</span></div>
+        <div><span class="w-normal">  port: </span><span class="w-number">3000</span></div>
+        <div><span class="w-normal">};</span></div>
+      </div>
+
+      <h2>효과적인 프롬프트 작성</h2>
+      <p>구체적이고 명확한 프롬프트를 작성하면 더 좋은 결과를 얻을 수 있습니다.</p>
+
+      <blockquote>좋은 프롬프트는 문제의 맥락, 기대 결과, 제약 조건을 포함합니다.</blockquote>
+
+      <h3>명령어 구조</h3>
+      <p>다음 명령어를 활용할 수 있습니다:</p>
+      <ul>
+        <li><span class="w-inline-code">/help</span> — 도움말 표시</li>
+        <li><span class="w-inline-code">/commit</span> — 변경 사항 커밋</li>
+        <li><span class="w-inline-code">/review</span> — 코드 리뷰</li>
+      </ul>
+
+      <!-- 언어 미지정 코드 블록 (하이라이팅 없음) -->
+      <div class="w-code-plain">
+        $ claude --help
+        $ claude /commit
+        $ claude /review
+      </div>
+
+      <h2>디버깅 팁</h2>
+      <p>에러가 발생하면 로그를 확인하고, 필요한 경우 <span class="w-inline-code">--verbose</span> 플래그를 추가하세요.</p>
+
+      <ol>
+        <li>에러 메시지 확인</li>
+        <li>관련 파일 검토</li>
+        <li>테스트 실행</li>
+      </ol>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>웹페이지 추출 결과 화면 — 기존 대비 변경점</p>
+        <ul>
+          <li>레이아웃 너비: max-w-lg(512px) → max-w-2xl(672px)</li>
+          <li>미리보기 영역: border 제거, max-h-96 제거 → 전체 펼침</li>
+          <li>코드 블록: 구문 하이라이팅 적용 (언어 지정 시)</li>
+          <li>언어 미지정 코드 블록: 하이라이팅 없이 기본 스타일</li>
+          <li>인터랙션: 복사 버튼은 상단 고정 유지</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<!-- Screen 1: YouTube 추출 결과 -->
+<div id="screen-1" class="screen" data-scenario="FEEDME-011, FEEDME-012">
+  <div class="screen-content @container max-w-2xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-5" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      YouTube 추출 결과
+    </h2>
+
+    <!-- Header -->
+    <div class="mb-4">
+      <div class="text-2xl font-bold mb-1">feedme</div>
+      <div class="text-sm" style="color:var(--w-muted)">URL을 입력하면 웹페이지나 YouTube 자막을 마크다운으로 추출합니다</div>
+    </div>
+
+    <!-- URL Input -->
+    <div class="flex border rounded-lg overflow-hidden" style="border-color:var(--w-border)">
+      <div class="flex-1 px-3 py-2 text-sm" style="background:white; color:var(--w-muted)">https://youtube.com/watch?v=example</div>
+      <div class="px-3 py-2 text-sm font-bold" style="background:var(--w-fill); border-left:1px solid var(--w-border)">가져오기</div>
+    </div>
+
+    <!-- 구분선: Form → Content -->
+    <hr class="my-6" style="border:none; border-top:1px solid var(--w-border)">
+
+    <!-- YouTube 썸네일 -->
+    <div class="rounded-lg overflow-hidden mb-4" style="background:var(--w-fill); aspect-ratio:16/9; display:flex; align-items:center; justify-content:center;">
+      <i data-lucide="play-circle" style="width:48px;height:48px;color:var(--w-muted)"></i>
+    </div>
+
+    <!-- 제목 + 복사 버튼 -->
+    <div class="flex items-start justify-between gap-4 mb-1">
+      <h1 class="text-xl font-bold" style="margin:0">YouTube 영상 제목</h1>
+      <div class="flex items-center gap-1 px-3 py-1 rounded text-xs shrink-0" style="border:1px solid var(--w-border)">
+        <i data-lucide="copy" style="width:12px;height:12px"></i>
+        복사
+      </div>
+    </div>
+    <p class="text-sm mb-4" style="color:var(--w-muted)">채널명</p>
+
+    <!-- 구분선: 제목 → 자막 -->
+    <hr class="mb-4" style="border:none; border-top:1px solid var(--w-border)">
+
+    <!-- 자막 콘텐츠 (테두리 없음, 높이 제한 없음) -->
+    <div class="w-prose">
+      <p>안녕하세요, 오늘은 Claude Code의 모범 사례에 대해 이야기해보겠습니다.</p>
+      <p>첫 번째로 프로젝트 설정에 대해 알아보겠습니다. CLAUDE.md 파일을 만들어서 프로젝트의 컨텍스트를 제공하는 것이 중요합니다.</p>
+      <p>두 번째는 효과적인 프롬프트 작성법입니다. 구체적이고 명확한 프롬프트를 작성하면 더 좋은 결과를 얻을 수 있습니다.</p>
+      <p>세 번째로 디버깅 팁을 소개합니다. 에러가 발생하면 로그를 먼저 확인하시기 바랍니다.</p>
+      <p>네 번째는 테스트 작성에 대한 가이드입니다. TDD 방식을 활용하면 안정적인 코드를 작성할 수 있습니다.</p>
+      <p>다섯 번째로 협업 시 유의사항을 설명드리겠습니다. 커밋 메시지를 명확하게 작성하는 것이 중요합니다.</p>
+      <p>마지막으로, Claude Code를 활용한 코드 리뷰 방법을 소개합니다. /review 명령어를 사용해보세요.</p>
+      <p>감사합니다. 더 자세한 내용은 공식 문서를 참고해주세요.</p>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>YouTube 추출 결과 화면 — 기존 대비 변경점</p>
+        <ul>
+          <li>자막 영역: border 제거, max-h-60 제거 → 전체 펼침</li>
+          <li>레이아웃 너비: max-w-2xl 적용</li>
+          <li>썸네일, 제목, 채널 구조는 기존 유지</li>
+          <li>인터랙션: 복사 버튼은 자막 라벨 옆 상단 고정 유지</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<!-- Screen 2: GFM 요소 데모 -->
+<div id="screen-2" class="screen" data-scenario="FEEDME-014, FEEDME-015, FEEDME-016, FEEDME-018">
+  <div class="screen-content @container max-w-2xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-5" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      GFM 요소 렌더링
+    </h2>
+
+    <!-- Header -->
+    <div class="mb-4">
+      <div class="text-2xl font-bold mb-1">feedme</div>
+      <div class="text-sm" style="color:var(--w-muted)">URL을 입력하면 웹페이지나 YouTube 자막을 마크다운으로 추출합니다</div>
+    </div>
+
+    <!-- URL Input -->
+    <div class="flex border rounded-lg overflow-hidden" style="border-color:var(--w-border)">
+      <div class="flex-1 px-3 py-2 text-sm" style="background:white; color:var(--w-muted)">https://example.com/gfm-article</div>
+      <div class="px-3 py-2 text-sm font-bold" style="background:var(--w-fill); border-left:1px solid var(--w-border)">가져오기</div>
+    </div>
+
+    <!-- 구분선: Form → Content -->
+    <hr class="my-6" style="border:none; border-top:1px solid var(--w-border)">
+
+    <!-- 제목 + 복사 버튼 -->
+    <div class="flex items-start justify-between gap-4 mb-1">
+      <h1 class="text-xl font-bold" style="margin:0">GFM 요소 데모</h1>
+      <div class="flex items-center gap-1 px-3 py-1 rounded text-xs shrink-0" style="border:1px solid var(--w-border)">
+        <i data-lucide="copy" style="width:12px;height:12px"></i>
+        복사
+      </div>
+    </div>
+    <p class="text-sm mb-4" style="color:var(--w-muted)">GitHub Flavored Markdown 요소가 포함된 페이지</p>
+
+    <!-- 여백: 제목 → 본문 -->
+    <div class="mb-6"></div>
+
+    <!-- GFM 요소들 -->
+    <div class="w-prose">
+
+      <!-- 취소선 -->
+      <h3>취소선</h3>
+      <p>이 기능은 <span class="w-strikethrough">더 이상 사용되지 않습니다</span>. 새로운 API를 사용하세요.</p>
+
+      <!-- 테이블 -->
+      <h3>테이블</h3>
+      <table class="w-table">
+        <thead>
+          <tr>
+            <th>명령어</th>
+            <th>설명</th>
+            <th>단축키</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="w-inline-code">/help</span></td>
+            <td>도움말 표시</td>
+            <td>Ctrl+H</td>
+          </tr>
+          <tr>
+            <td><span class="w-inline-code">/commit</span></td>
+            <td>변경사항 커밋</td>
+            <td>Ctrl+K</td>
+          </tr>
+          <tr>
+            <td><span class="w-inline-code">/review</span></td>
+            <td>코드 리뷰</td>
+            <td>Ctrl+R</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 태스크 리스트 -->
+      <h3>태스크 리스트</h3>
+      <div class="w-task-item"><span class="w-checkbox checked"></span> 프로젝트 설정 완료</div>
+      <div class="w-task-item"><span class="w-checkbox checked"></span> CLAUDE.md 작성</div>
+      <div class="w-task-item"><span class="w-checkbox"></span> 테스트 코드 작성</div>
+      <div class="w-task-item"><span class="w-checkbox"></span> 코드 리뷰 요청</div>
+
+      <!-- 자동 링크 -->
+      <h3>자동 링크</h3>
+      <p>공식 문서는 <span class="w-autolink">https://docs.example.com</span> 에서 확인할 수 있습니다.</p>
+      <p>이슈는 <span class="w-autolink">https://github.com/example/repo/issues</span> 에서 관리합니다.</p>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>GFM 요소별 렌더링 결과 데모</p>
+        <ul>
+          <li>취소선: ~~text~~ → &lt;del&gt; 태그로 렌더링</li>
+          <li>테이블: | 헤더 | → &lt;table&gt;로 렌더링</li>
+          <li>태스크 리스트: - [x] → 체크박스로 렌더링</li>
+          <li>자동 링크: URL 텍스트 → 클릭 가능한 &lt;a&gt; 태그</li>
+          <li>이 화면은 remark-gfm 플러그인 적용 후의 결과를 보여준다</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var currentScreen = 0;
+var screenIds = [];
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('nav button[id^="nav-"]').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('nav-' + id).classList.add('active');
+  currentScreen = screenIds.indexOf(id);
+}
+
+function setViewport(mode) {
+  document.body.classList.remove('viewport-mobile', 'viewport-desktop');
+  document.body.classList.add('viewport-' + mode);
+  document.querySelectorAll('.vp-toggle button').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('vp-' + mode).classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('nav button[id^="nav-"]').forEach(function(b) {
+    screenIds.push(parseInt(b.id.replace('nav-', '')));
+  });
+  var first = document.querySelector('nav button[id^="nav-"]');
+  if (first) first.click();
+  lucide.createIcons();
+});
+</script>
+</body>
+</html>
