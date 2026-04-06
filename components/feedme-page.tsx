@@ -146,15 +146,15 @@ export default function FeedmePage() {
                   style={{ aspectRatio: "16 / 9", objectFit: "cover" }}
                 />
               )}
-              <div className="flex items-start justify-between">
-                {result.title && (
-                  <div className="flex flex-col gap-1">
-                    <h2 className="text-2xl font-bold">{result.title}</h2>
-                    {result.type === "youtube" && result.channel && (
-                      <p className="text-sm text-muted-foreground">{result.channel}</p>
-                    )}
-                  </div>
-                )}
+              {result.title && (
+                <div className="flex flex-col gap-1">
+                  <h2 className="text-2xl font-bold">{result.title}</h2>
+                  {result.type === "youtube" && result.channel && (
+                    <p className="text-sm text-muted-foreground">{result.channel}</p>
+                  )}
+                </div>
+              )}
+              <div className="flex justify-end">
                 <SplitCopyButton
                   markdown={markdownText}
                   copied={copied}
@@ -183,10 +183,11 @@ function SplitCopyButton({
   onCopy: () => void;
 }) {
   return (
-    <div className="flex items-center">
+    <div className="relative flex items-center rounded-lg bg-secondary">
       <Button
-        variant="outline"
+        variant="secondary"
         size="sm"
+        className="shadow-none"
         onClick={onCopy}
         data-copied={copied ? "true" : undefined}
         aria-label="복사"
@@ -198,18 +199,22 @@ function SplitCopyButton({
         )}
         복사
       </Button>
-      <Separator orientation="vertical" />
+      <Separator
+        orientation="vertical"
+        className="absolute right-8 top-1 z-0 h-5! bg-foreground/10!"
+      />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
+            className="-ml-0.5 shadow-none"
             aria-label="열기 옵션"
           >
             <ChevronDown />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
               <a
