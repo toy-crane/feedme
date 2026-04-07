@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn, isValidUrl, buildCopyText } from "@/lib/utils";
+import type { ExtractResponse } from "@/types/extract";
 import { HyperText } from "@/components/ui/hyper-text";
 import ThemeToggle from "@/components/theme-toggle";
 
@@ -41,20 +42,11 @@ const REHYPE_PLUGINS: PluggableList = [rehypeHighlight];
 
 const PRESETS = ["요약해줘", "한국어로 번역해줘", "쉽게 설명해줘"] as const;
 
-type ExtractResult = {
-  markdown?: string;
-  content?: string;
-  title?: string;
-  type?: string;
-  thumbnail?: string;
-  source?: string;
-};
-
 export default function FeedmePage() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<ExtractResult | null>(null);
+  const [result, setResult] = useState<ExtractResponse | null>(null);
   const [copied, setCopied] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [promptOpen, setPromptOpen] = useState(false);
@@ -92,7 +84,7 @@ export default function FeedmePage() {
         return;
       }
 
-      setResult(data as ExtractResult);
+      setResult(data as ExtractResponse);
     } catch {
       setError("네트워크 오류가 발생했습니다");
     } finally {
