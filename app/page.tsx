@@ -1,5 +1,5 @@
-import FeedmePage from "@/components/feedme-page";
+import ContentExtractor from "@/components/content-extractor";
 
 export default function Page() {
-  return <FeedmePage />;
+  return <ContentExtractor />;
 }

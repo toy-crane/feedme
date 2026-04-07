@@ -13,7 +13,7 @@ import { HyperText } from "@/components/ui/hyper-text";
 import ThemeToggle from "@/components/theme-toggle";
 import { useFeedme } from "@/hooks/use-feedme";
 
-export default function FeedmePage() {
+export default function ContentExtractor() {
   const {
     url, setUrl,
     loading,

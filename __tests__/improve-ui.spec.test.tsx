@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import FeedmePage from "@/components/feedme-page";
+import ContentExtractor from "@/components/content-extractor";
 
 describe("improve-ui spec tests", () => {
   beforeEach(() => {
@@ -24,7 +24,7 @@ describe("improve-ui spec tests", () => {
         }),
       } as Response);
 
-      const { container } = render(<FeedmePage />);
+      const { container } = render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com/article");
@@ -60,7 +60,7 @@ describe("improve-ui spec tests", () => {
         }),
       } as Response);
 
-      const { container } = render(<FeedmePage />);
+      const { container } = render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://www.youtube.com/watch?v=test123");
@@ -94,7 +94,7 @@ describe("improve-ui spec tests", () => {
         }),
       } as Response);
 
-      const { container } = render(<FeedmePage />);
+      const { container } = render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com/article");
@@ -130,7 +130,7 @@ describe("improve-ui spec tests", () => {
         }),
       } as Response);
 
-      const { container } = render(<FeedmePage />);
+      const { container } = render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://www.youtube.com/watch?v=test123");
@@ -158,7 +158,7 @@ describe("improve-ui spec tests", () => {
   // FEEDME-013
   describe("FEEDME-013: 콘텐츠 영역 최대 너비 max-w-2xl 이상", () => {
     it("콘텐츠 영역에 max-w-2xl 이상의 클래스가 적용되어 있다", () => {
-      const { container } = render(<FeedmePage />);
+      const { container } = render(<ContentExtractor />);
 
       // max-w-2xl(672px) 이상: max-w-2xl, max-w-3xl, max-w-4xl, max-w-5xl, max-w-6xl, max-w-7xl, max-w-full, max-w-screen-*
       const wideContainerClasses = [
@@ -196,7 +196,7 @@ describe("improve-ui spec tests", () => {
         }),
       } as Response);
 
-      const { container } = render(<FeedmePage />);
+      const { container } = render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com/article");
@@ -228,7 +228,7 @@ describe("improve-ui spec tests", () => {
         }),
       } as Response);
 
-      const { container } = render(<FeedmePage />);
+      const { container } = render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com/article");
@@ -254,7 +254,7 @@ describe("improve-ui spec tests", () => {
         }),
       } as Response);
 
-      const { container } = render(<FeedmePage />);
+      const { container } = render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com/article");
@@ -284,7 +284,7 @@ describe("improve-ui spec tests", () => {
         }),
       } as Response);
 
-      const { container } = render(<FeedmePage />);
+      const { container } = render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com/article");
@@ -309,7 +309,7 @@ describe("improve-ui spec tests", () => {
         }),
       } as Response);
 
-      const { container } = render(<FeedmePage />);
+      const { container } = render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com/article");
@@ -334,7 +334,7 @@ describe("improve-ui spec tests", () => {
         }),
       } as Response);
 
-      const { container } = render(<FeedmePage />);
+      const { container } = render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com/article");
