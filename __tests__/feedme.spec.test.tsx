@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import FeedmePage from "@/components/feedme-page";
+import ContentExtractor from "@/components/content-extractor";
 
 describe("feedme spec tests", () => {
   let writeTextMock: ReturnType<typeof vi.fn>;
@@ -31,7 +31,7 @@ describe("feedme spec tests", () => {
         }),
       } as Response);
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com/article");
@@ -58,7 +58,7 @@ describe("feedme spec tests", () => {
         }),
       } as Response);
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
@@ -86,7 +86,7 @@ describe("feedme spec tests", () => {
         })
       );
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com/article");
@@ -115,7 +115,7 @@ describe("feedme spec tests", () => {
   // FEEDME-004
   describe("FEEDME-004: 초기 화면 복사 버튼 미표시", () => {
     it("초기 화면에서 복사 버튼이 표시되지 않는다", () => {
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       expect(screen.queryByRole("button", { name: /복사/ })).not.toBeInTheDocument();
     });
@@ -138,7 +138,7 @@ describe("feedme spec tests", () => {
         writable: true,
       });
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com/article");
@@ -163,7 +163,7 @@ describe("feedme spec tests", () => {
   // FEEDME-006
   describe("FEEDME-006: 빈 URL 시 버튼 비활성화", () => {
     it("빈 URL일 때 가져오기 버튼이 disabled 상태이다", () => {
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const button = screen.getByRole("button", { name: "가져오기" });
       expect(button).toHaveAttribute("aria-disabled", "true");
@@ -175,7 +175,7 @@ describe("feedme spec tests", () => {
     it("not-a-url 입력 시 가져오기 버튼이 disabled 상태이다", async () => {
       const user = userEvent.setup();
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "not-a-url");
@@ -195,7 +195,7 @@ describe("feedme spec tests", () => {
         json: async () => ({ error: "페이지에 접근할 수 없습니다" }),
       } as Response);
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://unreachable.invalid");
@@ -219,7 +219,7 @@ describe("feedme spec tests", () => {
         json: async () => ({ error: "자막을 찾을 수 없습니다" }),
       } as Response);
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://www.youtube.com/watch?v=no-captions");

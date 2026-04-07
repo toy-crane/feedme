@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import FeedmePage from "@/components/feedme-page";
+import ContentExtractor from "@/components/content-extractor";
 
 async function renderWithContent(markdown = "# Hello") {
   const user = userEvent.setup();
@@ -10,7 +10,7 @@ async function renderWithContent(markdown = "# Hello") {
     json: async () => ({ markdown }),
   } as Response);
 
-  render(<FeedmePage />);
+  render(<ContentExtractor />);
 
   const input = screen.getByRole("textbox");
   await user.type(input, "https://example.com");
@@ -35,7 +35,7 @@ describe("feedme-page spec acceptance tests", () => {
   // FEEDME-006: When URL input is empty → '가져오기' button is disabled
   describe("FEEDME-006: 빈 URL 입력 시 버튼 비활성화", () => {
     it("URL 입력이 비어 있을 때 '가져오기' 버튼이 비활성화된다", () => {
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const button = screen.getByRole("button", { name: "가져오기" });
       expect(button).toHaveAttribute("aria-disabled", "true");
@@ -46,7 +46,7 @@ describe("feedme-page spec acceptance tests", () => {
   describe("FEEDME-007: 잘못된 URL 입력 시 버튼 비활성화", () => {
     it("not-a-url 입력 시 '가져오기' 버튼이 비활성화된다", async () => {
       const user = userEvent.setup();
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "not-a-url");
@@ -60,7 +60,7 @@ describe("feedme-page spec acceptance tests", () => {
   describe("FEEDME-012: 유효하지 않은 URL이 유효한 URL로 변경되면 버튼 활성화", () => {
     it("not-a-url 입력 후 https://example.com으로 변경하면 '가져오기' 버튼이 활성화된다", async () => {
       const user = userEvent.setup();
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "not-a-url");
@@ -87,7 +87,7 @@ describe("feedme-page spec acceptance tests", () => {
         })
       );
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com");
@@ -125,7 +125,7 @@ describe("feedme-page spec acceptance tests", () => {
         json: async () => ({ error: "페이지에 접근할 수 없습니다" }),
       } as Response);
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://unreachable.invalid");
@@ -153,7 +153,7 @@ describe("feedme-page spec acceptance tests", () => {
         json: async () => ({ error: "자막을 찾을 수 없습니다" }),
       } as Response);
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://www.youtube.com/watch?v=no-captions");
@@ -177,7 +177,7 @@ describe("feedme-page spec acceptance tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com");
@@ -201,7 +201,7 @@ describe("feedme-page spec acceptance tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const input = screen.getByRole("textbox");
       await user.type(input, "https://example.com");
@@ -391,7 +391,7 @@ describe("feedme-page spec acceptance tests", () => {
   // FEEDME-035: 초기 화면에서 split button 미표시
   describe("FEEDME-035: 초기 화면에서 split button 미표시", () => {
     it("콘텐츠가 추출되지 않은 초기 화면에서 split button이 표시되지 않는다", () => {
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       // 메인 복사 버튼이 없어야 한다
       expect(screen.queryByRole("button", { name: "복사하기" })).not.toBeInTheDocument();
@@ -443,7 +443,7 @@ describe("Pre-prompt", () => {
   // PROMPT-002: 초기 화면에서 '프롬프트 추가하기' 토글이 표시되지 않는다
   describe("PROMPT-002: 초기 화면에서 프롬프트 추가하기 토글 미표시", () => {
     it("콘텐츠가 추출되지 않은 초기 화면에서 '프롬프트 추가하기' 토글이 표시되지 않는다", () => {
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       expect(screen.queryByRole("button", { name: /프롬프트 추가하기/i })).not.toBeInTheDocument();
     });
@@ -731,7 +731,7 @@ describe("upgrade-logo", () => {
   // LOGO-001: feedme 페이지 접속 시, HyperText 컴포넌트로 "Feed-me" 텍스트가 표시된다
   describe("LOGO-001: HyperText 컴포넌트로 'Feed-me' 텍스트 표시", () => {
     it("페이지에 'Feed-me' 텍스트가 표시되고 HyperText 컴포넌트가 사용된다", () => {
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       expect(screen.getByText("Feed-me")).toBeInTheDocument();
       expect(screen.getByTestId("logo")).toBeInTheDocument();
@@ -741,7 +741,7 @@ describe("upgrade-logo", () => {
   // LOGO-002: 로고 위에 마우스를 올리면, 포인터 커서가 표시된다
   describe("LOGO-002: 로고 호버 시 포인터 커서", () => {
     it("로고 요소에 cursor-pointer 스타일이 적용되어 있다", () => {
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       const logoContainer = screen.getByTestId("logo");
       expect(logoContainer.classList.contains("cursor-pointer")).toBe(true);
@@ -760,7 +760,7 @@ describe("upgrade-logo", () => {
         }),
       } as Response);
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       // URL 입력 후 가져오기
       const input = screen.getByRole("textbox");
@@ -798,7 +798,7 @@ describe("upgrade-logo", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
 
-      render(<FeedmePage />);
+      render(<ContentExtractor />);
 
       // URL 입력 후 가져오기 → 에러 상태 만들기
       const input = screen.getByRole("textbox");
@@ -856,7 +856,7 @@ async function renderWithWebpageResult({
     }),
   } as Response);
 
-  render(<FeedmePage />);
+  render(<ContentExtractor />);
 
   const input = screen.getByRole("textbox");
   await user.type(input, "https://example.com");
@@ -892,7 +892,7 @@ async function renderWithYoutubeResult({
     }),
   } as Response);
 
-  render(<FeedmePage />);
+  render(<ContentExtractor />);
 
   const input = screen.getByRole("textbox");
   await user.type(input, "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
