@@ -1,0 +1,21 @@
+{
+  "name": "feedme-extract",
+  "private": true,
+  "scripts": {
+    "dev": "WRANGLER_BUILD_CONDITIONS=workerd,worker wrangler dev",
+    "deploy": "WRANGLER_BUILD_CONDITIONS=workerd,worker wrangler deploy",
+    "test": "vitest run",
+    "types": "wrangler types"
+  },
+  "dependencies": {
+    "@mixmark-io/domino": "^2.2.0",
+    "defuddle": "latest",
+    "linkedom": "latest"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "latest",
+    "@cloudflare/workers-types": "latest",
+    "vitest": "latest",
+    "wrangler": "latest"
+  }
+}
