@@ -245,7 +245,7 @@ export default function FeedmePage() {
                             rows={2}
                           />
                           {prompt && (
-                            <InputGroupAddon align="inline-end">
+                            <InputGroupAddon align="inline-end" className="self-start pt-2">
                               <InputGroupButton
                                 variant="ghost"
                                 size="icon-xs"
