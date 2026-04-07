@@ -56,8 +56,8 @@
     - FEEDME-001: 웹페이지 URL 입력 후 가져오기 → 제목, 본문 미리보기 표시
     - FEEDME-002: YouTube URL 입력 후 가져오기 → 제목, 채널, 자막 미리보기 표시
     - FEEDME-003: 가져오기 클릭 후 로딩 인디케이터 표시
-    - FEEDME-004: 초기 화면에서 복사 버튼 미노출
-    - FEEDME-005: 복사 버튼 클릭 → 클립보드 복사 + "복사됨" 토스트
+    - FEEDME-045: 초기 화면에서 split button 미노출 (replaces FEEDME-004)
+    - FEEDME-041: 복사 버튼 클릭 → 클립보드 복사 + 체크 아이콘 (replaces FEEDME-005)
     - FEEDME-006: 빈 URL → "올바른 URL을 입력해주세요"
     - FEEDME-007: 잘못된 URL → "올바른 URL을 입력해주세요"
     - FEEDME-008: 접근 불가 URL → "페이지에 접근할 수 없습니다"
