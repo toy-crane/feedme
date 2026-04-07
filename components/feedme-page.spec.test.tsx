@@ -672,6 +672,51 @@ describe("Pre-prompt", () => {
       expect(screen.queryByText("요약해줘")).not.toBeInTheDocument();
     });
   });
+
+  // PROMPT-012: 프롬프트 입력 시 복사 버튼 아래에 '프롬프트 포함' 캡션 표시
+  describe("PROMPT-012: 프롬프트 입력 시 '프롬프트 포함' 캡션 표시", () => {
+    it("프롬프트가 입력되면 복사 버튼 아래에 '프롬프트 포함' 텍스트가 표시된다", async () => {
+      const { user } = await renderWithContentAndOpenCollapsible();
+
+      await user.click(screen.getByText("요약해줘"));
+
+      expect(screen.getByText("프롬프트 포함")).toBeInTheDocument();
+    });
+
+    it("프롬프트가 비어있으면 '프롬프트 포함' 텍스트가 표시되지 않는다", async () => {
+      await renderWithContent();
+
+      expect(screen.queryByText("프롬프트 포함")).not.toBeInTheDocument();
+    });
+  });
+
+  // PROMPT-013: 클리어 버튼 클릭 시 프롬프트 초기화
+  describe("PROMPT-013: 클리어 버튼 클릭 시 프롬프트 초기화", () => {
+    it("프롬프트가 입력된 상태에서 클리어 버튼 클릭 시 프롬프트가 비워지고 프리셋 선택이 해제된다", async () => {
+      const { user } = await renderWithContentAndOpenCollapsible();
+
+      await user.click(screen.getByText("요약해줘"));
+      const textarea = screen.getByRole("textbox", { name: /프롬프트/i });
+      expect(textarea).toHaveValue("요약해줘");
+
+      const clearButton = screen.getByRole("button", { name: /프롬프트 지우기/i });
+      await user.click(clearButton);
+
+      expect(textarea).toHaveValue("");
+      // 프리셋 칩이 선택 해제되어야 한다
+      const chip = screen.getByText("요약해줘");
+      expect(chip).toHaveAttribute("aria-pressed", "false");
+    });
+  });
+
+  // PROMPT-014: 프롬프트가 비어있으면 클리어 버튼 미표시
+  describe("PROMPT-014: 프롬프트가 비어있으면 클리어 버튼 미표시", () => {
+    it("프롬프트가 비어있을 때 클리어 버튼이 표시되지 않는다", async () => {
+      await renderWithContentAndOpenCollapsible();
+
+      expect(screen.queryByRole("button", { name: /프롬프트 지우기/i })).not.toBeInTheDocument();
+    });
+  });
 });
 
 describe("upgrade-logo", () => {
