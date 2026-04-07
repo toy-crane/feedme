@@ -7,6 +7,12 @@
 - `artifacts/spec.yaml`이 전체 앱의 단일 불변 계약이다
 - 구현이 spec.yaml과 맞지 않으면, 구현을 수정한다
 
+### spec feature 관리 (Merge & Evolve)
+- 새 feature가 기존 feature를 완전히 대체하면, 기존 feature를 삭제하고 새 feature에 `replaces: [기존-id]` 를 추가한다
+- 삭제된 시나리오 ID는 재사용하지 않는다
+- 수정 대상: `spec.yaml` + 해당 ID를 참조하는 `*.spec.test.tsx`
+- 과거 산출물(`plan.md`, `wireframe.html`)은 스냅샷이므로 수정하지 않는다
+
 ### TDD
 1. spec.yaml 기반으로 spec 테스트(*.spec.test.tsx) 생성 (Red)
 2. 구현 테스트(*.test.tsx)로 순수 로직 단위 테스트 작성 (Red)
