@@ -15,10 +15,14 @@
 
 ### 테스트 파일 컨벤션
 
-| 파일 패턴 | 용도 |
-|---|---|
-| `*.spec.test.tsx` | 수용 기준 테스트 (spec.yaml에서 파생) |
-| `*.test.tsx` | 구현 테스트 (단위/통합) |
+| 파일 패턴 | 위치 | 용도 |
+|---|---|---|
+| `{feature-id}.spec.test.tsx` | `__tests__/` | spec.yaml feature별 수용 기준 테스트 |
+| `*.test.tsx` | 컴포넌트/모듈 옆 | 구현 단위 테스트 |
+| `helpers.tsx` | `__tests__/` | 공유 테스트 헬퍼 (renderWithContent 등) |
+
+- spec 테스트는 spec.yaml의 feature 단위로 파일을 분리한다
+- unit 테스트에서 spec 시나리오를 중복 테스트하지 않는다
 
 ### spec 테스트 작성 규칙
 - spec 테스트(`*.spec.test.tsx`)는 spec.yaml의 계약을 검증하는 수용 기준이다
