@@ -31,7 +31,7 @@ wireframe.html을 코드로 읽어 의도를 파악하고, 구현 결과는 Play
 
 2. **구현 스크린샷 캡처**: 각 implPage에 대해 `capture-screenshots.ts`를 실행한다:
    ```bash
-   bun scripts/capture-screenshots.ts \
+   bun .claude/scripts/capture-screenshots.ts \
      --url <implUrl>/<page-path> \
      --output artifacts/<feature>/screenshots/<screen-id> \
      --viewports mobile,desktop
