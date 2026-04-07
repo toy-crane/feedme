@@ -51,7 +51,7 @@ export function UrlInputSection({
           <InputGroupAddon align="inline-end">
             <InputGroupButton
               variant="default"
-              size="icon-lg"
+              size="icon-sm"
               onClick={() => { if (isValidUrl(url) && !loading) onFetch(); }}
               aria-disabled={loading || !isValidUrl(url)}
               aria-label="가져오기"
