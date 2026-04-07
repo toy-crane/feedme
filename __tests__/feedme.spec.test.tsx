@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import ContentExtractor from "@/components/content-extractor";
+import { renderWithContent } from "@/__tests__/helpers";
 
 describe("feedme spec tests", () => {
   let writeTextMock: ReturnType<typeof vi.fn>;
@@ -230,6 +231,233 @@ describe("feedme spec tests", () => {
       await waitFor(() => {
         expect(screen.getByText("자막을 찾을 수 없습니다")).toBeInTheDocument();
       });
+    });
+  });
+
+  // FEEDME-010: When error is shown and user types in input → error text disappears
+  describe("FEEDME-010: 에러 표시 후 입력 시 에러 사라짐", () => {
+    it("에러가 표시된 상태에서 입력 필드에 타이핑하면 에러 텍스트가 사라진다", async () => {
+      const user = userEvent.setup();
+      global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
+
+      render(<ContentExtractor />);
+
+      const input = screen.getByRole("textbox");
+      await user.type(input, "https://example.com");
+
+      const button = screen.getByRole("button", { name: "가져오기" });
+      await user.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByText("네트워크 오류가 발생했습니다")).toBeInTheDocument();
+      });
+
+      await user.type(input, "a");
+
+      expect(screen.queryByText("네트워크 오류가 발생했습니다")).not.toBeInTheDocument();
+    });
+  });
+
+  // FEEDME-011: After network error → inline error text below input, NO Alert
+  describe("FEEDME-011: 네트워크 오류 - 인라인 표시", () => {
+    it("네트워크 오류 발생 시 인풋 하단에 인라인 에러 텍스트가 표시되고 Alert 컴포넌트는 사용되지 않는다", async () => {
+      const user = userEvent.setup();
+      global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
+
+      render(<ContentExtractor />);
+
+      const input = screen.getByRole("textbox");
+      await user.type(input, "https://example.com");
+
+      const button = screen.getByRole("button", { name: "가져오기" });
+      await user.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByText("네트워크 오류가 발생했습니다")).toBeInTheDocument();
+      });
+
+      const errorText = screen.getByText("네트워크 오류가 발생했습니다");
+      expect(errorText.closest('[role="alert"]')).toBeNull();
+    });
+  });
+
+  // FEEDME-012: When invalid URL changes to valid → button becomes enabled
+  describe("FEEDME-012: 유효하지 않은 URL이 유효한 URL로 변경되면 버튼 활성화", () => {
+    it("not-a-url 입력 후 https://example.com으로 변경하면 '가져오기' 버튼이 활성화된다", async () => {
+      const user = userEvent.setup();
+      render(<ContentExtractor />);
+
+      const input = screen.getByRole("textbox");
+      await user.type(input, "not-a-url");
+
+      const button = screen.getByRole("button", { name: "가져오기" });
+      expect(button).toHaveAttribute("aria-disabled", "true");
+
+      await user.clear(input);
+      await user.type(input, "https://example.com");
+
+      expect(button).not.toHaveAttribute("aria-disabled", "true");
+    });
+  });
+
+  // FEEDME-030: 콘텐츠 추출 후 split button 표시
+  describe("FEEDME-030: 콘텐츠 추출 후 split button 표시", () => {
+    it("복사 아이콘+텍스트 메인 버튼과 chevron 버튼이 함께 표시된다", async () => {
+      await renderWithContent();
+
+      const copyButton = screen.getByRole("button", { name: "복사하기" });
+      expect(copyButton).toBeInTheDocument();
+
+      const iconInCopyButton = copyButton.querySelector("svg");
+      expect(iconInCopyButton).not.toBeNull();
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      expect(chevronButton).toBeInTheDocument();
+    });
+  });
+
+  // FEEDME-031: 메인 복사 버튼 클릭 → 클립보드 복사 + 체크 아이콘 (토스트 없음)
+  describe("FEEDME-031: 메인 복사 버튼 클릭 시 클립보드 복사 및 체크 아이콘 표시", () => {
+    it("클립보드에 마크다운이 복사되고 버튼 아이콘이 체크로 바뀐다", async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+
+      const { user } = await renderWithContent("# Hello");
+
+      Object.defineProperty(navigator, "clipboard", {
+        value: { writeText },
+        writable: true,
+        configurable: true,
+      });
+
+      const copyButton = screen.getByRole("button", { name: "복사하기" });
+      await user.click(copyButton);
+
+      expect(writeText).toHaveBeenCalledWith("# Hello");
+
+      await waitFor(() => {
+        const updatedButton = screen.getByRole("button", { name: "복사하기" });
+        expect(updatedButton).toHaveAttribute("data-copied", "true");
+      });
+
+      expect(screen.queryByText("복사됨")).not.toBeInTheDocument();
+    });
+  });
+
+  // FEEDME-032: chevron 버튼 클릭 → 드롭다운 메뉴에 3개 항목 표시
+  describe("FEEDME-032: chevron 버튼 클릭 시 드롭다운 메뉴 표시", () => {
+    it("마크다운 다운로드, ChatGPT에서 열기, Claude에서 열기 항목이 아이콘과 함께 표시된다", async () => {
+      const { user } = await renderWithContent();
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      await user.click(chevronButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("마크다운 다운로드")).toBeInTheDocument();
+        expect(screen.getByText("ChatGPT에서 열기")).toBeInTheDocument();
+        expect(screen.getByText("Claude에서 열기")).toBeInTheDocument();
+      });
+
+      const downloadItem = screen.getByText("마크다운 다운로드");
+      const chatgptItem = screen.getByText("ChatGPT에서 열기");
+      const claudeItem = screen.getByText("Claude에서 열기");
+
+      const downloadMenuItem = downloadItem.closest('[role="menuitem"]') ?? downloadItem.parentElement;
+      const chatgptMenuItem = chatgptItem.closest('[role="menuitem"]') ?? chatgptItem.parentElement;
+      const claudeMenuItem = claudeItem.closest('[role="menuitem"]') ?? claudeItem.parentElement;
+
+      const downloadIcon =
+        downloadMenuItem!.querySelector("svg") ?? downloadMenuItem!.querySelector("img");
+      const chatgptIcon =
+        chatgptMenuItem!.querySelector("svg") ?? chatgptMenuItem!.querySelector("img");
+      const claudeIcon =
+        claudeMenuItem!.querySelector("svg") ?? claudeMenuItem!.querySelector("img");
+      expect(downloadIcon).not.toBeNull();
+      expect(chatgptIcon).not.toBeNull();
+      expect(claudeIcon).not.toBeNull();
+    });
+  });
+
+  // FEEDME-033: ChatGPT에서 열기 → 마크다운 포함된 URL, 새 탭
+  describe("FEEDME-033: ChatGPT에서 열기 링크 URL 검증", () => {
+    it("마크다운 내용이 query에 포함된 ChatGPT URL이 새 탭 링크로 표시된다", async () => {
+      const { user } = await renderWithContent("# Hello");
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      await user.click(chevronButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("ChatGPT에서 열기")).toBeInTheDocument();
+      });
+
+      const chatgptLink = screen.getByRole("menuitem", { name: /ChatGPT에서 열기/ });
+      const expectedHref = `https://chatgpt.com/?q=${encodeURIComponent("# Hello")}`;
+      expect(chatgptLink).toHaveAttribute("href", expectedHref);
+      expect(chatgptLink).toHaveAttribute("target", "_blank");
+    });
+  });
+
+  // FEEDME-034: Claude에서 열기 → 마크다운 포함된 URL, 새 탭
+  describe("FEEDME-034: Claude에서 열기 링크 URL 검증", () => {
+    it("마크다운 내용이 query에 포함된 Claude URL이 새 탭 링크로 표시된다", async () => {
+      const { user } = await renderWithContent("# Hello");
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      await user.click(chevronButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("Claude에서 열기")).toBeInTheDocument();
+      });
+
+      const claudeLink = screen.getByRole("menuitem", { name: /Claude에서 열기/ });
+      const expectedHref = `https://claude.ai/new?q=${encodeURIComponent("# Hello")}`;
+      expect(claudeLink).toHaveAttribute("href", expectedHref);
+      expect(claudeLink).toHaveAttribute("target", "_blank");
+    });
+  });
+
+  // FEEDME-035: 초기 화면에서 split button 미표시
+  describe("FEEDME-035: 초기 화면에서 split button 미표시", () => {
+    it("콘텐츠가 추출되지 않은 초기 화면에서 split button이 표시되지 않는다", () => {
+      render(<ContentExtractor />);
+
+      expect(screen.queryByRole("button", { name: "복사하기" })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /열기 옵션/i })
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  // FEEDME-036: 마크다운 다운로드 항목 클릭 시 .md 파일 다운로드
+  describe("FEEDME-036: 마크다운 다운로드 항목 클릭 시 파일 다운로드", () => {
+    it("드롭다운에 '마크다운 다운로드' 항목이 맨 위에 표시된다", async () => {
+      const { user } = await renderWithContent();
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      await user.click(chevronButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("마크다운 다운로드")).toBeInTheDocument();
+      });
+
+      const menuItems = screen.getAllByRole("menuitem");
+      expect(menuItems[0]).toHaveTextContent("마크다운 다운로드");
+    });
+
+    it("'마크다운 다운로드' 항목에 아이콘이 있다", async () => {
+      const { user } = await renderWithContent();
+
+      const chevronButton = screen.getByRole("button", { name: /열기 옵션/i });
+      await user.click(chevronButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("마크다운 다운로드")).toBeInTheDocument();
+      });
+
+      const downloadItem = screen.getByText("마크다운 다운로드");
+      const downloadMenuItem = downloadItem.closest('[role="menuitem"]') ?? downloadItem.parentElement;
+      const icon =
+        downloadMenuItem!.querySelector("svg") ?? downloadMenuItem!.querySelector("img");
+      expect(icon).not.toBeNull();
     });
   });
 });
