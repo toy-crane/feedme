@@ -31,26 +31,6 @@ features:
       - "콘텐츠 편집 기능 — 설계 원칙 '편집 없이 바로 복사'"
       - "추출 히스토리 저장 — MVP 범위 외"
 
-  - id: feedme-copy
-    title: "클립보드 복사"
-    scenarios:
-      - id: FEEDME-004
-        given: "콘텐츠가 추출되지 않은 초기 화면"
-        when: "화면을 확인한다"
-        then: "'복사' 버튼이 표시되지 않는다"
-        examples:
-          - input: { state: "initial" }
-            expect: { copyButtonVisible: false }
-      - id: FEEDME-005
-        given: "콘텐츠가 추출되어 마크다운 미리보기가 표시된 상태"
-        when: "'복사' 버튼을 클릭한다"
-        then: "마크다운 원문이 클립보드에 복사되고, 버튼 아이콘이 체크로 바뀐다"
-        examples:
-          - input: { action: "clickCopyButton" }
-            expect: { clipboardHasContent: true, copyButtonIcon: "check" }
-    excludes:
-      - "챗봇별 맞춤 형식 — 설계 원칙 '챗봇 비종속'"
-
   - id: feedme-error
     title: "에러 처리"
     scenarios:

@@ -113,8 +113,8 @@ describe("feedme spec tests", () => {
     });
   });
 
-  // FEEDME-004
-  describe("FEEDME-004: 초기 화면 복사 버튼 미표시", () => {
+  // FEEDME-045 (replaces FEEDME-004)
+  describe("FEEDME-045: 초기 화면 split button 미표시", () => {
     it("초기 화면에서 복사 버튼이 표시되지 않는다", () => {
       render(<ContentExtractor />);
 
@@ -122,8 +122,8 @@ describe("feedme spec tests", () => {
     });
   });
 
-  // FEEDME-005
-  describe("FEEDME-005: 클립보드 복사 및 체크 아이콘", () => {
+  // FEEDME-041 (replaces FEEDME-005)
+  describe("FEEDME-041: 클립보드 복사 및 체크 아이콘", () => {
     it("추출 완료 후 복사 버튼 클릭 시 클립보드에 복사되고 버튼에 체크 아이콘이 표시된다", async () => {
       const user = userEvent.setup({ writeToClipboard: false });
       const markdownContent = "# 제목\n\n본문 내용";
