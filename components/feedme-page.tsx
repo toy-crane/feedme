@@ -12,10 +12,11 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
   InputGroup,
   InputGroupInput,
+  InputGroupTextarea,
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { ArrowRight, Loader2, Copy, Check, ChevronDown, ChevronRight, Download, Plus } from "lucide-react";
+import { ArrowRight, Loader2, Copy, Check, ChevronDown, ChevronRight, Download, Plus, X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ButtonGroup } from "@/components/ui/button-group";
 import {
@@ -32,7 +33,6 @@ import {
 } from "@/components/ui/collapsible";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn, isValidUrl, buildCopyText } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
 import { HyperText } from "@/components/ui/hyper-text";
 import ThemeToggle from "@/components/theme-toggle";
 
@@ -201,7 +201,7 @@ export default function FeedmePage() {
                     )}
                   </div>
                 )}
-                <div className="flex justify-end">
+                <div className="flex flex-col items-end gap-1">
                   <SplitCopyButton
                     markdown={markdownText}
                     prompt={prompt}
@@ -209,6 +209,9 @@ export default function FeedmePage() {
                     onCopy={handleCopy}
                     title={result?.title}
                   />
+                  {prompt && (
+                    <p className="text-xs text-muted-foreground">프롬프트 포함</p>
+                  )}
                 </div>
 
                 <Collapsible open={promptOpen} onOpenChange={setPromptOpen}>
@@ -233,13 +236,27 @@ export default function FeedmePage() {
                         <FieldLabel htmlFor="prompt-input" className="sr-only">
                           프롬프트
                         </FieldLabel>
-                        <Textarea
-                          id="prompt-input"
-                          placeholder="ex) 이 글을 요약해줘"
-                          value={prompt}
-                          onChange={(e) => setPrompt(e.target.value)}
-                          rows={2}
-                        />
+                        <InputGroup>
+                          <InputGroupTextarea
+                            id="prompt-input"
+                            placeholder="ex) 이 글을 요약해줘"
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            rows={2}
+                          />
+                          {prompt && (
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                variant="ghost"
+                                size="icon-xs"
+                                onClick={() => setPrompt("")}
+                                aria-label="프롬프트 지우기"
+                              >
+                                <X />
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          )}
+                        </InputGroup>
                       </Field>
                       <ToggleGroup
                         type="single"

@@ -704,8 +704,8 @@ describe("Pre-prompt", () => {
 
       expect(textarea).toHaveValue("");
       // 프리셋 칩이 선택 해제되어야 한다
-      const chip = screen.getByText("요약해줘");
-      expect(chip).toHaveAttribute("aria-pressed", "false");
+      const chip = screen.getByRole("radio", { name: "요약해줘" });
+      expect(chip).toHaveAttribute("aria-checked", "false");
     });
   });
 
