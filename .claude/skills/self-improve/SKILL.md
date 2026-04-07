@@ -1,6 +1,6 @@
 ---
-name: improve-harness
-description: 실행 중 반복된 패턴을 감지하고 Skill/Hook/Rule 변경을 제안한다. "/improve-harness", "하네스 개선", "반복 패턴 승격" 등으로 실행.
+name: self-improve
+description: 실행 중 반복된 패턴을 감지하고 Skill/Hook/Rule 변경을 제안한다. "/self-improve", "하네스 개선", "반복 패턴 승격" 등으로 실행.
 ---
 
 # 하네스 개선

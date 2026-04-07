@@ -70,6 +70,6 @@ spec.yaml과 wireframe을 참조하여 구현 계획을 수립합니다. skill-r
 
 plan.md의 Task를 TDD로 순차 실행합니다. 완료 후 QA Evaluator(spec 시나리오 검증)로 검증하고, Code Simplifier로 정리합니다.
 
-### 5. Improve (`/improve-harness`)
+### 5. Improve (`/self-improve`)
 
 실행 중 반복된 패턴을 감지하고 Skill/Hook/Rule 변경을 제안합니다.
