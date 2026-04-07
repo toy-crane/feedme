@@ -35,6 +35,7 @@ description: "Generator-Evaluator 구조를 적용한 executing-plans 스킬의 
                                                         v
                                                 [E2E Reviewer] <---- spec.yaml
                                                 [Wireframe Reviewer] <---- wireframe.html
+                                                [UI Quality Reviewer] <---- visual heuristics
                                                 [Design Reviewer] <---- design rules
                                                 [React Reviewer] <---- react best practices
                                                         |
@@ -59,6 +60,7 @@ description: "Generator-Evaluator 구조를 적용한 executing-plans 스킬의 
   agents/
     e2e-reviewer.md         <- Playwright 기반 기능 검증
     wireframe-reviewer.md   <- wireframe ↔ 구현 레이아웃 정합성 검증
+    ui-quality-reviewer.md  <- 스크린샷 기반 시각적 품질 검증
     design-reviewer.md      <- 디자인 시스템 규칙 검증
     react-reviewer.md       <- React/Next.js 성능 패턴 검증
 ```
@@ -81,7 +83,18 @@ description: "Generator-Evaluator 구조를 적용한 executing-plans 스킬의 
 - 비교 대상: 컴포넌트 배치, grid/flex 구조, 정보 계층, 반응형 전환
 - 무시 대상: 색상, 폰트, 아이콘, 그림자, border 스타일
 
-### 3. E2E Reviewer (에이전트)
+### 3. UI Quality Reviewer (에이전트)
+
+- 입력: 구현 앱 URL, screen → URL 경로 매핑
+- 도구: Playwright 스크린샷, LLM 멀티모달 시각 분석
+- 판정: 3-tier (Fail / Warning / Advisory)
+- 출력: page별 시각적 품질 리포트 + 수정 방향
+- Fail: 텍스트 잘림, 요소 겹침, 가로 스크롤, 깨진 이미지, 명암 대비 부족
+- Warning: 간격 불일치, 정렬 어긋남, 다크모드 미적용, 반응형 깨짐
+- Advisory: 시각적 위계, 정보 밀도, 일관성
+- 뷰포트: mobile (375x812) + desktop (1280x900), 테마: light + dark
+
+### 4. E2E Reviewer (에이전트)
 
 - 입력: spec.yaml, 실행 중인 앱 URL
 - 도구: Playwright MCP
@@ -89,7 +102,7 @@ description: "Generator-Evaluator 구조를 적용한 executing-plans 스킬의 
 - 출력: 실패 시나리오 목록 + 재현 방법
 - 전체 pass 시 종료
 
-### 4. React Reviewer (에이전트)
+### 5. React Reviewer (에이전트)
 
 - 입력: 구현된 컴포넌트/페이지 파일 목록
 - 도구: vercel-react-best-practices 스킬 규칙
@@ -103,6 +116,7 @@ description: "Generator-Evaluator 구조를 적용한 executing-plans 스킬의 
 |----------|----------|----------|
 | E2E | spec 시나리오별 pass/fail | 전체 pass |
 | Wireframe | screen별 레이아웃 pass/fail | 전체 pass |
+| UI Quality | 3-tier (Fail/Warning/Advisory) | Fail-tier 전체 pass |
 | Design | 디자인 시스템 규칙 pass/fail | 전체 pass |
 | React | fail-tier 규칙 위반 pass/fail | fail-tier 전체 pass |
 

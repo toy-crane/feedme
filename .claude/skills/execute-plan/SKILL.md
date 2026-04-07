@@ -32,6 +32,7 @@ feature 특성을 분석하여 이번 실행에 필요한 팀원을 결정한다
 - **Builder**: Task 수와 병렬 가능성을 고려하여 필요한 수를 결정
 - **Reviewer 선별**:
   - `wireframe-reviewer` — wireframe.html이 존재하고 UI 변경 Task가 있을 때
+  - `ui-quality-reviewer` — UI 변경 Task가 있을 때 (wireframe.html 불필요)
   - `design-reviewer` — UI 컴포넌트가 있을 때만
   - `react-reviewer` — React/Next.js 코드가 있을 때만
 
@@ -55,7 +56,7 @@ plan.md의 Task 목록을 분석한다.
 
 ## Step 5: 평가 루프
 
-전체 Task 완료 후 Step 2에서 선별한 Reviewer를 **병렬로** spawn한다. wireframe-reviewer에게는 feature명, 구현 앱 URL, wireframe screen ↔ 구현 URL 경로 매핑을 함께 전달한다.
+전체 Task 완료 후 Step 2에서 선별한 Reviewer를 **병렬로** spawn한다. wireframe-reviewer와 ui-quality-reviewer에게는 feature명, 구현 앱 URL, wireframe screen ↔ 구현 URL 경로 매핑을 함께 전달한다.
 
 ### 피드백 처리
 
@@ -67,6 +68,14 @@ plan.md의 Task 목록을 분석한다.
   - 구현 수준 수정: Builder를 다시 spawn하여 Reviewer 피드백과 함께 위임
 - 수정 후 Reviewer를 재실행하여 pass를 확인한다
 - UI 변경이 포함된 수정은 스크린샷을 캡처하여 시각적으로 확인한 뒤 승인한다
+
+### ui-quality-reviewer 피드백 처리
+
+ui-quality-reviewer는 3-tier 판정 체계를 사용한다. tier별 처리 방식:
+
+- **Fail** → 기존 Reviewer와 동일하게 Builder 수정 루프 트리거
+- **Warning** → decisions.md에 기록, 재리뷰 트리거하지 않음
+- **Advisory** → Step 7 최종 보고서에만 포함
 
 수정 전략 판단을 decisions.md에 기록한다.
 
