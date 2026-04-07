@@ -1,83 +1,44 @@
 "use client";
 
-import { useState } from "react";
-import type { ExtractResponse } from "@/types/extract";
 import { buildCopyText } from "@/lib/utils";
-import { PRESETS } from "@/config/presets";
+import { useExtract } from "@/hooks/use-extract";
+import { usePrompt } from "@/hooks/use-prompt";
+import { useClipboard } from "@/hooks/use-clipboard";
 
 export function useFeedme() {
-  const [url, setUrl] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<ExtractResponse | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [prompt, setPrompt] = useState("");
-  const [promptOpen, setPromptOpen] = useState(false);
-
-  const markdownText = result?.markdown ?? result?.content ?? null;
-  const selectedPreset = (PRESETS as readonly string[]).includes(prompt) ? prompt : "";
+  const extract = useExtract();
+  const prompt = usePrompt();
+  const clipboard = useClipboard();
 
   function handleReset() {
-    setUrl("");
-    setResult(null);
-    setError(null);
-    setCopied(false);
-    setLoading(false);
-    setPrompt("");
-    setPromptOpen(false);
-  }
-
-  async function handleFetch() {
-    setError(null);
-    setLoading(true);
-    setResult(null);
-    setCopied(false);
-
-    try {
-      const response = await fetch("/api/extract", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error ?? "알 수 없는 오류가 발생했습니다");
-        return;
-      }
-
-      setResult(data as ExtractResponse);
-    } catch {
-      setError("네트워크 오류가 발생했습니다");
-    } finally {
-      setLoading(false);
-    }
+    extract.reset();
+    prompt.reset();
+    clipboard.reset();
   }
 
   async function handleCopy() {
-    if (!markdownText) return;
-    await navigator.clipboard.writeText(buildCopyText(prompt, markdownText));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (!extract.markdownText) return;
+    await clipboard.handleCopy(
+      buildCopyText(prompt.prompt, extract.markdownText)
+    );
   }
 
   return {
-    url,
-    setUrl,
-    loading,
-    error,
-    setError,
-    result,
-    copied,
-    prompt,
-    setPrompt,
-    promptOpen,
-    setPromptOpen,
-    markdownText,
-    selectedPreset,
+    url: extract.url,
+    setUrl: extract.setUrl,
+    loading: extract.loading,
+    error: extract.error,
+    setError: extract.setError,
+    result: extract.result,
+    copied: clipboard.copied,
+    prompt: prompt.prompt,
+    setPrompt: prompt.setPrompt,
+    promptOpen: prompt.promptOpen,
+    setPromptOpen: prompt.setPromptOpen,
+    markdownText: extract.markdownText,
+    selectedPreset: prompt.selectedPreset,
     handleReset,
-    handleFetch,
+    handleFetch: extract.handleFetch,
     handleCopy,
   };
 }
