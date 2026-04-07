@@ -6,8 +6,11 @@ Next.js 16 + React 19 프로젝트 템플릿
 
 - **Framework**: Next.js 16 (App Router)
 - **UI**: React 19, Tailwind CSS 4, shadcn/ui, Radix UI, Base UI
+- **Animation**: Motion
+- **Markdown**: react-markdown, remark-gfm, rehype-highlight
+- **Theme**: next-themes
 - **Icons**: Lucide React
-- **Testing**: Vitest, Testing Library
+- **Testing**: Vitest, Testing Library, Playwright
 - **Lint**: ESLint
 - **Package Manager**: Bun
 
@@ -40,6 +43,7 @@ Claude Code hooks 기반 자동 품질 게이트 (`.claude/settings.json`)
 | **PreToolUse** | `Bash` | `secret-guard.sh` — git commit/add 시 gitleaks로 시크릿 탐지 |
 | **PostToolUse** | `Write\|Edit` | `lint-fix.sh` — ESLint auto-fix |
 | **Stop** | 작업 완료 시 | `stop-test.sh` — 전체 테스트 실행, 실패 시 재시도 (최대 3회) |
+| **WorktreeCreate** | worktree 생성 시 | `worktree-create.sh` — worktree 환경 초기화 |
 
 ## 테스트 파일 컨벤션
 
