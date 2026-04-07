@@ -2,8 +2,8 @@
   "name": "feedme-extract",
   "private": true,
   "scripts": {
-    "dev": "WRANGLER_BUILD_CONDITIONS=workerd,worker wrangler dev",
-    "deploy": "WRANGLER_BUILD_CONDITIONS=workerd,worker wrangler deploy",
+    "dev": "WRANGLER_BUILD_PLATFORM=node wrangler dev",
+    "deploy": "WRANGLER_BUILD_PLATFORM=node wrangler deploy",
     "test": "vitest run",
     "types": "wrangler types"
   },
