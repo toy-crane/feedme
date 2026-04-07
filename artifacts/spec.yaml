@@ -283,7 +283,6 @@ features:
 
   - id: improve-copy-button
     title: "복사 버튼 개선 (split button + dropdown)"
-    replaces: [feedme-copy]
     scenarios:
       - id: FEEDME-040
         given: "콘텐츠가 추출되어 미리보기가 표시된 상태"

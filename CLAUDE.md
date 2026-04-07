@@ -6,7 +6,7 @@
 ### 불변 계약
 - `artifacts/spec.yaml`이 전체 앱의 단일 불변 계약이다
 - 구현이 spec.yaml과 맞지 않으면, 구현을 수정한다
-- 새 feature가 기존 feature를 완전히 대체하면 기존을 삭제하고 `replaces: [기존-id]`로 이력을 남기되, 삭제된 시나리오 ID는 재사용하지 않는다
+- 새 feature가 기존 feature를 완전히 대체하면 기존을 삭제하되, 삭제된 시나리오 ID는 재사용하지 않는다
 
 ### TDD
 1. spec.yaml 기반으로 spec 테스트(*.spec.test.tsx) 생성 (Red)

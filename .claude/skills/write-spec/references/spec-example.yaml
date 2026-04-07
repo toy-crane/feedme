@@ -36,15 +36,3 @@ features:
             expect: { itemCount: 2 }
     preconditions:
       - "할 일 추가 기능이 구현되어 있다"
-
-  - id: todo-delete-v2
-    title: "할 일 삭제 (스와이프)"
-    replaces: [todo-delete]
-    scenarios:
-      - id: TODO-DEL-002
-        given: "할 일 3개가 표시된 목록"
-        when: "첫 번째 항목을 왼쪽으로 스와이프한다"
-        then: "항목이 삭제되어 목록에 할 일 2개가 표시된다"
-        examples:
-          - input: { targetIndex: 0, gesture: "swipe-left" }
-            expect: { itemCount: 2 }
