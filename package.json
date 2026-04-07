@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run",
+    "test": "vitest run && cd workers/extract && vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
@@ -16,8 +16,6 @@
     "agentation": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "defuddle": "^0.15.0",
-    "linkedom": "^0.18.12",
     "lucide-react": "^0.576.0",
     "motion": "^12.38.0",
     "next": "16.1.6",

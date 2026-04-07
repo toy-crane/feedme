@@ -17,13 +17,17 @@ export function useExtract() {
     setResult(null);
 
     try {
-      const response = await fetch("/api/extract", {
+      const apiUrl = process.env.NEXT_PUBLIC_EXTRACT_API_URL;
+      if (!apiUrl) {
+        throw new Error("NEXT_PUBLIC_EXTRACT_API_URL 환경변수가 설정되지 않았습니다");
+      }
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string } & ExtractResponse;
 
       if (!response.ok) {
         setError(data.error ?? "알 수 없는 오류가 발생했습니다");
