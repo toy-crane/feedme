@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { parseHTML } from "linkedom";
+import { Defuddle } from "defuddle/node";
 
 const INNERTUBE_API_URL =
   "https://www.youtube.com/youtubei/v1/player?prettyPrint=false";
@@ -63,16 +65,50 @@ async function testClient(
   }
 }
 
+async function testDefuddleE2E(url: string) {
+  try {
+    const fetchStart = Date.now();
+    const resp = await fetch(url);
+    const html = await resp.text();
+    const fetchTime = Date.now() - fetchStart;
+
+    const { document } = parseHTML(html);
+    const defuddleStart = Date.now();
+    const result = await Defuddle(document, url, { markdown: true });
+    const defuddleTime = Date.now() - defuddleStart;
+
+    const hasTranscript =
+      (result.content?.length ?? 0) > 100 &&
+      result.content?.includes("Transcript");
+
+    return {
+      htmlLength: html.length,
+      fetchTimeMs: fetchTime,
+      defuddleTimeMs: defuddleTime,
+      extractorType: result.extractorType,
+      title: result.title,
+      contentMarkdownLength: result.contentMarkdown?.length ?? null,
+      contentLength: result.content?.length ?? 0,
+      contentPreview: result.content?.slice(0, 300),
+      hasTranscript,
+      error: null,
+    };
+  } catch (e: any) {
+    return { error: e.message ?? String(e) };
+  }
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const videoId = searchParams.get("v") || "2wdsNwPUCgQ";
+  const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
-  const [android, web] = await Promise.all([
+  const [android, web, e2e] = await Promise.all([
     testClient("ANDROID", INNERTUBE_CONTEXT, videoId, INNERTUBE_USER_AGENT),
     testClient("WEB", INNERTUBE_WEB_CONTEXT, videoId),
+    testDefuddleE2E(youtubeUrl),
   ]);
 
-  // Also test fetching actual caption XML if we got a track
   let captionFetchTest = null;
   const allResults = [android, web];
   const firstWithTrack = allResults.find(
@@ -81,7 +117,6 @@ export async function GET(request: Request) {
 
   if (firstWithTrack) {
     try {
-      // Re-fetch to get baseUrl
       const ctx =
         firstWithTrack.client === "ANDROID"
           ? INNERTUBE_CONTEXT
@@ -120,7 +155,8 @@ export async function GET(request: Request) {
   return NextResponse.json({
     videoId,
     timestamp: new Date().toISOString(),
-    results: { android, web },
+    innertubeTests: { android, web },
     captionFetchTest,
+    defuddleE2E: e2e,
   });
 }
