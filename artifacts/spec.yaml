@@ -521,6 +521,29 @@ features:
         examples:
           - input: { prompt: "요약해줘", collapsibleOpen: true, action: "clickLogo" }
             expect: { textareaValue: "", collapsibleOpen: false, selectedPreset: null }
+      - id: PROMPT-012
+        given: "프롬프트에 '요약해줘'가 입력된 상태"
+        when: "복사 버튼 영역을 확인한다"
+        then: "복사 버튼 아래에 '프롬프트 포함' 캡션이 표시된다"
+        examples:
+          - input: { prompt: "요약해줘" }
+            expect: { promptIncludedCaptionVisible: true }
+          - input: { prompt: "" }
+            expect: { promptIncludedCaptionVisible: false }
+      - id: PROMPT-013
+        given: "프롬프트에 '요약해줘'가 입력되고 Collapsible이 펼쳐진 상태"
+        when: "Textarea의 클리어(X) 버튼을 클릭한다"
+        then: "프롬프트가 비워지고 ToggleGroup 선택이 해제된다"
+        examples:
+          - input: { prompt: "요약해줘", action: "clickClearButton" }
+            expect: { textareaValue: "", selectedPreset: null }
+      - id: PROMPT-014
+        given: "프롬프트가 비어있는 상태"
+        when: "Textarea 영역을 확인한다"
+        then: "클리어(X) 버튼이 표시되지 않는다"
+        examples:
+          - input: { prompt: "" }
+            expect: { clearButtonVisible: false }
     excludes:
       - "프롬프트 히스토리 저장 — MVP 범위 외"
       - "사용자 정의 프리셋 추가/삭제 — MVP 범위 외"
