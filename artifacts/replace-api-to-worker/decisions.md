@@ -29,6 +29,6 @@
 ## turndown browser 번들 해결
 
 - 내용: wrangler(esbuild)가 turndown의 `browser` 필드를 해석하여 브라우저 번들을 로드 → `document is not defined` 에러 발생. Workers 런타임에 전역 `document`가 없기 때문. defuddle의 `toMarkdown()` → turndown → `document.implementation.createHTMLDocument()` 경로에서 실패.
-- 판단: `WRANGLER_BUILD_CONDITIONS=workerd,worker` 환경변수로 esbuild의 `browser` 조건을 제거하여 Node 번들(`@mixmark-io/domino` 사용)이 resolve되도록 설정. `no_bundle` + 외부 번들러 방식은 불채택.
-- 근거: 3가지 방법을 비교 검토함. (1) `WRANGLER_BUILD_CONDITIONS` — Cloudflare 컨트리뷰터가 workers-sdk#10755에서 직접 제시, wrangler 기본 번들링 유지 가능. (2) `no_bundle` + `bun build --target=bun` — 동작하지만 번들러 이중화로 복잡도 증가. (3) wrangler `alias` — defuddle 내부 import에 적용되지 않아 불가. postinstall 패치는 임시방편으로 불채택.
-- 결과: 성공 — 로컬(`wrangler dev`) + 프로덕션(`wrangler deploy`) 모두 YouTube transcript 정상 추출 확인
+- 판단: `WRANGLER_BUILD_PLATFORM=node` 환경변수로 esbuild의 platform을 node로 변경하여 `browser` 필드를 무시, Node 번들(`@mixmark-io/domino` 사용)이 resolve되도록 설정.
+- 근거: `WRANGLER_BUILD_CONDITIONS`는 esbuild conditions만 제어하며 browser 필드 해석에 영향 없음 (번들 사이즈 비교로 확인). esbuild의 `platform` 설정이 browser 필드 해석을 제어하며, `WRANGLER_BUILD_PLATFORM=node`로 이를 변경. (1) `WRANGLER_BUILD_PLATFORM=node` — wrangler 기본 번들링 유지, 번들 2711KiB(domino 포함). (2) `WRANGLER_BUILD_CONDITIONS` — browser 필드에 무효, 불채택. (3) `no_bundle` + `bun build` — 동작하지만 번들러 이중화. (4) wrangler `alias` — defuddle 내부 import에 미적용.
+- 결과: 성공 — 프로덕션 YouTube transcript 정상 추출 확인 (강남스타일 등 여러 URL 검증)
