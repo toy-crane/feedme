@@ -2,29 +2,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import ContentExtractor from "@/components/content-extractor";
+import { renderWithContent } from "@/__tests__/helpers";
 
 const SAMPLE_MARKDOWN = "# Hello World\n\nThis is sample content.";
-
-async function renderWithExtractedContent(markdown = SAMPLE_MARKDOWN) {
-  global.fetch = vi.fn().mockResolvedValue({
-    ok: true,
-    json: async () => ({ markdown, title: "Hello World", type: "webpage" }),
-  });
-
-  const user = userEvent.setup();
-  render(<ContentExtractor />);
-
-  const input = screen.getByRole("textbox");
-  await user.type(input, "https://example.com");
-
-  const button = screen.getByRole("button", { name: "가져오기" });
-  await user.click(button);
-
-  // 결과가 표시될 때까지 대기
-  await screen.findByRole("button", { name: /복사/ });
-
-  return user;
-}
 
 describe("feedme-page unit tests", () => {
   beforeEach(() => {
@@ -69,7 +49,7 @@ describe("feedme-page unit tests", () => {
   describe("복사 버튼 클릭 시 클립보드에 마크다운 복사 (FEEDME-031)", () => {
     it("메인 '복사' 버튼 클릭 시 navigator.clipboard.writeText가 마크다운 내용으로 호출된다", async () => {
       const writeTextSpy = vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue(undefined);
-      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+      await renderWithContent(SAMPLE_MARKDOWN, { title: "Hello World", type: "webpage" });
 
       const copyButton = screen.getByRole("button", { name: /복사/ });
       await userEvent.setup().click(copyButton);
@@ -78,7 +58,7 @@ describe("feedme-page unit tests", () => {
     });
 
     it("복사 후 버튼 아이콘이 체크 아이콘으로 바뀐다", async () => {
-      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+      await renderWithContent(SAMPLE_MARKDOWN, { title: "Hello World", type: "webpage" });
 
       const copyButton = screen.getByRole("button", { name: /복사/ });
       await userEvent.setup().click(copyButton);
@@ -88,7 +68,7 @@ describe("feedme-page unit tests", () => {
     });
 
     it("복사 후 토스트 메시지가 표시되지 않는다", async () => {
-      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+      await renderWithContent(SAMPLE_MARKDOWN, { title: "Hello World", type: "webpage" });
 
       const copyButton = screen.getByRole("button", { name: /복사/ });
       await userEvent.setup().click(copyButton);
@@ -100,7 +80,7 @@ describe("feedme-page unit tests", () => {
   // FEEDME-033: ChatGPT URL 생성
   describe("드롭다운 'ChatGPT에서 열기' 링크 URL 검증 (FEEDME-033)", () => {
     it("'ChatGPT에서 열기' 링크의 href가 encodeURIComponent된 마크다운을 포함한다", async () => {
-      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+      await renderWithContent(SAMPLE_MARKDOWN, { title: "Hello World", type: "webpage" });
 
       const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
       await userEvent.setup().click(chevronButton);
@@ -112,7 +92,7 @@ describe("feedme-page unit tests", () => {
     });
 
     it("'ChatGPT에서 열기' 링크에 target='_blank' 속성이 있다", async () => {
-      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+      await renderWithContent(SAMPLE_MARKDOWN, { title: "Hello World", type: "webpage" });
 
       const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
       await userEvent.setup().click(chevronButton);
@@ -126,7 +106,7 @@ describe("feedme-page unit tests", () => {
   // FEEDME-034: Claude URL 생성
   describe("드롭다운 'Claude에서 열기' 링크 URL 검증 (FEEDME-034)", () => {
     it("'Claude에서 열기' 링크의 href가 encodeURIComponent된 마크다운을 포함한다", async () => {
-      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+      await renderWithContent(SAMPLE_MARKDOWN, { title: "Hello World", type: "webpage" });
 
       const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
       await userEvent.setup().click(chevronButton);
@@ -138,7 +118,7 @@ describe("feedme-page unit tests", () => {
     });
 
     it("'Claude에서 열기' 링크에 target='_blank' 속성이 있다", async () => {
-      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+      await renderWithContent(SAMPLE_MARKDOWN, { title: "Hello World", type: "webpage" });
 
       const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
       await userEvent.setup().click(chevronButton);
@@ -157,7 +137,7 @@ describe("feedme-page unit tests", () => {
       global.URL.createObjectURL = createObjectURLSpy;
       global.URL.revokeObjectURL = revokeObjectURLSpy;
 
-      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+      await renderWithContent(SAMPLE_MARKDOWN, { title: "Hello World", type: "webpage" });
 
       const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
       await userEvent.setup().click(chevronButton);
@@ -188,7 +168,7 @@ describe("feedme-page unit tests", () => {
       global.URL.createObjectURL = createObjectURLSpy;
       global.URL.revokeObjectURL = vi.fn();
 
-      await renderWithExtractedContent(SAMPLE_MARKDOWN);
+      await renderWithContent(SAMPLE_MARKDOWN, { title: "Hello World", type: "webpage" });
 
       const chevronButton = screen.getByRole("button", { name: /열기 옵션/ });
       await userEvent.setup().click(chevronButton);
