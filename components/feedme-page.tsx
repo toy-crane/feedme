@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 
@@ -21,70 +20,29 @@ import {
   CollapsibleContent,
 } from "@/components/ui/collapsible";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { cn, isValidUrl, buildCopyText } from "@/lib/utils";
-import type { ExtractResponse } from "@/types/extract";
+import { cn, isValidUrl } from "@/lib/utils";
 import { PRESETS } from "@/config/presets";
 import { REMARK_PLUGINS, REHYPE_PLUGINS } from "@/lib/markdown-plugins";
 import { SplitCopyButton } from "@/components/split-copy-button";
 import { HyperText } from "@/components/ui/hyper-text";
 import ThemeToggle from "@/components/theme-toggle";
+import { useFeedme } from "@/hooks/use-feedme";
 
 export default function FeedmePage() {
-  const [url, setUrl] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<ExtractResponse | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [prompt, setPrompt] = useState("");
-  const [promptOpen, setPromptOpen] = useState(false);
-
-  const markdownText = result?.markdown ?? result?.content ?? null;
-  const selectedPreset = (PRESETS as readonly string[]).includes(prompt) ? prompt : "";
-
-  function handleReset() {
-    setUrl("");
-    setResult(null);
-    setError(null);
-    setCopied(false);
-    setLoading(false);
-    setPrompt("");
-    setPromptOpen(false);
-  }
-
-  async function handleFetch() {
-    setError(null);
-    setLoading(true);
-    setResult(null);
-    setCopied(false);
-
-    try {
-      const response = await fetch("/api/extract", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error ?? "알 수 없는 오류가 발생했습니다");
-        return;
-      }
-
-      setResult(data as ExtractResponse);
-    } catch {
-      setError("네트워크 오류가 발생했습니다");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleCopy() {
-    if (!markdownText) return;
-    await navigator.clipboard.writeText(buildCopyText(prompt, markdownText));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
+  const {
+    url, setUrl,
+    loading,
+    error, setError,
+    result,
+    copied,
+    prompt, setPrompt,
+    promptOpen, setPromptOpen,
+    markdownText,
+    selectedPreset,
+    handleReset,
+    handleFetch,
+    handleCopy,
+  } = useFeedme();
 
   return (
     <div className="min-h-screen flex flex-col items-center pt-8 px-4">
