@@ -26,6 +26,11 @@
       "sourceType": "github",
       "computedHash": "7c1dc22f37f2b1bebd7f37c75c2f0251a7c76feca5325955c0e6a68b68216bcf"
     },
+    "refactor": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "87789a786b96f99ba0680e89345a975106e10e7db1071c7cdc2e76d507c449d6"
+    },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
