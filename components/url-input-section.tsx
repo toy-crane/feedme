@@ -5,7 +5,6 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { Separator } from "@/components/ui/separator";
 import { ArrowRight, Loader2, X } from "lucide-react";
 import { cn, isValidUrl } from "@/lib/utils";
 
@@ -55,19 +54,17 @@ export function UrlInputSection({
             }}
           />
           {url && !loading && (
-            <>
-              <InputGroupAddon align="inline-end">
-                <InputGroupButton
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={handleClear}
-                  aria-label="입력 지우기"
-                >
-                  <X />
-                </InputGroupButton>
-              </InputGroupAddon>
-              <Separator orientation="vertical" className="my-auto h-5" />
-            </>
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                variant="ghost"
+                size="icon-sm"
+                onClick={handleClear}
+                aria-label="입력 지우기"
+              >
+                <X />
+              </InputGroupButton>
+              <div className="h-5 w-px bg-border" />
+            </InputGroupAddon>
           )}
           <InputGroupAddon align="inline-end">
             <InputGroupButton
