@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { ExtractResponse } from "@/types/extract";
 
-const DEFUDDLE_API = "https://defuddle.md";
+const EXTRACT_API = "/api/extract";
 
 function parseFrontmatter(text: string): {
   metadata: Record<string, string>;
@@ -66,9 +66,10 @@ export function useExtract() {
     setResult(null);
 
     try {
-      const response = await fetch(`${DEFUDDLE_API}/${url}`, {
-        signal: AbortSignal.timeout(15_000),
-      });
+      const response = await fetch(
+        `${EXTRACT_API}?url=${encodeURIComponent(url)}`,
+        { signal: AbortSignal.timeout(15_000) }
+      );
 
       if (!response.ok) {
         let message = "페이지에 접근할 수 없습니다";
