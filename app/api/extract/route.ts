@@ -12,6 +12,9 @@ export async function GET(request: NextRequest) {
   try {
     const response = await fetch(`${DEFUDDLE_API}/${url}`, {
       signal: AbortSignal.timeout(15_000),
+      headers: {
+        "User-Agent": request.headers.get("User-Agent") || "",
+      },
     });
 
     if (!response.ok) {
