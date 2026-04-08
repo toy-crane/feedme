@@ -2,6 +2,7 @@ const ALLOWED_ORIGINS = [
   "http://localhost:3000",
   "https://feedme.vercel.app",
   "https://feedme-*.vercel.app",
+  "https://www.feedme.wiki",
 ];
 
 export function isAllowedOrigin(origin: string | null): boolean {

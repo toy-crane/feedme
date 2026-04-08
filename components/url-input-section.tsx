@@ -5,7 +5,7 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, X } from "lucide-react";
 import { cn, isValidUrl } from "@/lib/utils";
 
 interface UrlInputSectionProps {
@@ -25,6 +25,11 @@ export function UrlInputSection({
   onErrorClear,
   onFetch,
 }: UrlInputSectionProps) {
+  const handleClear = () => {
+    onUrlChange("");
+    onErrorClear();
+  };
+
   return (
     <FieldGroup>
       <Field>
@@ -49,6 +54,20 @@ export function UrlInputSection({
             }}
           />
           <InputGroupAddon align="inline-end">
+            {url && !loading && (
+              <>
+                <InputGroupButton
+                  variant="ghost"
+                  size="icon-sm"
+                  className="ml-1"
+                  onClick={handleClear}
+                  aria-label="입력 지우기"
+                >
+                  <X />
+                </InputGroupButton>
+                <div className="h-5 w-px bg-border" />
+              </>
+            )}
             <InputGroupButton
               variant="default"
               size="icon-sm"

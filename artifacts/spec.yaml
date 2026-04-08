@@ -681,3 +681,42 @@ features:
       - "Cloudflare 계정 (Free plan)"
       - "wrangler CLI 설치"
       - "KV 네임스페이스 생성 및 바인딩"
+
+  - id: fix-ui
+    title: "URL 입력창 Clear 버튼"
+    scenarios:
+      - id: FEEDME-050
+        given: "URL 입력창에 'https://example.com'이 입력된 상태"
+        when: "사용자가 입력창을 확인한다"
+        then: "입력창 오른쪽(fetch 버튼 왼쪽)에 X(clear) 버튼이 표시된다"
+        examples:
+          - input: { url: "https://example.com" }
+            expect: { clearButtonVisible: true }
+          - input: { url: "" }
+            expect: { clearButtonVisible: false }
+      - id: FEEDME-051
+        given: "URL 입력창에 'https://example.com'이 입력된 상태"
+        when: "X(clear) 버튼을 클릭한다"
+        then: "URL 입력창이 비워지고, 이미 불러온 결과(프리뷰)와 프롬프트는 유지된다"
+        examples:
+          - input: { url: "https://example.com", hasPreview: true }
+            expect: { urlField: "", previewVisible: true }
+      - id: FEEDME-052
+        given: "fetch가 진행 중인 상태"
+        when: "사용자가 입력창을 확인한다"
+        then: "X(clear) 버튼이 표시되지 않는다"
+        examples:
+          - input: { url: "https://example.com", loading: true }
+            expect: { clearButtonVisible: false }
+      - id: FEEDME-053
+        given: "에러 메시지가 표시된 상태에서 URL 입력창에 텍스트가 있는 상태"
+        when: "X(clear) 버튼을 클릭한다"
+        then: "URL 입력창이 비워지고 에러 메시지도 사라진다"
+        examples:
+          - input: { url: "https://bad-url.com", errorVisible: true }
+            expect: { urlField: "", errorVisible: false }
+    excludes:
+      - "전체 초기화 (결과, 프롬프트 등) — 로고 클릭으로 이미 제공됨"
+      - "키보드 단축키 (Escape 등) — 이번 범위 아님"
+    preconditions:
+      - "URL 입력 컴포넌트(UrlInputSection)가 구현되어 있다"
