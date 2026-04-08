@@ -7,10 +7,10 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "Feedme - 어떤 URL이든, Markdown으로.",
+  title: "Feedme",
   description: "어떤 URL이든, Markdown으로.",
   openGraph: {
-    title: "Feedme - 어떤 URL이든, Markdown으로.",
+    title: "Feedme",
     description: "어떤 URL이든, Markdown으로.",
     url: "https://feedme-web.vercel.app",
     siteName: "Feedme",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Feedme - 어떤 URL이든, Markdown으로.",
+    title: "Feedme",
     description: "어떤 URL이든, Markdown으로.",
   },
 };
