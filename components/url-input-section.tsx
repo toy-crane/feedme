@@ -5,7 +5,8 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { ArrowRight, Loader2, X } from "lucide-react";
 import { cn, isValidUrl } from "@/lib/utils";
 
 interface UrlInputSectionProps {
@@ -48,6 +49,22 @@ export function UrlInputSection({
               if (e.key === "Enter" && isValidUrl(url) && !loading) onFetch();
             }}
           />
+          {url.length > 0 && !loading && (
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => {
+                  onUrlChange("");
+                  onErrorClear();
+                }}
+                aria-label="입력 지우기"
+              >
+                <X />
+              </InputGroupButton>
+              <Separator orientation="vertical" className="h-5" />
+            </InputGroupAddon>
+          )}
           <InputGroupAddon align="inline-end">
             <InputGroupButton
               variant="default"
