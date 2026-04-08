@@ -7,8 +7,21 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "feedme",
-  description: "URL을 입력하면 웹페이지나 YouTube 자막을 마크다운으로 추출합니다",
+  title: "Feedme",
+  description: "어떤 URL이든, Markdown으로.",
+  openGraph: {
+    title: "Feedme",
+    description: "어떤 URL이든, Markdown으로.",
+    url: "https://feedme.wiki",
+    siteName: "Feedme",
+    type: "website",
+    locale: "ko_KR",
+  },
+  twitter: {
+    card: "summary",
+    title: "Feedme",
+    description: "어떤 URL이든, Markdown으로.",
+  },
 };
 
 export default function RootLayout({
