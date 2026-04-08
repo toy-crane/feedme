@@ -26,6 +26,11 @@ export function UrlInputSection({
   onErrorClear,
   onFetch,
 }: UrlInputSectionProps) {
+  const handleClear = () => {
+    onUrlChange("");
+    onErrorClear();
+  };
+
   return (
     <FieldGroup>
       <Field>
@@ -49,15 +54,12 @@ export function UrlInputSection({
               if (e.key === "Enter" && isValidUrl(url) && !loading) onFetch();
             }}
           />
-          {url.length > 0 && !loading && (
+          {url && !loading && (
             <InputGroupAddon align="inline-end">
               <InputGroupButton
                 variant="ghost"
                 size="icon-sm"
-                onClick={() => {
-                  onUrlChange("");
-                  onErrorClear();
-                }}
+                onClick={handleClear}
                 aria-label="입력 지우기"
               >
                 <X />

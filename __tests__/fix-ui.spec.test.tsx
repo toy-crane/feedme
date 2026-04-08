@@ -1,16 +1,12 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { UrlInputSection } from "@/components/url-input-section";
 import ContentExtractor from "@/components/content-extractor";
 
 describe("fix-ui spec tests", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
   });
 
   // FEEDME-050
@@ -71,14 +67,10 @@ describe("fix-ui spec tests", () => {
         expect(screen.getByRole("button", { name: "복사하기" })).toBeInTheDocument();
       });
 
-      // 프리뷰가 표시된 상태에서 clear 버튼 클릭
       const clearButton = screen.getByRole("button", { name: "입력 지우기" });
       await user.click(clearButton);
 
-      // URL이 비워진다
       expect(input).toHaveValue("");
-
-      // 프리뷰(복사하기 버튼)는 여전히 표시된다
       expect(screen.getByRole("button", { name: "복사하기" })).toBeInTheDocument();
     });
   });
@@ -120,19 +112,14 @@ describe("fix-ui spec tests", () => {
         />
       );
 
-      // 에러 메시지가 표시된다
       expect(screen.getByText("잘못된 URL입니다")).toBeInTheDocument();
 
-      // clear 버튼 클릭
       const clearButton = screen.getByRole("button", { name: "입력 지우기" });
       await user.click(clearButton);
 
-      // onUrlChange가 빈 문자열로 호출된다
       expect(mockOnUrlChange).toHaveBeenCalledWith("");
-      // onErrorClear가 호출된다
       expect(mockOnErrorClear).toHaveBeenCalled();
 
-      // 에러가 사라진 상태로 리렌더링
       rerender(
         <UrlInputSection
           url=""
