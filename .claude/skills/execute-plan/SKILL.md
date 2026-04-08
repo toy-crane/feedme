@@ -53,7 +53,7 @@ plan.md의 Task 목록을 분석한다.
 
 ### 스킬 주입
 
-Builder는 Core 스킬만 내장한다. Task별로 `.claude/skills/*/SKILL.md`를 스캔하고, 각 스킬의 description과 Task 내용을 대조하여 관련 스킬을 Builder 프롬프트에 추가한다.
+Task의 **참조**에 스킬이 명시되어 있으면 해당 스킬명을 Builder 프롬프트에 포함한다.
 
 ### 실행
 
