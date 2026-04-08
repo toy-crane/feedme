@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Feedme",
     description: "어떤 URL이든, Markdown으로.",
-    url: "https://feedme-web.vercel.app",
+    url: "https://feedme.wiki",
     siteName: "Feedme",
     type: "website",
     locale: "ko_KR",
