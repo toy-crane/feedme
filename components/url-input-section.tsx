@@ -53,20 +53,20 @@ export function UrlInputSection({
               if (e.key === "Enter" && isValidUrl(url) && !loading) onFetch();
             }}
           />
-          {url && !loading && (
-            <InputGroupAddon align="inline-end">
-              <InputGroupButton
-                variant="ghost"
-                size="icon-sm"
-                onClick={handleClear}
-                aria-label="입력 지우기"
-              >
-                <X />
-              </InputGroupButton>
-              <div className="h-5 w-px bg-border" />
-            </InputGroupAddon>
-          )}
           <InputGroupAddon align="inline-end">
+            {url && !loading && (
+              <>
+                <InputGroupButton
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={handleClear}
+                  aria-label="입력 지우기"
+                >
+                  <X />
+                </InputGroupButton>
+                <div className="h-5 w-px bg-border" />
+              </>
+            )}
             <InputGroupButton
               variant="default"
               size="icon-sm"
