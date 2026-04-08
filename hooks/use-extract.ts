@@ -27,31 +27,6 @@ function parseFrontmatter(text: string): {
   return { metadata, content: match[2] };
 }
 
-function isYouTubeUrl(url: string): boolean {
-  try {
-    const { hostname } = new URL(url);
-    return (
-      hostname === "youtube.com" ||
-      hostname === "www.youtube.com" ||
-      hostname === "youtu.be"
-    );
-  } catch {
-    return false;
-  }
-}
-
-function getYouTubeVideoId(url: string): string {
-  try {
-    const u = new URL(url);
-    if (u.hostname === "youtu.be") return u.pathname.slice(1).split("?")[0];
-    if (u.pathname.includes("/shorts/"))
-      return u.pathname.split("/shorts/")[1].split("/")[0];
-    return u.searchParams.get("v") || "";
-  } catch {
-    return "";
-  }
-}
-
 export function useExtract() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -87,22 +62,13 @@ export function useExtract() {
       const text = await response.text();
       const { metadata, content } = parseFrontmatter(text);
 
-      const isYT = isYouTubeUrl(url);
-      let thumbnail: string | undefined;
-      if (isYT) {
-        const videoId = getYouTubeVideoId(url);
-        if (videoId) {
-          thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-        }
-      }
-
       setResult({
         title: metadata.title || undefined,
         markdown: content,
         content,
-        type: isYT ? "youtube" : "webpage",
-        source: metadata.author || metadata.site || metadata.domain || undefined,
-        thumbnail,
+        type: "webpage",
+        source:
+          metadata.author || metadata.site || metadata.domain || undefined,
       });
     } catch {
       setError("네트워크 오류가 발생했습니다");

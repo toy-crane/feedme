@@ -13,13 +13,6 @@ features:
         examples:
           - input: { url: "https://example.com/article" }
             expect: { previewVisible: true, previewContainsTitle: true, previewContainsSource: true, previewContainsBody: true }
-      - id: FEEDME-002
-        given: "URL 입력창이 비어 있는 초기 화면"
-        when: "URL 입력란에 YouTube URL을 입력하고 '추출' 버튼을 클릭한다"
-        then: "영상 제목, 채널명, 설명, 자막이 렌더링된 마크다운 미리보기로 표시된다"
-        examples:
-          - input: { url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }
-            expect: { previewVisible: true, previewContainsTitle: true, previewContainsChannel: true, previewContainsTranscript: true }
       - id: FEEDME-003
         given: "유효한 URL을 입력하고 '가져오기' 버튼을 클릭한 직후"
         when: "서버에서 콘텐츠를 가져오는 동안"
@@ -55,13 +48,6 @@ features:
         examples:
           - input: { url: "https://unreachable.invalid" }
             expect: { inlineErrorText: "페이지에 접근할 수 없습니다", alertComponentVisible: false }
-      - id: FEEDME-009
-        given: "자막이 없는 YouTube 영상의 URL이 입력된 상태"
-        when: "'가져오기' 버튼을 클릭한다"
-        then: "입력 필드 하단에 '자막을 찾을 수 없습니다' 인라인 에러 텍스트가 빨간색으로 표시된다"
-        examples:
-          - input: { url: "https://www.youtube.com/watch?v=no-captions" }
-            expect: { inlineErrorText: "자막을 찾을 수 없습니다", alertComponentVisible: false }
       - id: FEEDME-011
         given: "네트워크 연결 오류 또는 서버 응답 없음 상태에서 유효한 URL이 입력된 상태"
         when: "'가져오기' 버튼을 클릭한다"
@@ -94,21 +80,12 @@ features:
         examples:
           - input: { contentLength: "long" }
             expect: { hasMaxHeight: false, allContentVisible: true }
-      - id: FEEDME-021
-        given: "YouTube URL을 추출하여 자막 미리보기가 표시된 상태"
-        when: "자막 영역을 확인한다"
-        then: "높이 제한 없이 전체 자막이 페이지에 펼쳐져 표시된다"
-        examples:
-          - input: { contentType: "youtube" }
-            expect: { hasMaxHeight: false, allContentVisible: true }
       - id: FEEDME-022
         given: "콘텐츠가 추출되어 미리보기가 표시된 상태"
         when: "미리보기 영역의 스타일을 확인한다"
         then: "미리보기 영역에 테두리(border)가 없다"
         examples:
           - input: { contentType: "webpage" }
-            expect: { hasBorder: false }
-          - input: { contentType: "youtube" }
             expect: { hasBorder: false }
       - id: FEEDME-023
         given: "feedme 페이지에 접속한 상태"
@@ -564,14 +541,10 @@ features:
           - input: { url: "https://blog.example.com/article", author: null }
             expect: { sourceText: "blog.example.com" }
       - id: ALIGN-005
-        given: "YouTube URL과 웹페이지 URL을 각각 추출하여 결과가 표시된 상태"
-        when: "두 결과의 레이아웃 구조를 비교한다"
-        then: "동일한 요소 순서(썸네일 -> 제목 -> 출처 -> 복사 버튼 -> 프롬프트 -> 본문)와 동일한 간격으로 표시된다"
+        given: "웹페이지 URL을 추출하여 결과가 표시된 상태"
+        when: "결과의 레이아웃 구조를 확인한다"
+        then: "동일한 요소 순서(제목 → 출처 → 복사 버튼 → 프롬프트 → 본문)와 동일한 간격으로 표시된다"
         examples:
-          - input: { contentType: "youtube" }
-            expect: { elementOrder: ["thumbnail", "title", "source", "copyButton", "prompt", "body"], gap: "gap-4" }
-          - input: { contentType: "webpage", hasOgImage: true }
-            expect: { elementOrder: ["thumbnail", "title", "source", "copyButton", "prompt", "body"], gap: "gap-4" }
           - input: { contentType: "webpage", hasOgImage: false }
             expect: { elementOrder: ["title", "source", "copyButton", "prompt", "body"], gap: "gap-4" }
       - id: ALIGN-006
@@ -588,20 +561,11 @@ features:
         examples:
           - input: { url: "https://blog.example.com/article", hasAuthor: false }
             expect: { sourceInResponse: "blog.example.com" }
-      - id: ALIGN-008
-        given: "YouTube URL을 추출하여 결과가 표시된 상태"
-        when: "마크다운 본문을 확인한다"
-        then: "Defuddle이 삽입한 '## Transcript' 헤딩이 제거되어 표시되지 않는다"
-        examples:
-          - input: { url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", rawContent: "![](url)\n\n## Transcript\n\n### 소개\n\n내용" }
-            expect: { contentContainsTranscriptHeading: false, contentContainsBody: true }
       - id: ALIGN-009
         given: "콘텐츠가 추출되어 결과가 표시된 상태"
         when: "프롬프트 영역과 마크다운 본문 사이를 확인한다"
         then: "프롬프트 영역과 본문 사이에 구분선(Separator)이 표시된다"
         examples:
-          - input: { contentType: "youtube" }
-            expect: { separatorBetweenPromptAndBody: true }
           - input: { contentType: "webpage" }
             expect: { separatorBetweenPromptAndBody: true }
     excludes:

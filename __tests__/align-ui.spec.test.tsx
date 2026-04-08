@@ -1,9 +1,6 @@
 import { screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import {
-  renderWithWebpageResult,
-  renderWithYoutubeResult,
-} from "@/__tests__/helpers";
+import { renderWithWebpageResult } from "@/__tests__/helpers";
 
 describe("align-ui", () => {
   beforeEach(() => {
@@ -69,55 +66,20 @@ describe("align-ui", () => {
     });
   });
 
-  // ALIGN-005: YouTube/웹페이지 결과의 요소 순서와 gap이 동일
-  describe("ALIGN-005: YouTube/웹페이지 결과의 요소 순서와 gap이 동일", () => {
-    it("YouTube 결과의 최상위 컨테이너 gap이 gap-4이다", async () => {
-      await renderWithYoutubeResult();
-
-      const separator = document.querySelector("[data-testid='result-container']");
-      expect(separator).not.toBeNull();
-      const className = separator?.getAttribute("class") ?? "";
-      expect(className).toContain("gap-4");
-    });
-
+  // ALIGN-005: 웹페이지 결과의 요소 순서와 gap
+  describe("ALIGN-005: 웹페이지 결과의 요소 순서와 gap", () => {
     it("웹페이지 결과의 최상위 컨테이너 gap이 gap-4이다", async () => {
-      await renderWithWebpageResult({
-        thumbnail: "https://example.com/og.jpg",
-      });
+      await renderWithWebpageResult({});
 
       const container = document.querySelector("[data-testid='result-container']");
       expect(container).not.toBeNull();
       const className = container?.getAttribute("class") ?? "";
       expect(className).toContain("gap-4");
     });
-
-    it("YouTube와 웹페이지 결과의 요소 순서가 동일하다 (썸네일 → 제목/출처 → 액션 → 콘텐츠)", async () => {
-      await renderWithYoutubeResult();
-
-      const container = document.querySelector("[data-testid='result-container']");
-      expect(container).not.toBeNull();
-
-      const children = Array.from(container!.children);
-      const firstChild = children[0];
-      expect(firstChild.tagName.toLowerCase()).toBe("div");
-      expect(firstChild.querySelector("img")).not.toBeNull();
-      const secondChild = children[1];
-      expect(secondChild.tagName.toLowerCase()).toBe("div");
-    });
   });
 
   // ALIGN-009: 프롬프트 영역과 본문 사이에 구분선
   describe("ALIGN-009: 프롬프트 영역과 본문 사이 구분선", () => {
-    it("YouTube 결과에서 프롬프트 영역과 본문 사이에 Separator가 표시된다", async () => {
-      await renderWithYoutubeResult();
-
-      const container = document.querySelector("[data-testid='result-container']");
-      expect(container).not.toBeNull();
-
-      const separators = container!.querySelectorAll('[role="separator"], [data-slot="separator"]');
-      expect(separators.length).toBeGreaterThanOrEqual(1);
-    });
-
     it("웹페이지 결과에서 프롬프트 영역과 본문 사이에 Separator가 표시된다", async () => {
       await renderWithWebpageResult({});
 

@@ -42,7 +42,7 @@ export function UrlInputSection({
             name="url"
             type="url"
             autoComplete="url"
-            placeholder="https://example.com 또는 YouTube URL"
+            placeholder="https://example.com"
             value={url}
             aria-invalid={!!error}
             onChange={(e) => {

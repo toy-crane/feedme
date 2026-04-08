@@ -46,32 +46,6 @@ describe("feedme spec tests", () => {
     });
   });
 
-  // FEEDME-002
-  describe("FEEDME-002: YouTube URL 추출", () => {
-    it("YouTube URL 입력 후 가져오기 버튼 클릭 시 제목, 채널명, 자막이 렌더링된 마크다운으로 표시된다", async () => {
-      const user = userEvent.setup();
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        text: async () => "---\ntitle: \"Never Gonna Give You Up\"\nauthor: \"Rick Astley\"\nsite: \"YouTube\"\n---\n\n# Never Gonna Give You Up\n\n채널: Rick Astley\n\n## 자막\n\nWe're no strangers to love",
-      } as Response);
-
-      render(<ContentExtractor />);
-
-      const input = screen.getByRole("textbox");
-      await user.type(input, "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-
-      const button = screen.getByRole("button", { name: "가져오기" });
-      await user.click(button);
-
-      await waitFor(() => {
-        expect(screen.getAllByText(/Never Gonna Give You Up/).length).toBeGreaterThan(0);
-      });
-
-      expect(screen.getAllByText(/Rick Astley/).length).toBeGreaterThan(0);
-      expect(screen.getByText(/We're no strangers to love/)).toBeInTheDocument();
-    });
-  });
-
   // FEEDME-003
   describe("FEEDME-003: 로딩 스피너", () => {
     it("가져오기 버튼 클릭 직후 버튼에 스피너가 표시되고 텍스트는 사라진다", async () => {
@@ -202,30 +176,6 @@ describe("feedme spec tests", () => {
 
       await waitFor(() => {
         expect(screen.getByText("페이지에 접근할 수 없습니다")).toBeInTheDocument();
-      });
-    });
-  });
-
-  // FEEDME-009
-  describe("FEEDME-009: 자막 없는 YouTube URL 에러", () => {
-    it("자막 없는 YouTube URL 입력 후 가져오기 클릭 시 자막을 찾을 수 없습니다 에러가 표시된다", async () => {
-      const user = userEvent.setup();
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: false,
-        status: 404,
-        text: async () => JSON.stringify({ error: "자막을 찾을 수 없습니다" }),
-      } as Response);
-
-      render(<ContentExtractor />);
-
-      const input = screen.getByRole("textbox");
-      await user.type(input, "https://www.youtube.com/watch?v=no-captions");
-
-      const button = screen.getByRole("button", { name: "가져오기" });
-      await user.click(button);
-
-      await waitFor(() => {
-        expect(screen.getByText("자막을 찾을 수 없습니다")).toBeInTheDocument();
       });
     });
   });

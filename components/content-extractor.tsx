@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 
 import { Separator } from "@/components/ui/separator";
@@ -68,18 +67,6 @@ export default function ContentExtractor() {
           <>
             <Separator />
             <div data-testid="result-container" className="flex flex-col gap-4">
-              {result.thumbnail && (
-                <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
-                  <Image
-                    src={result.thumbnail}
-                    alt={result.title ?? "썸네일"}
-                    fill
-                    sizes="(max-width: 672px) 100vw, 672px"
-                    className="rounded-lg object-cover"
-                    unoptimized
-                  />
-                </div>
-              )}
               <div className="flex flex-col gap-1">
                 {result.title && (
                   <div className="flex flex-col gap-1">

@@ -3,6 +3,5 @@ export type ExtractResponse = {
   content?: string;
   title?: string;
   type?: string;
-  thumbnail?: string;
   source?: string;
 };

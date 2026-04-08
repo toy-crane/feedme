@@ -83,30 +83,3 @@ export async function renderWithWebpageResult({
   return { user };
 }
 
-export async function renderWithYoutubeResult({
-  source = "Rick Astley",
-  title = "YouTube 테스트",
-  content = "# YouTube 콘텐츠",
-}: {
-  source?: string;
-  title?: string;
-  content?: string;
-} = {}) {
-  const user = userEvent.setup();
-  global.fetch = vi.fn().mockResolvedValue({
-    ok: true,
-    text: async () => buildDefuddleText(content, { title, author: source, site: "YouTube" }),
-  } as Response);
-
-  render(<ContentExtractor />);
-
-  const input = screen.getByRole("textbox");
-  await user.type(input, "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-  await user.click(screen.getByRole("button", { name: "가져오기" }));
-
-  await waitFor(() => {
-    expect(screen.getByRole("button", { name: "복사하기" })).toBeInTheDocument();
-  });
-
-  return { user };
-}

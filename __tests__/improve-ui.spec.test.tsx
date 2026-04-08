@@ -51,39 +51,6 @@ describe("improve-ui spec tests", () => {
     });
   });
 
-  // FEEDME-011
-  describe("FEEDME-011: YouTube 자막 높이 제한 없음", () => {
-    it("YouTube 자막 영역에 max-height 관련 클래스가 없다", async () => {
-      const user = userEvent.setup();
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        text: async () => mockText(
-          "## 자막\n\n" + "자막 내용이 매우 길어집니다.\n\n".repeat(20),
-          { title: "테스트 영상", author: "테스트 채널", site: "YouTube" }
-        ),
-      } as Response);
-
-      const { container } = render(<ContentExtractor />);
-
-      const input = screen.getByRole("textbox");
-      await user.type(input, "https://www.youtube.com/watch?v=test123");
-      await user.click(screen.getByRole("button", { name: "가져오기" }));
-
-      await waitFor(() => {
-        expect(screen.getByText("테스트 영상")).toBeInTheDocument();
-      });
-
-      const proseContainer = container.querySelector(".prose");
-      expect(proseContainer).toBeTruthy();
-
-      const classList = Array.from(proseContainer!.classList);
-      const hasMaxHeight = classList.some(
-        (cls) => cls.startsWith("max-h-") || cls === "overflow-y-auto"
-      );
-      expect(hasMaxHeight).toBe(false);
-    });
-  });
-
   // FEEDME-012
   describe("FEEDME-012: 미리보기 영역에 border 없음", () => {
     it("웹페이지 미리보기 영역에 border 관련 클래스가 없다", async () => {
@@ -117,39 +84,6 @@ describe("improve-ui spec tests", () => {
       expect(hasBorder).toBe(false);
     });
 
-    it("YouTube 자막 영역에 border 관련 클래스가 없다", async () => {
-      const user = userEvent.setup();
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        text: async () => mockText(
-          "## 자막\n\n자막 내용",
-          { title: "테스트 영상", author: "테스트 채널", site: "YouTube" }
-        ),
-      } as Response);
-
-      const { container } = render(<ContentExtractor />);
-
-      const input = screen.getByRole("textbox");
-      await user.type(input, "https://www.youtube.com/watch?v=test123");
-      await user.click(screen.getByRole("button", { name: "가져오기" }));
-
-      await waitFor(() => {
-        expect(screen.getByText("테스트 영상")).toBeInTheDocument();
-      });
-
-      const proseContainer = container.querySelector(".prose");
-      expect(proseContainer).toBeTruthy();
-
-      const classList = Array.from(proseContainer!.classList);
-      const hasBorder = classList.some(
-        (cls) =>
-          cls === "border" ||
-          cls.startsWith("border-") ||
-          cls === "rounded-md" ||
-          cls === "rounded-lg"
-      );
-      expect(hasBorder).toBe(false);
-    });
   });
 
   // FEEDME-013
