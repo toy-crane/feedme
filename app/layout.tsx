@@ -8,10 +8,10 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "feedme",
-  description: "URL을 입력하면 웹페이지나 YouTube 자막을 마크다운으로 추출합니다",
+  description: "어떤 URL이든, Markdown으로.",
   openGraph: {
     title: "feedme",
-    description: "URL을 입력하면 웹페이지나 YouTube 자막을 마크다운으로 추출합니다",
+    description: "어떤 URL이든, Markdown으로.",
     url: "https://feedme-web.vercel.app",
     siteName: "feedme",
     type: "website",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary",
     title: "feedme",
-    description: "URL을 입력하면 웹페이지나 YouTube 자막을 마크다운으로 추출합니다",
+    description: "어떤 URL이든, Markdown으로.",
   },
 };
 
