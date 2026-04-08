@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const response = await fetch(`${DEFUDDLE_API}/${encodeURIComponent(url)}`, {
+    const response = await fetch(`${DEFUDDLE_API}/${url}`, {
       signal: AbortSignal.timeout(15_000),
     });
 
