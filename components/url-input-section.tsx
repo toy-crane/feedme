@@ -59,12 +59,13 @@ export function UrlInputSection({
                 <InputGroupButton
                   variant="ghost"
                   size="icon-sm"
+                  className="ml-1"
                   onClick={handleClear}
                   aria-label="입력 지우기"
                 >
                   <X />
                 </InputGroupButton>
-                <div className="ml-1 h-5 w-px bg-border" />
+                <div className="h-5 w-px bg-border" />
               </>
             )}
             <InputGroupButton
