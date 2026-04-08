@@ -37,7 +37,7 @@ export default function RootLayout({
           {children}
         </ThemeProvider>
         {process.env.NODE_ENV === "development" && <Agentation />}
-        <Analytics />
+        {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>
   );
