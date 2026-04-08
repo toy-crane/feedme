@@ -53,17 +53,14 @@ plan.md의 Task 목록을 분석한다.
 
 ### 스킬 주입
 
-Builder는 Core 스킬(`next-best-practices`, `vercel-react-best-practices`)만 내장한다. Task 내용을 분석하여 추가 스킬이 필요하면 Builder 프롬프트에 "다음 스킬을 로드하고 규칙을 따라라"와 함께 스킬명을 전달한다.
+Builder는 Core 스킬(`next-best-practices`, `vercel-react-best-practices`)만 내장한다. Task별로 추가 스킬이 필요하면 Builder 프롬프트에 스킬명을 전달한다.
 
-| 스킬 | 주입 조건 |
-|------|----------|
-| `shadcn` | UI 컴포넌트를 생성/수정하는 Task |
-| `web-design-guidelines` | 레이아웃, 접근성, UX 패턴을 다루는 Task |
-| `vercel-composition-patterns` | 컴포넌트 구조 설계/리팩터링 Task |
-| `vercel-react-view-transitions` | 페이지 전환, 애니메이션 Task |
-| `ai-elements` | AI 채팅 인터페이스 Task |
-
-새 스킬이 설치되면 이 테이블에 추가한다. 조건에 해당하는 스킬이 없으면 Core 스킬만으로 실행한다.
+**스킬 선택 절차:**
+1. `.claude/skills/*/SKILL.md`를 glob으로 스캔하여 설치된 스킬 목록을 수집한다
+2. Builder에 이미 내장된 Core 스킬은 제외한다
+3. 각 SKILL.md의 frontmatter(`name`, `description`)를 읽고, Task 내용과 대조하여 관련 스킬을 선택한다
+4. 선택한 스킬이 있으면 Builder 프롬프트에 "다음 스킬을 로드하고 규칙을 따라라: [스킬명 목록]"을 포함한다
+5. 해당하는 스킬이 없으면 Core 스킬만으로 실행한다
 
 ### 실행
 
