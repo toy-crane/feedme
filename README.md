@@ -1,17 +1,22 @@
-# Harness Engineering Template
+# feedme
 
-Next.js 16 + React 19 프로젝트 템플릿
+어떤 URL이든, Markdown으로 — AI 챗봇에 바로 붙여넣을 수 있는 미니멀 웹 도구
+
+## 기능
+
+- **URL → Markdown 변환**: URL을 입력하면 콘텐츠를 추출하여 Markdown으로 렌더링
+- **클립보드 복사**: Markdown 단독 복사 또는 프롬프트와 함께 복사
+- **커스텀 프롬프트**: 프리셋 프롬프트 선택 또는 직접 작성하여 콘텐츠와 함께 복사
+- **다크 모드**: 시스템 테마에 연동되는 라이트/다크 모드 지원
 
 ## 기술 스택
 
-- **Framework**: Next.js 16 (App Router)
-- **UI**: React 19, Tailwind CSS 4, shadcn/ui, Radix UI, Base UI
-- **Animation**: Motion
+- **Framework**: Next.js 16 (App Router), React 19
+- **UI**: Tailwind CSS 4, shadcn/ui, Radix UI, Base UI
+- **Content Extraction**: Defuddle, linkedom
 - **Markdown**: react-markdown, remark-gfm, rehype-highlight
-- **Theme**: next-themes
-- **Icons**: Lucide React
+- **Animation**: Motion
 - **Testing**: Vitest, Testing Library, Playwright
-- **Lint**: ESLint
 - **Package Manager**: Bun
 
 ## 시작하기
@@ -34,46 +39,34 @@ bun dev
 | `bun run test` | 테스트 실행 |
 | `bun run test:watch` | 테스트 워치 모드 |
 
-## Hooks
+## 프로젝트 구조
 
-Claude Code hooks 기반 자동 품질 게이트 (`.claude/settings.json`)
+```
+app/                  # Next.js 라우트 및 API
+  api/extract/        # 콘텐츠 추출 API 엔드포인트
+components/           # React 컴포넌트
+hooks/                # 커스텀 훅 (use-feedme, use-extract, use-prompt, use-clipboard)
+lib/                  # 유틸리티 (콘텐츠 추출, Markdown 플러그인)
+types/                # TypeScript 타입 정의
+config/               # 설정 파일
+artifacts/            # 스펙 및 기능 문서
+  spec.yaml           # 단일 불변 계약 (요구사항 정의)
+__tests__/            # spec.yaml 기반 수용 기준 테스트
+```
 
-| 단계 | 트리거 | 동작 |
-|---|---|---|
-| **PreToolUse** | `Bash` | `secret-guard.sh` — git commit/add 시 gitleaks로 시크릿 탐지 |
-| **PostToolUse** | `Write\|Edit` | `lint-fix.sh` — ESLint auto-fix |
-| **Stop** | 작업 완료 시 | `stop-test.sh` — 전체 테스트 실행, 실패 시 재시도 (최대 3회) |
-| **WorktreeCreate** | worktree 생성 시 | `worktree-create.sh` — worktree 환경 초기화 |
+## 개발 워크플로우
 
-## 테스트 파일 컨벤션
+이 프로젝트는 spec-driven TDD로 개발합니다.
+
+1. **Spec** — `artifacts/spec.yaml`에 요구사항 정의
+2. **Wireframe** — spec 기반 HTML 와이어프레임으로 레이아웃 검증
+3. **Plan** — 구현 계획 수립
+4. **Execute** — TDD로 구현 후 검증
+5. **Improve** — 반복 패턴 감지 및 개선
+
+## 테스트
 
 | 파일 패턴 | 용도 |
 |---|---|
 | `*.spec.test.tsx` | 수용 기준 테스트 (`artifacts/spec.yaml`에서 파생) |
-| `*.test.tsx` | 구현 테스트 (단위/통합) |
-
-## Claude Code 워크플로우
-
-이 프로젝트는 `/write-spec` → `/sketch-wireframe` → `/draft-plan` → `/execute-plan` 순서로 개발합니다.
-
-`artifacts/spec.yaml`이 전체 앱의 **단일 불변 계약**입니다. spec.yaml의 시나리오에서 spec 테스트를 파생하고, 구현이 spec.yaml과 맞지 않으면 구현을 수정합니다.
-
-### 1. Spec (`/write-spec`)
-
-유저와 대화하며 기능의 스펙을 작성합니다. 사용자 흐름을 시뮬레이션하고 빈칸을 질문으로 채운 뒤, spec.md(논의 기록)와 spec.yaml(검증 가능한 요구사항)을 생성합니다.
-
-### 2. Wireframe (`/sketch-wireframe`)
-
-spec.yaml 기반 HTML 와이어프레임을 생성합니다. 레이아웃 검증이 목적이며, 피드백 루프를 돌리며 `artifacts/<feature>/wireframe.html`에 저장합니다.
-
-### 3. Plan (`/draft-plan`)
-
-spec.yaml과 wireframe을 참조하여 구현 계획을 수립합니다. skill-researcher로 관련 스킬을 찾고, plan-reviewer로 독립 검토합니다.
-
-### 4. Execute (`/execute-plan`)
-
-plan.md의 Task를 TDD로 순차 실행합니다. 완료 후 QA Evaluator(spec 시나리오 검증)로 검증하고, Code Simplifier로 정리합니다.
-
-### 5. Improve (`/self-improve`)
-
-실행 중 반복된 패턴을 감지하고 Skill/Hook/Rule 변경을 제안합니다.
+| `*.test.tsx` | 구현 단위/통합 테스트 |
