@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireframe: URL Clear Button</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --w-bg: #f5f5f5;
+    --w-border: #ccc;
+    --w-text: #555;
+    --w-muted: #aaa;
+    --w-fill: #eee;
+  }
+
+  * {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    color: var(--w-text);
+  }
+
+  body { background: var(--w-bg); }
+
+  nav { position: sticky; top: 0; z-index: 40; background: var(--w-bg); border-bottom: 1px solid var(--w-border); }
+  nav button { cursor: pointer; font-size: 13px; }
+  nav button:hover { background: var(--w-fill); border-radius: 4px; }
+  nav button.active { font-weight: bold; border-bottom: 2px solid var(--w-text); }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .vp-toggle button {
+    font-size: 12px; padding: 2px 8px;
+    border: 1px solid var(--w-border); cursor: pointer; background: white;
+  }
+  .vp-toggle button:first-child { border-radius: 4px 0 0 4px; }
+  .vp-toggle button:last-child { border-radius: 0 4px 4px 0; border-left: none; }
+  .vp-toggle button.active { background: var(--w-text); color: white; }
+
+  body.viewport-mobile .screen-content {
+    max-width: 375px !important;
+    margin: 24px auto !important;
+    border: 2px solid var(--w-border);
+    border-radius: 24px;
+    min-height: 667px;
+    background: white;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 32px 16px !important;
+  }
+
+  .screen-notes {
+    background: #fffde7;
+    border-left: 3px solid #ffd54f;
+    padding: 12px 16px;
+    margin-top: 24px;
+    font-size: 13px;
+    border-radius: 0 4px 4px 0;
+  }
+  .screen-notes summary {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    color: #b0a050;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .screen-notes p { margin: 6px 0 2px; color: #777; }
+  .screen-notes ul { margin: 4px 0 0 16px; padding: 0; color: #777; }
+  .screen-notes li { margin: 2px 0; }
+
+  /* Custom wireframe styles */
+  .w-input-group {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--w-border);
+    border-radius: 8px;
+    height: 48px;
+    background: white;
+    overflow: hidden;
+  }
+  .w-input-group:focus-within {
+    border-color: var(--w-text);
+    box-shadow: 0 0 0 2px rgba(85,85,85,0.15);
+  }
+  .w-input-field {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 0 12px;
+    font-size: 14px;
+    background: transparent;
+    color: var(--w-text);
+  }
+  .w-input-field::placeholder { color: var(--w-muted); }
+  .w-clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--w-muted);
+    flex-shrink: 0;
+  }
+  .w-clear-btn:hover { background: var(--w-fill); color: var(--w-text); }
+  .w-fetch-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    background: var(--w-text);
+    cursor: pointer;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  .w-fetch-btn svg { color: white !important; }
+  .w-fetch-btn.w-disabled { opacity: 0.4; cursor: not-allowed; }
+  .w-error { color: #d32f2f; font-size: 13px; margin-top: 6px; }
+  .w-preview-box {
+    border: 1px dashed var(--w-border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+    background: var(--w-fill);
+  }
+  .w-label { font-size: 11px; color: var(--w-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .w-separator { width: 1px; height: 20px; background: var(--w-border); flex-shrink: 0; margin: 0 2px; }
+</style>
+</head>
+<body class="p-0 m-0 viewport-mobile">
+
+<nav class="flex items-center gap-4 px-6 py-2">
+  <span class="text-xs" style="color:var(--w-muted)">wireframe</span>
+  <button id="nav-0" onclick="show(0)" class="px-2 py-1">Default (Empty)</button>
+  <button id="nav-1" onclick="show(1)" class="px-2 py-1">Clear Visible</button>
+  <button id="nav-2" onclick="show(2)" class="px-2 py-1">Loading</button>
+  <button id="nav-3" onclick="show(3)" class="px-2 py-1">Error + Clear</button>
+  <div class="vp-toggle flex ml-auto">
+    <button id="vp-desktop" onclick="setViewport('desktop')">Desktop</button>
+    <button id="vp-mobile" onclick="setViewport('mobile')" class="active">Mobile</button>
+  </div>
+</nav>
+
+<!-- Screen 0: Default empty state - no clear button -->
+<div id="screen-0" class="screen" data-scenario="FEEDME-050">
+  <div class="screen-content @container max-w-6xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-5" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      URL Empty - No Clear Button
+    </h2>
+
+    <!-- Logo -->
+    <div class="text-center mb-6">
+      <span class="text-xl font-bold">feed-me</span>
+    </div>
+
+    <!-- URL Input Group -->
+    <div>
+      <div class="w-input-group">
+        <input class="w-input-field" type="text" placeholder="https://example.com or YouTube URL" readonly />
+        <!-- No clear button when empty -->
+        <div class="w-fetch-btn w-disabled" style="margin-right:8px;">
+          <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>URL 입력창이 비어 있는 기본 상태</p>
+        <ul>
+          <li>트리거: 페이지 첫 로드 또는 clear 후</li>
+          <li>인터랙션: URL 텍스트 입력</li>
+          <li>전환: URL 입력 시 → Clear Visible 상태로</li>
+          <li>Clear 버튼: 표시되지 않음</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<!-- Screen 1: URL entered - clear button visible -->
+<div id="screen-1" class="screen" data-scenario="FEEDME-050, FEEDME-051">
+  <div class="screen-content @container max-w-6xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-5" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      URL Entered - Clear Button Visible
+    </h2>
+
+    <!-- Logo -->
+    <div class="text-center mb-6">
+      <span class="text-xl font-bold">feed-me</span>
+    </div>
+
+    <!-- URL Input Group with Clear Button -->
+    <div>
+      <div class="w-input-group">
+        <input class="w-input-field" type="text" value="https://example.com" readonly />
+        <!-- Clear (X) button - between input and fetch button -->
+        <div class="w-clear-btn" title="Clear URL">
+          <i data-lucide="x" style="width:16px;height:16px;"></i>
+        </div>
+        <div class="w-separator"></div>
+        <div class="w-fetch-btn" style="margin-right:8px;">
+          <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Existing preview (stays after clear) -->
+    <div class="w-preview-box">
+      <div class="w-label">Preview (remains after clear)</div>
+      <div class="font-bold mb-1">Article Title</div>
+      <div style="font-size:13px; color:var(--w-muted);">example.com</div>
+      <div style="font-size:13px; margin-top:8px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit...</div>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>URL이 입력된 상태 - X 버튼 노출</p>
+        <ul>
+          <li>트리거: URL 입력창에 텍스트가 있을 때</li>
+          <li>인터랙션: X 클릭 → URL만 비워짐, 프리뷰 유지</li>
+          <li>전환: X 클릭 → Default (Empty) 상태로</li>
+          <li>X 버튼 위치: 입력 텍스트 오른쪽, fetch 버튼(→) 왼쪽</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<!-- Screen 2: Loading - no clear button -->
+<div id="screen-2" class="screen" data-scenario="FEEDME-052">
+  <div class="screen-content @container max-w-6xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-5" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      Loading - Clear Button Hidden
+    </h2>
+
+    <!-- Logo -->
+    <div class="text-center mb-6">
+      <span class="text-xl font-bold">feed-me</span>
+    </div>
+
+    <!-- URL Input Group - loading state -->
+    <div>
+      <div class="w-input-group">
+        <input class="w-input-field" type="text" value="https://example.com" readonly />
+        <!-- No clear button during loading -->
+        <div class="w-fetch-btn w-disabled" style="margin-right:8px;">
+          <i data-lucide="loader-2" style="width:16px;height:16px;" class="animate-spin"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>Fetch 진행 중 - X 버튼 숨김</p>
+        <ul>
+          <li>트리거: fetch 요청 진행 중</li>
+          <li>인터랙션: 없음 (입력 비활성)</li>
+          <li>전환: fetch 완료 → Clear Visible 또는 Error 상태로</li>
+          <li>Clear 버튼: 표시되지 않음</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<!-- Screen 3: Error state with clear button -->
+<div id="screen-3" class="screen" data-scenario="FEEDME-053">
+  <div class="screen-content @container max-w-6xl mx-auto p-6">
+
+    <h2 class="text-lg font-bold mb-5" style="color:var(--w-muted); border-bottom:1px solid var(--w-border); padding-bottom:8px;">
+      Error State - Clear Removes Error Too
+    </h2>
+
+    <!-- Logo -->
+    <div class="text-center mb-6">
+      <span class="text-xl font-bold">feed-me</span>
+    </div>
+
+    <!-- URL Input Group with error -->
+    <div>
+      <div class="w-input-group" style="border-color:#d32f2f;">
+        <input class="w-input-field" type="text" value="https://bad-url.com" readonly />
+        <!-- Clear (X) button -->
+        <div class="w-clear-btn" title="Clear URL">
+          <i data-lucide="x" style="width:16px;height:16px;"></i>
+        </div>
+        <div class="w-separator"></div>
+        <div class="w-fetch-btn" style="margin-right:8px;">
+          <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+        </div>
+      </div>
+      <div class="w-error">페이지에 접근할 수 없습니다</div>
+    </div>
+
+    <div class="screen-notes">
+      <details open>
+        <summary>Notes</summary>
+        <p>에러 상태 - X 클릭 시 URL과 에러 모두 제거</p>
+        <ul>
+          <li>트리거: fetch 실패 후 에러 메시지 표시</li>
+          <li>인터랙션: X 클릭 → URL 비워짐 + 에러 메시지 사라짐</li>
+          <li>전환: X 클릭 → Default (Empty) 상태로</li>
+        </ul>
+      </details>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var currentScreen = 0;
+var screenIds = [];
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('nav button[id^="nav-"]').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('nav-' + id).classList.add('active');
+  currentScreen = screenIds.indexOf(id);
+}
+
+function setViewport(mode) {
+  document.body.classList.remove('viewport-mobile', 'viewport-desktop');
+  document.body.classList.add('viewport-' + mode);
+  document.querySelectorAll('.vp-toggle button').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('vp-' + mode).classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('nav button[id^="nav-"]').forEach(function(b) {
+    screenIds.push(parseInt(b.id.replace('nav-', '')));
+  });
+  var first = document.querySelector('nav button[id^="nav-"]');
+  if (first) first.click();
+  lucide.createIcons();
+});
+</script>
+</body>
+</html>
