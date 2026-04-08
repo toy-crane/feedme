@@ -166,6 +166,43 @@ CLAUDE.md에 `*.spec.test.tsx`와 `*.test.tsx`의 역할은 정의했지만, **"
 
 ---
 
+---
+
+# Decision Log — 2026-04-08
+
+## 세션 요약
+
+Cloudflare Worker 기반 extract API를 Defuddle 호스팅 API(defuddle.md)로 전환 검토 및 실행.
+
+---
+
+## 9. Extract Worker → Defuddle API 전환
+
+### 문제
+- YouTube 자막 추출이 여전히 불안정 (InnerTube API가 datacenter IP를 차단)
+- Cloudflare Worker 관리 포인트가 복잡도를 높임 (wrangler 설정, KV, 별도 배포 등)
+
+### 검토 과정
+1. **Defuddle 호스팅 API 코드 분석** (github.com/kepano/defuddle): 비인증 요청은 IP당 월 1,000건 rate limit (KV 기반, `cf-connecting-ip`). API key 구매 시 key 기반 과금.
+2. **YouTube 경로 확인**: Defuddle 호스팅도 동일하게 oEmbed + InnerTube API 사용 → YouTube 불안정 이슈는 근본적으로 해결 안 됨. 다만 테스트 목적으로 전환 진행.
+3. **1차 시도 — Next.js API route (서버 프록시)**: `app/api/extract/route.ts`에서 `defuddle.md/{url}` 호출. Vercel preview에서 **403 반환** (62ms). Cloudflare 봇 방어가 Vercel datacenter IP를 차단.
+4. **2차 시도 — 브라우저 직접 호출**: Defuddle API가 `Access-Control-Allow-Origin: *` CORS를 지원하므로, `use-extract.ts`에서 브라우저가 직접 `defuddle.md` 호출. 서버 코드 불필요.
+
+### 해결
+- `use-extract.ts`에서 `fetch("https://defuddle.md/${url}")` 직접 호출
+- YAML frontmatter 파싱 후 기존 `ExtractResponse` 포맷으로 변환
+- `app/api/extract/route.ts` 삭제
+
+### Rate limit 특성
+브라우저 직접 호출 시 `cf-connecting-ip`는 각 사용자의 실제 IP → 사용자별 월 1,000건 독립 카운트. 서버 프록시보다 유리.
+
+### 남은 과제
+- YouTube 자막 안정성은 Defuddle API에서도 동일 이슈 (InnerTube API datacenter IP 차단)
+- Defuddle API 장애 시 fallback 없음
+- Worker 코드(`workers/extract/`)는 아직 삭제하지 않음 — 검증 후 정리 예정
+
+---
+
 ## 요약: Harness 개선 우선순위
 
 | 우선순위 | 개선 항목 | 적용 위치 |
