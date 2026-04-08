@@ -1,47 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
+import { extractContent } from "@/lib/extract";
 
-const DEFUDDLE_API = "https://defuddle.md";
+const ERROR_STATUS_MAP: Record<string, number> = {
+  "올바른 URL을 입력해주세요": 400,
+  "페이지에 접근할 수 없습니다": 502,
+};
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.searchParams.get("url");
 
   if (!url) {
-    return NextResponse.json({ error: "url parameter is required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "url parameter is required" },
+      { status: 400 },
+    );
   }
 
-  const targetUrl = `${DEFUDDLE_API}/${url}`;
-
   try {
-    const response = await fetch(targetUrl, {
-      signal: AbortSignal.timeout(15_000),
-      headers: {
-        "User-Agent": request.headers.get("User-Agent") || "",
-      },
-    });
-
-    const body = await response.text();
-    const responseHeaders = Object.fromEntries(response.headers.entries());
-
-    console.log("[extract] upstream response", {
-      targetUrl,
-      status: response.status,
-      headers: responseHeaders,
-      bodyPreview: body.slice(0, 500),
-    });
-
-    if (!response.ok) {
-      return new NextResponse(body, {
-        status: response.status,
-        headers: { "Content-Type": response.headers.get("Content-Type") || "text/plain" },
-      });
-    }
-
-    return new NextResponse(body, {
-      status: 200,
-      headers: { "Content-Type": response.headers.get("Content-Type") || "text/markdown" },
-    });
-  } catch (err) {
-    console.error("[extract] fetch error", { targetUrl, error: String(err) });
-    return NextResponse.json({ error: "Failed to fetch the URL" }, { status: 502 });
+    const result = await extractContent(url);
+    return NextResponse.json(result);
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "알 수 없는 오류가 발생했습니다";
+    const status = ERROR_STATUS_MAP[message] ?? 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }

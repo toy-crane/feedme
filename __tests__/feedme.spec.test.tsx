@@ -27,7 +27,7 @@ describe("feedme spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        text: async () => "# 웹 접근성 가이드라인 소개\n\n웹 접근성은 장애 여부와 관계없이 모든 사람이 웹 콘텐츠를 이용할 수 있도록 보장합니다.",
+        json: async () => ({ title: "웹 접근성 가이드라인 소개", content: "# 웹 접근성 가이드라인 소개\n\n웹 접근성은 장애 여부와 관계없이 모든 사람이 웹 콘텐츠를 이용할 수 있도록 보장합니다." }),
       } as Response);
 
       render(<ContentExtractor />);
@@ -39,7 +39,7 @@ describe("feedme spec tests", () => {
       await user.click(button);
 
       await waitFor(() => {
-        expect(screen.getByText(/웹 접근성 가이드라인 소개/)).toBeInTheDocument();
+        expect(screen.getAllByText(/웹 접근성 가이드라인 소개/).length).toBeGreaterThan(0);
       });
 
       expect(screen.getByText(/웹 접근성은 장애 여부와 관계없이/)).toBeInTheDocument();
@@ -78,7 +78,7 @@ describe("feedme spec tests", () => {
 
       resolveResponse!({
         ok: true,
-        text: async () => "# 제목\n\n본문",
+        json: async () => ({ title: "제목", content: "# 제목\n\n본문" }),
       });
     });
   });
@@ -99,7 +99,7 @@ describe("feedme spec tests", () => {
       const markdownContent = "# 제목\n\n본문 내용";
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        text: async () => markdownContent,
+        json: async () => ({ title: "제목", content: markdownContent }),
       } as Response);
 
       // userEvent.setup() 이후 clipboard mock 재설정 (userEvent가 clipboard를 교체하므로)
@@ -162,8 +162,8 @@ describe("feedme spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
-        status: 500,
-        text: async () => JSON.stringify({ error: "페이지에 접근할 수 없습니다" }),
+        status: 502,
+        json: async () => ({ error: "페이지에 접근할 수 없습니다" }),
       } as Response);
 
       render(<ContentExtractor />);

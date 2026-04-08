@@ -5,28 +5,6 @@ import type { ExtractResponse } from "@/types/extract";
 
 const EXTRACT_API = "/api/extract";
 
-function parseFrontmatter(text: string): {
-  metadata: Record<string, string>;
-  content: string;
-} {
-  const match = text.match(/^---\n([\s\S]*?)\n---\n\n?([\s\S]*)$/);
-  if (!match) return { metadata: {}, content: text };
-
-  const metadata: Record<string, string> = {};
-  for (const line of match[1].split("\n")) {
-    const idx = line.indexOf(": ");
-    if (idx === -1) continue;
-    const key = line.slice(0, idx).trim();
-    let value = line.slice(idx + 2).trim();
-    if (value.startsWith('"') && value.endsWith('"')) {
-      value = value.slice(1, -1).replace(/\\"/g, '"');
-    }
-    metadata[key] = value;
-  }
-
-  return { metadata, content: match[2] };
-}
-
 export function useExtract() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,32 +21,22 @@ export function useExtract() {
     try {
       const response = await fetch(
         `${EXTRACT_API}?url=${encodeURIComponent(url)}`,
-        { signal: AbortSignal.timeout(15_000) }
+        { signal: AbortSignal.timeout(15_000) },
       );
 
+      const data = await response.json();
+
       if (!response.ok) {
-        let message = "페이지에 접근할 수 없습니다";
-        try {
-          const errorBody = await response.text();
-          const parsed = JSON.parse(errorBody);
-          if (parsed.error) message = parsed.error;
-        } catch {
-          // plain text error
-        }
-        setError(message);
+        setError(data.error || "페이지에 접근할 수 없습니다");
         return;
       }
 
-      const text = await response.text();
-      const { metadata, content } = parseFrontmatter(text);
-
       setResult({
-        title: metadata.title || undefined,
-        markdown: content,
-        content,
+        title: data.title || undefined,
+        markdown: data.content,
+        content: data.content,
         type: "webpage",
-        source:
-          metadata.author || metadata.site || metadata.domain || undefined,
+        source: data.source || undefined,
       });
     } catch {
       setError("네트워크 오류가 발생했습니다");

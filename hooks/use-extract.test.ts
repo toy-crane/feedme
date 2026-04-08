@@ -2,13 +2,11 @@ import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useExtract } from "@/hooks/use-extract";
 
-function defuddleResponse(content: string, meta: Record<string, string> = {}) {
-  const lines = ["---"];
-  for (const [k, v] of Object.entries(meta)) {
-    lines.push(`${k}: "${v}"`);
-  }
-  lines.push("---");
-  return `${lines.join("\n")}\n\n${content}`;
+function jsonResponse(data: Record<string, unknown>, ok = true) {
+  return {
+    ok,
+    json: async () => data,
+  };
 }
 
 describe("useExtract", () => {
@@ -35,10 +33,11 @@ describe("useExtract", () => {
   });
 
   it("handleFetch 성공 시 result가 설정되고 loading이 false로 돌아온다", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      text: async () => defuddleResponse("# Hello", { title: "Test" }),
-    });
+    global.fetch = vi
+      .fn()
+      .mockResolvedValue(
+        jsonResponse({ title: "Test", content: "# Hello", source: "example" }),
+      );
 
     const { result } = renderHook(() => useExtract());
 
@@ -52,10 +51,11 @@ describe("useExtract", () => {
   });
 
   it("handleFetch 서버 에러 시 error가 설정된다", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: false,
-      text: async () => JSON.stringify({ error: "페이지에 접근할 수 없습니다" }),
-    });
+    global.fetch = vi
+      .fn()
+      .mockResolvedValue(
+        jsonResponse({ error: "페이지에 접근할 수 없습니다" }, false),
+      );
 
     const { result } = renderHook(() => useExtract());
 
@@ -77,11 +77,12 @@ describe("useExtract", () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it("frontmatter 없는 plain markdown도 content로 파싱된다", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      text: async () => "plain markdown content",
-    });
+  it("JSON 응답에서 content가 markdownText로 설정된다", async () => {
+    global.fetch = vi
+      .fn()
+      .mockResolvedValue(
+        jsonResponse({ title: "Test", content: "plain markdown content" }),
+      );
 
     const { result } = renderHook(() => useExtract());
 
@@ -91,10 +92,11 @@ describe("useExtract", () => {
   });
 
   it("reset 호출 시 모든 상태가 초기화된다", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      text: async () => defuddleResponse("# Hello", { title: "Test" }),
-    });
+    global.fetch = vi
+      .fn()
+      .mockResolvedValue(
+        jsonResponse({ title: "Test", content: "# Hello" }),
+      );
 
     const { result } = renderHook(() => useExtract());
 
