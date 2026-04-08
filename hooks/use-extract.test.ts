@@ -1,6 +1,15 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useExtract } from "@/hooks/use-extract";
+
+function defuddleResponse(content: string, meta: Record<string, string> = {}) {
+  const lines = ["---"];
+  for (const [k, v] of Object.entries(meta)) {
+    lines.push(`${k}: "${v}"`);
+  }
+  lines.push("---");
+  return `${lines.join("\n")}\n\n${content}`;
+}
 
 describe("useExtract", () => {
   beforeEach(() => {
@@ -26,10 +35,9 @@ describe("useExtract", () => {
   });
 
   it("handleFetch 성공 시 result가 설정되고 loading이 false로 돌아온다", async () => {
-    const mockData = { markdown: "# Hello", title: "Test" };
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => mockData,
+      text: async () => defuddleResponse("# Hello", { title: "Test" }),
     });
 
     const { result } = renderHook(() => useExtract());
@@ -37,7 +45,7 @@ describe("useExtract", () => {
     act(() => result.current.setUrl("https://example.com"));
     await act(() => result.current.handleFetch());
 
-    expect(result.current.result).toEqual(mockData);
+    expect(result.current.result?.title).toBe("Test");
     expect(result.current.markdownText).toBe("# Hello");
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
@@ -46,7 +54,7 @@ describe("useExtract", () => {
   it("handleFetch 서버 에러 시 error가 설정된다", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
-      json: async () => ({ error: "페이지에 접근할 수 없습니다" }),
+      text: async () => JSON.stringify({ error: "페이지에 접근할 수 없습니다" }),
     });
 
     const { result } = renderHook(() => useExtract());
@@ -69,23 +77,23 @@ describe("useExtract", () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it("markdownText는 markdown 필드를 우선하고 content를 fallback으로 사용한다", async () => {
+  it("frontmatter 없는 plain markdown도 content로 파싱된다", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ content: "fallback content" }),
+      text: async () => "plain markdown content",
     });
 
     const { result } = renderHook(() => useExtract());
 
     await act(() => result.current.handleFetch());
 
-    expect(result.current.markdownText).toBe("fallback content");
+    expect(result.current.markdownText).toBe("plain markdown content");
   });
 
   it("reset 호출 시 모든 상태가 초기화된다", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ markdown: "# Hello" }),
+      text: async () => defuddleResponse("# Hello", { title: "Test" }),
     });
 
     const { result } = renderHook(() => useExtract());
