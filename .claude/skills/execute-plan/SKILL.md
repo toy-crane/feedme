@@ -51,6 +51,22 @@ plan.md의 Task 목록을 분석한다.
 
 실행 계획에 따라 `builder` agent를 spawn한다. 각 Builder에게 Task 내용, spec.yaml 경로, wireframe 경로, 구현 앱 URL을 전달한다. UI 요소를 지시할 때 컴포넌트명을 특정하지 않는다. wireframe 구조를 Builder가 직접 읽고 판단하게 한다.
 
+### 스킬 주입
+
+Builder는 Core 스킬(`next-best-practices`, `vercel-react-best-practices`)만 내장한다. Task 내용을 분석하여 추가 스킬이 필요하면 Builder 프롬프트에 "다음 스킬을 로드하고 규칙을 따라라"와 함께 스킬명을 전달한다.
+
+| 스킬 | 주입 조건 |
+|------|----------|
+| `shadcn` | UI 컴포넌트를 생성/수정하는 Task |
+| `web-design-guidelines` | 레이아웃, 접근성, UX 패턴을 다루는 Task |
+| `vercel-composition-patterns` | 컴포넌트 구조 설계/리팩터링 Task |
+| `vercel-react-view-transitions` | 페이지 전환, 애니메이션 Task |
+| `ai-elements` | AI 채팅 인터페이스 Task |
+
+새 스킬이 설치되면 이 테이블에 추가한다. 조건에 해당하는 스킬이 없으면 Core 스킬만으로 실행한다.
+
+### 실행
+
 - 순차 Task: 하나씩 위임하고 결과 확인 후 다음으로 진행
 - 병렬 Task: 독립적인 Task는 동시에 여러 Builder를 spawn하고 완료 후 결과 종합
 
