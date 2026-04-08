@@ -17,11 +17,7 @@ export function useExtract() {
     setResult(null);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_EXTRACT_API_URL;
-      if (!apiUrl) {
-        throw new Error("NEXT_PUBLIC_EXTRACT_API_URL 환경변수가 설정되지 않았습니다");
-      }
-      const response = await fetch(apiUrl, {
+      const response = await fetch("/api/extract", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
