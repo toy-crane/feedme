@@ -27,9 +27,7 @@ describe("feedme spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "# 웹 접근성 가이드라인 소개\n\n웹 접근성은 장애 여부와 관계없이 모든 사람이 웹 콘텐츠를 이용할 수 있도록 보장합니다.",
-        }),
+        text: async () => "# 웹 접근성 가이드라인 소개\n\n웹 접근성은 장애 여부와 관계없이 모든 사람이 웹 콘텐츠를 이용할 수 있도록 보장합니다.",
       } as Response);
 
       render(<ContentExtractor />);
@@ -54,9 +52,7 @@ describe("feedme spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "# Never Gonna Give You Up\n\n채널: Rick Astley\n\n## 자막\n\nWe're no strangers to love",
-        }),
+        text: async () => "---\ntitle: \"Never Gonna Give You Up\"\nauthor: \"Rick Astley\"\nsite: \"YouTube\"\n---\n\n# Never Gonna Give You Up\n\n채널: Rick Astley\n\n## 자막\n\nWe're no strangers to love",
       } as Response);
 
       render(<ContentExtractor />);
@@ -68,10 +64,10 @@ describe("feedme spec tests", () => {
       await user.click(button);
 
       await waitFor(() => {
-        expect(screen.getByText(/Never Gonna Give You Up/)).toBeInTheDocument();
+        expect(screen.getAllByText(/Never Gonna Give You Up/).length).toBeGreaterThan(0);
       });
 
-      expect(screen.getByText(/Rick Astley/)).toBeInTheDocument();
+      expect(screen.getAllByText(/Rick Astley/).length).toBeGreaterThan(0);
       expect(screen.getByText(/We're no strangers to love/)).toBeInTheDocument();
     });
   });
@@ -108,7 +104,7 @@ describe("feedme spec tests", () => {
 
       resolveResponse!({
         ok: true,
-        json: async () => ({ markdown: "# 제목\n\n본문" }),
+        text: async () => "# 제목\n\n본문",
       });
     });
   });
@@ -129,7 +125,7 @@ describe("feedme spec tests", () => {
       const markdownContent = "# 제목\n\n본문 내용";
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({ markdown: markdownContent }),
+        text: async () => markdownContent,
       } as Response);
 
       // userEvent.setup() 이후 clipboard mock 재설정 (userEvent가 clipboard를 교체하므로)
@@ -193,7 +189,7 @@ describe("feedme spec tests", () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 500,
-        json: async () => ({ error: "페이지에 접근할 수 없습니다" }),
+        text: async () => JSON.stringify({ error: "페이지에 접근할 수 없습니다" }),
       } as Response);
 
       render(<ContentExtractor />);
@@ -217,7 +213,7 @@ describe("feedme spec tests", () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 404,
-        json: async () => ({ error: "자막을 찾을 수 없습니다" }),
+        text: async () => JSON.stringify({ error: "자막을 찾을 수 없습니다" }),
       } as Response);
 
       render(<ContentExtractor />);

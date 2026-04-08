@@ -38,10 +38,7 @@ describe("upgrade-logo", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "# 추출된 콘텐츠",
-          title: "테스트 페이지",
-        }),
+        text: async () => "---\ntitle: \"테스트 페이지\"\n---\n\n# 추출된 콘텐츠",
       } as Response);
 
       render(<ContentExtractor />);

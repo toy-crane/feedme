@@ -3,6 +3,18 @@ import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import ContentExtractor from "@/components/content-extractor";
 
+function buildDefuddleText(
+  markdown: string,
+  meta: Record<string, string | undefined> = {}
+): string {
+  const entries = Object.entries(meta).filter(([, v]) => v != null);
+  if (entries.length === 0) return markdown;
+  const lines = ["---"];
+  for (const [k, v] of entries) lines.push(`${k}: "${v}"`);
+  lines.push("---");
+  return `${lines.join("\n")}\n\n${markdown}`;
+}
+
 export async function renderWithContent(
   markdown = "# Hello",
   { title, type }: { title?: string; type?: string } = {}
@@ -10,7 +22,7 @@ export async function renderWithContent(
   const user = userEvent.setup();
   global.fetch = vi.fn().mockResolvedValue({
     ok: true,
-    json: async () => ({ markdown, ...(title && { title }), ...(type && { type }) }),
+    text: async () => buildDefuddleText(markdown, { title }),
   } as Response);
 
   render(<ContentExtractor />);
@@ -55,13 +67,7 @@ export async function renderWithWebpageResult({
   const user = userEvent.setup();
   global.fetch = vi.fn().mockResolvedValue({
     ok: true,
-    json: async () => ({
-      content,
-      title,
-      type: "webpage",
-      thumbnail,
-      source: author ?? domain,
-    }),
+    text: async () => buildDefuddleText(content, { title, author, domain }),
   } as Response);
 
   render(<ContentExtractor />);
@@ -78,12 +84,10 @@ export async function renderWithWebpageResult({
 }
 
 export async function renderWithYoutubeResult({
-  thumbnail = "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
   source = "Rick Astley",
   title = "YouTube 테스트",
   content = "# YouTube 콘텐츠",
 }: {
-  thumbnail?: string;
   source?: string;
   title?: string;
   content?: string;
@@ -91,13 +95,7 @@ export async function renderWithYoutubeResult({
   const user = userEvent.setup();
   global.fetch = vi.fn().mockResolvedValue({
     ok: true,
-    json: async () => ({
-      content,
-      title,
-      type: "youtube",
-      thumbnail,
-      source,
-    }),
+    text: async () => buildDefuddleText(content, { title, author: source, site: "YouTube" }),
   } as Response);
 
   render(<ContentExtractor />);

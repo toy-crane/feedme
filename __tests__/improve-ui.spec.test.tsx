@@ -3,6 +3,15 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import ContentExtractor from "@/components/content-extractor";
 
+function mockText(markdown: string, meta: Record<string, string> = {}) {
+  const entries = Object.entries(meta).filter(([, v]) => v != null);
+  if (entries.length === 0) return markdown;
+  const lines = ["---"];
+  for (const [k, v] of entries) lines.push(`${k}: "${v}"`);
+  lines.push("---");
+  return `${lines.join("\n")}\n\n${markdown}`;
+}
+
 describe("improve-ui spec tests", () => {
   beforeEach(() => {
     vi.resetAllMocks();
@@ -18,10 +27,7 @@ describe("improve-ui spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "# 긴 콘텐츠\n\n" + "본문 내용이 매우 길어집니다.\n\n".repeat(20),
-          type: "webpage",
-        }),
+        text: async () => mockText("# 긴 콘텐츠\n\n" + "본문 내용이 매우 길어집니다.\n\n".repeat(20)),
       } as Response);
 
       const { container } = render(<ContentExtractor />);
@@ -34,7 +40,6 @@ describe("improve-ui spec tests", () => {
         expect(screen.getByText(/긴 콘텐츠/)).toBeInTheDocument();
       });
 
-      // prose 클래스를 가진 컨테이너를 직접 찾아서 확인
       const proseContainer = container.querySelector(".prose");
       expect(proseContainer).toBeTruthy();
 
@@ -52,12 +57,10 @@ describe("improve-ui spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "## 자막\n\n" + "자막 내용이 매우 길어집니다.\n\n".repeat(20),
-          type: "youtube",
-          title: "테스트 영상",
-          channel: "테스트 채널",
-        }),
+        text: async () => mockText(
+          "## 자막\n\n" + "자막 내용이 매우 길어집니다.\n\n".repeat(20),
+          { title: "테스트 영상", author: "테스트 채널", site: "YouTube" }
+        ),
       } as Response);
 
       const { container } = render(<ContentExtractor />);
@@ -70,7 +73,6 @@ describe("improve-ui spec tests", () => {
         expect(screen.getByText("테스트 영상")).toBeInTheDocument();
       });
 
-      // prose 클래스를 가진 컨테이너를 직접 찾아서 확인
       const proseContainer = container.querySelector(".prose");
       expect(proseContainer).toBeTruthy();
 
@@ -88,10 +90,7 @@ describe("improve-ui spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "# 테스트\n\n본문 내용",
-          type: "webpage",
-        }),
+        text: async () => mockText("# 테스트\n\n본문 내용"),
       } as Response);
 
       const { container } = render(<ContentExtractor />);
@@ -122,12 +121,10 @@ describe("improve-ui spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "## 자막\n\n자막 내용",
-          type: "youtube",
-          title: "테스트 영상",
-          channel: "테스트 채널",
-        }),
+        text: async () => mockText(
+          "## 자막\n\n자막 내용",
+          { title: "테스트 영상", author: "테스트 채널", site: "YouTube" }
+        ),
       } as Response);
 
       const { container } = render(<ContentExtractor />);
@@ -160,20 +157,11 @@ describe("improve-ui spec tests", () => {
     it("콘텐츠 영역에 max-w-2xl 이상의 클래스가 적용되어 있다", () => {
       const { container } = render(<ContentExtractor />);
 
-      // max-w-2xl(672px) 이상: max-w-2xl, max-w-3xl, max-w-4xl, max-w-5xl, max-w-6xl, max-w-7xl, max-w-full, max-w-screen-*
       const wideContainerClasses = [
-        "max-w-2xl",
-        "max-w-3xl",
-        "max-w-4xl",
-        "max-w-5xl",
-        "max-w-6xl",
-        "max-w-7xl",
-        "max-w-full",
-        "max-w-screen-sm",
-        "max-w-screen-md",
-        "max-w-screen-lg",
-        "max-w-screen-xl",
-        "max-w-screen-2xl",
+        "max-w-2xl", "max-w-3xl", "max-w-4xl", "max-w-5xl",
+        "max-w-6xl", "max-w-7xl", "max-w-full",
+        "max-w-screen-sm", "max-w-screen-md", "max-w-screen-lg",
+        "max-w-screen-xl", "max-w-screen-2xl",
       ];
 
       const hasWideContainer = wideContainerClasses.some((cls) =>
@@ -190,10 +178,7 @@ describe("improve-ui spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "~~취소선 텍스트~~",
-          type: "webpage",
-        }),
+        text: async () => mockText("~~취소선 텍스트~~"),
       } as Response);
 
       const { container } = render(<ContentExtractor />);
@@ -203,11 +188,9 @@ describe("improve-ui spec tests", () => {
       await user.click(screen.getByRole("button", { name: "가져오기" }));
 
       await waitFor(() => {
-        // 마크다운이 렌더링될 때까지 대기
         expect(container.querySelector(".prose")).toBeInTheDocument();
       });
 
-      // 충분한 시간 후 del 요소 확인
       await waitFor(() => {
         const delElement = container.querySelector("del");
         expect(delElement).toBeInTheDocument();
@@ -222,10 +205,7 @@ describe("improve-ui spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "| 헤더1 | 헤더2 |\n|---|---|\n| 값1 | 값2 |",
-          type: "webpage",
-        }),
+        text: async () => mockText("| 헤더1 | 헤더2 |\n|---|---|\n| 값1 | 값2 |"),
       } as Response);
 
       const { container } = render(<ContentExtractor />);
@@ -248,10 +228,7 @@ describe("improve-ui spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "- [x] 완료\n- [ ] 미완료",
-          type: "webpage",
-        }),
+        text: async () => mockText("- [x] 완료\n- [ ] 미완료"),
       } as Response);
 
       const { container } = render(<ContentExtractor />);
@@ -278,10 +255,7 @@ describe("improve-ui spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "```javascript\nconst x = 1;\n```",
-          type: "webpage",
-        }),
+        text: async () => mockText("```javascript\nconst x = 1;\n```"),
       } as Response);
 
       const { container } = render(<ContentExtractor />);
@@ -303,10 +277,7 @@ describe("improve-ui spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "방문하세요 https://example.com 여기에",
-          type: "webpage",
-        }),
+        text: async () => mockText("방문하세요 https://example.com 여기에"),
       } as Response);
 
       const { container } = render(<ContentExtractor />);
@@ -328,10 +299,7 @@ describe("improve-ui spec tests", () => {
       const user = userEvent.setup();
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({
-          markdown: "```\nplain text code\n```",
-          type: "webpage",
-        }),
+        text: async () => mockText("```\nplain text code\n```"),
       } as Response);
 
       const { container } = render(<ContentExtractor />);
@@ -345,11 +313,9 @@ describe("improve-ui spec tests", () => {
         expect(codeElement).toBeInTheDocument();
       });
 
-      // hljs- 클래스가 없어야 함 (rehype-highlight 적용 시 붙는 클래스)
       const highlightedCode = container.querySelector("code[class*='hljs']");
       expect(highlightedCode).not.toBeInTheDocument();
 
-      // language- 클래스가 없어야 함
       const languageCode = container.querySelector("code[class*='language-']");
       expect(languageCode).not.toBeInTheDocument();
     });
