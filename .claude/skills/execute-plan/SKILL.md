@@ -51,6 +51,12 @@ plan.md의 Task 목록을 분석한다.
 
 실행 계획에 따라 `builder` agent를 spawn한다. 각 Builder에게 Task 내용, spec.yaml 경로, wireframe 경로, 구현 앱 URL을 전달한다. UI 요소를 지시할 때 컴포넌트명을 특정하지 않는다. wireframe 구조를 Builder가 직접 읽고 판단하게 한다.
 
+### 스킬 전달
+
+Task의 **참조**에 스킬이 명시되어 있으면 해당 스킬명을 Builder 프롬프트에 포함한다.
+
+### 실행
+
 - 순차 Task: 하나씩 위임하고 결과 확인 후 다음으로 진행
 - 병렬 Task: 독립적인 Task는 동시에 여러 Builder를 spawn하고 완료 후 결과 종합
 
